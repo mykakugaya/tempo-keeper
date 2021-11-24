@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SpotifyDemo</string>
+    <string name="btnLogin">Connect Spotify Account</string>
+    <string name="btnStart">Start</string>
+    <string name="optionsDirections">Choose a Music Option Below:</string>
+    <string name="option1">Match My Run BPM</string>
+    <string name="option2">Set a Constant BPM</string>
+    <string name="option3">Select a Playlist</string>
+    <string name="selectSong">Select a Song</string>
+    <string name="upNext">Up Next:</string>
+    <string name="searchResults">Search Results:</string>
+    <string name="btnSearch">Search Music</string>
+</resources>
