@@ -38,7 +38,9 @@ public class UserService {
             */
             // Here, use Gson to convert JSON response into a User object
             Gson gson = new Gson();
-            user = gson.fromJson(response.toString(), User.class);  // saves userId, country, etc.
+            /* this conversion automatically saves userId, country, etc.
+            in the appropriate fields of the User class */
+            user = gson.fromJson(response.toString(), User.class);
             // VolleyCallBack checks for successful response
             callBack.onSuccess();
         }, error -> getUserProfile(() -> {

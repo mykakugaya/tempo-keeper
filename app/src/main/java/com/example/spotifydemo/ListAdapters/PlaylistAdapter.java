@@ -1,6 +1,7 @@
 package com.example.spotifydemo.ListAdapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.spotifydemo.Model.Playlist;
 import com.example.spotifydemo.R;
+import com.example.spotifydemo.TrackActivity;
 
 import java.util.ArrayList;
 
@@ -23,14 +25,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView txtName;
+        public TextView txtNumTracks;
         public ImageView imgView;
 
-        private SharedPreferences.Editor editor;
         private SharedPreferences sharedPreferences;
 
         // Playlist object being stored in this row of the recycler view list
         private Playlist playlist;
-        // context for MainActivity
+        // context for PlaylistActivity
         private Context context;
 
         // each item in the recycler view is a ViewHolder
@@ -43,27 +45,35 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
             itemView.setOnClickListener(this);
 
-            txtName = (TextView) itemView.findViewById(R.id.txtPlaylistName);
+            // each playlist ViewHolder has an image, name, and number of tracks
             imgView = (ImageView) itemView.findViewById(R.id.imgPlaylist);
+            txtName = (TextView) itemView.findViewById(R.id.txtPlaylistName);
+            txtNumTracks = (TextView) itemView.findViewById(R.id.txtNumTracks);
         }
 
-        // Clicked on a playlist in the list of user's playlists
-        // Go to TrackActivity to see the tracks of the selected playlist
+        // User clicked on a playlist from the list of playlists
         @Override
         public void onClick(View view) {
+            // Toast notifies which playlist was clicked
             Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
 
+            // Go to TrackActivity to see the list of tracks for the selected playlist
+            Intent trackIntent = new Intent(context, TrackActivity.class);
+            // put the playlist id and name in the intent bundle
+            // we will use playlist id to get the tracks later
+            trackIntent.putExtra("playlistName", playlist.getName());
+            trackIntent.putExtra("playlistId", playlist.getId());
+            context.startActivity(trackIntent);
 
         }
-
 
     }
 
     // constructor for PlaylistAdapter
     // pass in playlists to show and the PlaylistActivity context
     public PlaylistAdapter(ArrayList<Playlist> playlists, Context context) {
-        mContext = context;
         userPlaylists = playlists;
+        mContext = context;
     }
 
     // inflate the adapter_playlist layout to the ViewHolder
@@ -74,6 +84,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
 
+        // ViewHolder is one row of the list - holds one playlist
         ViewHolder vh = new ViewHolder(layoutView, mContext);
         return vh;
     }
@@ -81,8 +92,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     // set the name and image of the playlist if available
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtName.setText(userPlaylists.get(position).getName());
+        // set the playlist, its name, and number of tracks
         holder.playlist = userPlaylists.get(position);
+        holder.txtName.setText(userPlaylists.get(position).getName());
+        holder.txtNumTracks.setText(userPlaylists.get(position).getNumTracks()+" tracks");
+
         // if the playlist has an image url, load the image using Glide framework
         if (holder.playlist.getImageURL() != null) {
             /* Glide is an image loading framework for Android
@@ -93,7 +107,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         }
     }
 
-    // get the number of playlists displayed
+    // get the number of playlists displayed in the list
     @Override
     public int getItemCount() {
         return userPlaylists.size();

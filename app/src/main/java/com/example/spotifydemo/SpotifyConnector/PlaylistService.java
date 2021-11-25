@@ -24,7 +24,6 @@ public class PlaylistService {
 
 
     private SharedPreferences sharedPreferences;
-    private String playlistId;  // specific id for each playlist
     private String requestURL;  // URL for API calls
 
     // recycler view variables for custom list adapter
@@ -41,31 +40,20 @@ public class PlaylistService {
     public ArrayList<Playlist> getPlaylists() {return playlists;}
 
     // get a user's own and followed playlists
-    public ArrayList<Playlist> getUserPlaylists() {
+    public void getUserPlaylists() {
         // assign requestURL for GET request
         requestURL = EndPoints.USER_PLAYLISTS.toString();
 
         // use OkHttpClient to build a new request with token in authorization header
+        // token is stored in SharedPreferences
         Request request = new Request.Builder().url(requestURL)
                 .method("GET",null)
                 .addHeader("Authorization", "Bearer " + sharedPreferences.getString("TOKEN", ""))
-//                .addHeader("Content-Type", "application/json")
                 .build();
 
         // clear previous requests
         cancelCall();
-//        AsyncTask.execute(() -> {
-//            try (Response response = client.newCall(request).execute()) {
-//                if (!response.isSuccessful())
-//                    throw new IOException("Unexpected code " + response);
-//
-//                System.out.println(response.body().string());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//        });
-//    }
+
         // create new call for the request
         mCall = mOkHttpClient.newCall(request);
         // queue up the request
@@ -82,7 +70,6 @@ public class PlaylistService {
             try {
                 // get the response body as new json array object
                 final JSONObject jsonObject = new JSONObject(response.body().string());
-                System.out.println(jsonObject);
                 // convert json array object into array of playlist objects
                 addToPlaylists(jsonObject);
             } catch (JSONException e) {
@@ -92,7 +79,6 @@ public class PlaylistService {
             }
         }
     });
-        return playlists;
 }
 
     // cancel the current HTTP call request
@@ -111,15 +97,20 @@ public class PlaylistService {
         // loop through the array of playlists, create playlist object instance for each item
         for (int n = 0; n < jsonArray.length(); n++) {
             try {
-                // converting to playlist object
+                // converting to playlist object - this will set the name of the playlist
                 JSONObject jsonObject = jsonArray.getJSONObject(n);
                 Playlist playlist = gson.fromJson(jsonObject.toString(), Playlist.class);
+
+                // set playlist number of tracks by getting the length of the "tracks" field
+                playlist.setNumTracks(jsonObject.optJSONObject("tracks").getInt("total"));
+
                 // set playlist image url if available
                 try {
                     playlist.setImageURL(jsonObject.optJSONArray("images").optJSONObject(0).getString("url"));
                 } catch (NullPointerException e) {
                     playlist.setImageURL(null);
                 }
+
                 // add each playlist object to array of playlists
                 playlists.add(playlist);
             } catch (JSONException e) {

@@ -141,8 +141,6 @@ public class SpotifyOAuth extends AppCompatActivity {
                     String token = response.getAccessToken();
                     this.editor.putString("TOKEN", token);
                     editor.apply();
-
-                    Toast.makeText(SpotifyOAuth.this, "Token: " + token, Toast.LENGTH_LONG).show();
                     Log.d("OAUTH", "GOT AUTH TOKEN");
 
                     // create a new User object

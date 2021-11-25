@@ -4,14 +4,14 @@ public class Playlist {
     private String id;
     private String imageURL;
     private String name;
-
+    private int numTracks;
 
     public Playlist(String id, String name){
         this.id = id;
         this.name = name;
     }
 
-
+    // methods to get and set the playlist information
     public String getId() {
         return id;
     }
@@ -27,6 +27,10 @@ public class Playlist {
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
+
+    public int getNumTracks() { return this.numTracks; }
+
+    public void setNumTracks(int numTracks) { this.numTracks = numTracks; }
 
     public String getName() {
         return name;

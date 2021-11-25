@@ -5,11 +5,11 @@ public class Track {
     private String id;
     private String name;
     private String artist;
+    private String albumName;
     private String imageURL;
-    private Boolean liked;
     private Long timestamp;
-    private Playlist playlist;
-    private float tempo;
+    private String playlistId;
+    private double tempo;
 
     public Track(String id, String name) {
         this.name = name;
@@ -40,17 +40,25 @@ public class Track {
         this.artist = artist;
     }
 
-    public Playlist getPlaylist() {
-        return playlist;
+    public String getAlbumName() {
+        return albumName;
     }
 
-    public void setPlaylist(Playlist playlist) {
-        this.playlist = playlist;
+    public void setAlbumName(String albumName) {
+        this.albumName = albumName;
     }
 
-    public void setTempo(float tempo) { this.tempo = tempo; }
+    public String getPlaylistId() {
+        return playlistId;
+    }
 
-    public float getTempo() { return this.tempo; }
+    public void setPlaylistId(String playlistId) {
+        this.playlistId = playlistId;
+    }
+
+    public void setTempo(double tempo) { this.tempo = tempo; }
+
+    public double getTempo() { return this.tempo; }
 
     public String getImageURL() {
         return imageURL;
@@ -58,14 +66,6 @@ public class Track {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
-    }
-
-    public Boolean getLiked() {
-        return liked;
-    }
-
-    public void setLiked(Boolean liked) {
-        this.liked = liked;
     }
 
     public Long getTimestamp() {

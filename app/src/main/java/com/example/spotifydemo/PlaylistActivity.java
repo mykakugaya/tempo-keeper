@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -22,7 +23,7 @@ public class PlaylistActivity extends AppCompatActivity {
     private TextView txtUser;
     private Button btnUserPlaylists;
 
-    private User user;  // current logged in user
+    private String userId;  // current logged in user
     private SharedPreferences sharedPref;   // sharedPreferences for id and token
 
     // playlist service instance to get user playlists
@@ -33,23 +34,23 @@ public class PlaylistActivity extends AppCompatActivity {
 
     // adapter to create custom list of playlists
     private RecyclerView rvPlaylists;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.Adapter playlistAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_playlist);
+        setContentView(R.layout.activity_playlists);
 
         txtUser = (TextView) findViewById(R.id.txtUser);
-        rvPlaylists = (RecyclerView) findViewById(R.id.rvPlaylists);
+        rvPlaylists = (RecyclerView) findViewById(R.id.rvTracks);
         btnUserPlaylists = (Button) findViewById(R.id.btnGetUserPlaylists);
 
         // sharedPref has the token for API calls
         sharedPref = getSharedPreferences("SPOTIFY", 0);
         // get current user's Spotify id
-        user = UserService.getUser();
-        txtUser.setText("Spotify User: " + user.id);
+        userId = sharedPref.getString("USERID", "User Not Found");
+        txtUser.setText("Spotify User: " + userId);
 
         // Set recycler view to have linear layout and no fixed size
         rvPlaylists.setHasFixedSize(false);
@@ -72,10 +73,10 @@ public class PlaylistActivity extends AppCompatActivity {
     // set the user's playlists in RecyclerView for playlists
     public void setUserPlaylists() {
         // first get the user's playlists
-        userPlaylists = playlistService.getUserPlaylists();
+        playlistService.getUserPlaylists();
         // create a PlaylistAdapter instance and set the adapter to show playlists
-        mAdapter = new PlaylistAdapter(userPlaylists, this);
-        mAdapter.notifyDataSetChanged();
-        rvPlaylists.setAdapter(mAdapter);
+        playlistAdapter = new PlaylistAdapter(playlistService.getPlaylists(), this);
+        playlistAdapter.notifyDataSetChanged();
+        rvPlaylists.setAdapter(playlistAdapter);
     }
 }
