@@ -1,6 +1,6 @@
 package com.example.spotifydemo.Model;
 
-public class Song {
+public class Track {
 
     private String id;
     private String name;
@@ -11,7 +11,7 @@ public class Song {
     private Playlist playlist;
     private float tempo;
 
-    public Song(String id, String name) {
+    public Track(String id, String name) {
         this.name = name;
         this.id = id;
     }

@@ -9,5 +9,6 @@
     <string name="selectSong">Select a Song</string>
     <string name="upNext">Up Next:</string>
     <string name="searchResults">Search Results:</string>
-    <string name="btnSearch">Search Music</string>
+    <string name="btnMyPlaylists">My Playlists</string>
+    <string name="btnMyTracks">My Tracks</string>
 </resources>

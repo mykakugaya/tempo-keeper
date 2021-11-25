@@ -93,7 +93,7 @@ public class SpotifyOAuth extends AppCompatActivity {
             Toast.makeText(SpotifyOAuth.this, "Logged in as: "+user.id, Toast.LENGTH_LONG).show();
 
             // Go to next activity: SearchByBpm
-            Intent newIntent = new Intent(SpotifyOAuth.this, MainActivity.class);
+            Intent newIntent = new Intent(SpotifyOAuth.this, PlaylistActivity.class);
 //            newIntent.putExtra("queue", (Parcelable) queue);
             startActivity(newIntent);
         });
