@@ -4,7 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/mykak/AndroidStudioProjects/SpotifyDemo/app/src/main/res/layout/activity_main.xml" value="0.13677536231884058" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/SpotifyDemo/app/src/main/res/layout/activity_playback.xml" value="0.335" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/SpotifyDemo/app/src/main/res/layout/activity_playlists.xml" value="0.25" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/SpotifyDemo/app/src/main/res/layout/activity_spotifyoauth.xml" value="0.25" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/SpotifyDemo/app/src/main/res/layout/activity_tracks.xml" value="0.25" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/SpotifyDemo/app/src/main/res/layout/adapter_playlist.xml" value="0.165" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/SpotifyDemo/app/src/main/res/layout/adapter_track.xml" value="0.16032608695652173" />
       </map>
     </option>
   </component>

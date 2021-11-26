@@ -28,8 +28,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         public TextView txtNumTracks;
         public ImageView imgView;
 
-        private SharedPreferences sharedPreferences;
-
         // Playlist object being stored in this row of the recycler view list
         private Playlist playlist;
         // context for PlaylistActivity
@@ -41,8 +39,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
             // get the sharedPreferences from PlaylistActivity
             this.context = context;
-            sharedPreferences = context.getSharedPreferences("SPOTIFY", 0);
 
+            // set clickable
             itemView.setOnClickListener(this);
 
             // each playlist ViewHolder has an image, name, and number of tracks

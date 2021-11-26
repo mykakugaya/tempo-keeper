@@ -27,6 +27,7 @@ import okhttp3.Response;
 public class TrackService {
     // tracks array to store the request response items
     private ArrayList<Track> tracks = new ArrayList<>();
+    private String playlistId;
 
     // tracksAdded is set to true when tracks array if filled after a get request
     public boolean tracksAdded = false;
@@ -47,7 +48,8 @@ public class TrackService {
 
     // get the tracks of a specific playlist
     // pass in the specific playlist id
-    public void getPlaylistTracks(String playlistId) {
+    public void getPlaylistTracks(String id) {
+        playlistId = id;
         tracksAdded = false;
         // create the request URL for GET request
         // format string so that playlist id replaces the "%s" in endpoint
@@ -134,6 +136,9 @@ public class TrackService {
                     track.setImageURL(null);
                 }
 
+                // set the playlist id of the track
+                track.setPlaylistId(playlistId);
+
                 // add each track object to array of tracks
                 tracks.add(track);
 
@@ -152,7 +157,7 @@ public class TrackService {
     // method to get the tempo of each track
     public void setTrackTempos() {
         // First build the query string of track ids by looping over tracks array
-        // Example of query string: "7ouMYWpwJ422jRcDASZB7P,4VqPOruhp5EdPBeR92t6lQ,2takcwOaAZWiXQijPHIx7B"
+        // Example of query "ids": "7ouMYWpwJ422jRcDASZB7P,4VqPOruhp5EdPBeR92t6lQ,2takcwOaAZWiXQijPHIx7B"
         StringBuilder sb = new StringBuilder();
         // We loop over the global tracks array, appending each track id to the stringBuilder
         for (int i=0; i<tracks.size(); i++) {
