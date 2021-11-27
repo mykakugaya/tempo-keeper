@@ -3,6 +3,7 @@ package com.example.spotifydemo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -57,6 +58,8 @@ public class SpotifyOAuth extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_spotifyoauth);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         btnLogin = (Button) findViewById(R.id.btnLogin);
 
         // This is where we will save the user ID and token obtained in the login activity
@@ -94,7 +97,6 @@ public class SpotifyOAuth extends AppCompatActivity {
 
             // Go to next activity: SearchByBpm
             Intent newIntent = new Intent(SpotifyOAuth.this, PlaylistActivity.class);
-//            newIntent.putExtra("queue", (Parcelable) queue);
             startActivity(newIntent);
         });
     }

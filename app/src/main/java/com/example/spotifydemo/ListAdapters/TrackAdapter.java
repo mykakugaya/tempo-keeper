@@ -1,7 +1,6 @@
 package com.example.spotifydemo.ListAdapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.util.Log;
@@ -17,11 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.spotifydemo.Model.Track;
-import com.example.spotifydemo.PlaybackActivity;
 import com.example.spotifydemo.R;
-import com.example.spotifydemo.SpotifyConnector.PlaybackService;
-import com.example.spotifydemo.SpotifyConnector.TrackService;
-import com.example.spotifydemo.TrackActivity;
 
 import java.util.ArrayList;
 
@@ -86,18 +81,23 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                 // Make a toast indicating which track was selected at which bpm
                 Toast.makeText(context, "Track " + track.getName() + " selected: "+track.getTempo()+" bpm", Toast.LENGTH_SHORT).show();
                 layoutTrack.setBackgroundColor(Color.GREEN);
+                // save the selected tempo in sharedPreferences
+                // we will use it in TrackActivity when the filter tempos button is clicked
+                editor = sharedPreferences.edit();
+                editor.putString("TEMPO", Double.toString(track.getTempo()));
+                editor.putString("TRACK", track.getId());
+                editor.commit();
+
+                Log.d("TRACK", "SELECTED TEMPO: "+track.getTempo());
             } else {    // if the item is clicked twice, background is set to transparent (unselecting)
                 layoutTrack.setBackgroundColor(Color.TRANSPARENT);
+                // clear previously selected track from sharedPreferences
+                editor = sharedPreferences.edit();
+                editor.putString("TEMPO", "");
+                editor.putString("TRACK", "");
+                editor.commit();
             }
 
-            // save the selected tempo in sharedPreferences
-            // we will use it in TrackActivity when the filter tempos button is clicked
-            editor = sharedPreferences.edit();
-            editor.putString("TEMPO", Double.toString(track.getTempo()));
-            editor.putString("TRACK", track.getId());
-            editor.commit();
-
-            Log.d("TRACK", "SELECTED TEMPO: "+track.getTempo());
         }
 
     }

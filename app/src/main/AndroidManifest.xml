@@ -24,9 +24,9 @@
             android:exported="true" />
         <activity android:name=".TrackActivity"
             android:exported="true" />
-<!--        <activity android:name=".PlaybackActivity"-->
+<!--        <activity android:name=".PedometerActivity"-->
 <!--            android:exported="true" />-->
-
+<!--        <service android:name=".PaceTracker.StepService"/>-->
     </application>
 
 </manifest>

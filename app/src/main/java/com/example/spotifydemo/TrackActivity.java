@@ -4,6 +4,7 @@ import static java.lang.Double.parseDouble;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -67,6 +68,7 @@ public class TrackActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_tracks);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         txtSpotifyUser = (TextView) findViewById(R.id.txtSpotifyUser);
         txtSelectedPlaylist = (TextView) findViewById(R.id.txtSelectedPlaylist);
@@ -78,17 +80,15 @@ public class TrackActivity extends AppCompatActivity {
         btnPause = (FloatingActionButton) findViewById(R.id.btnPause);
         btnNext = (FloatingActionButton) findViewById(R.id.btnNext);
 
-        // Get the playlist id passed in through the intent bundle
-        Bundle bundle = getIntent().getExtras();
-        playlistId = bundle.getString("playlistId");
-        // get playlist name as well, display at top of screen
-        playlistName = bundle.getString("playlistName");
-        txtSelectedPlaylist.setText(playlistName);
-
-        // sharedPref has the token for API calls
+        // sharedPref stores userId, API token, etc.
         sharedPref = getSharedPreferences("SPOTIFY", 0);
         userId = sharedPref.getString("USERID", "User Not Found");
         txtSpotifyUser.setText("Spotify User: " + userId);
+
+        // set the playlist name by getting it from sharedPreferences
+        playlistId = sharedPref.getString("PLAYLISTID","");
+        playlistName = sharedPref.getString("PLAYLISTNAME","");
+        txtSelectedPlaylist.setText(playlistName);
 
         // Set recycler view to have linear layout and no fixed size
         rvTracks.setHasFixedSize(false);
@@ -123,7 +123,6 @@ public class TrackActivity extends AppCompatActivity {
                 enablePlaybackControls();
             }
         });
-
 
 
     }

@@ -18,11 +18,13 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTracks"
-        android:layout_width="409dp"
-        android:layout_height="569dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="412dp"
+        android:layout_height="496dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnGetUserPlaylists" />
 
     <Button
         android:id="@+id/btnGetUserPlaylists"
@@ -30,10 +32,30 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
         android:text="@string/btnLoadPlaylists"
-        app:layout_constraintBottom_toTopOf="@+id/rvTracks"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtUser"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/txtUser" />
+
+    <Button
+        android:id="@+id/btnTargetBpm"
+        android:layout_width="161dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="16dp"
+        android:text="@string/btnTargetBpm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvTracks"
+        app:layout_constraintVertical_bias="0.483" />
+
+    <Button
+        android:id="@+id/btnPedometerBpm"
+        android:layout_width="186dp"
+        android:layout_height="62dp"
+        android:layout_marginEnd="4dp"
+        android:text="@string/btnPedometerBpm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvTracks"
+        app:layout_constraintVertical_bias="0.448" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

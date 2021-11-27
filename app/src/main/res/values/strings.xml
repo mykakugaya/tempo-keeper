@@ -10,6 +10,8 @@
     <string name="upNext">Up Next:</string>
     <string name="searchResults">Search Results:</string>
     <string name="btnLoadPlaylists">Load My Playlists</string>
+    <string name="btnTargetBpm">Set Target BPM</string>
+    <string name="btnPedometerBpm">Dynamic Pedometer BPM</string>
     <string name="btnLoadTracks">Load Tracks</string>
     <string name="btnSelectTrack">Filter by Tempo</string>
 

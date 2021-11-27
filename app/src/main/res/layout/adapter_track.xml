@@ -11,6 +11,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/layoutTrackInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
@@ -24,7 +25,6 @@
                 tools:ignore="ImageContrastCheck" />
 
             <LinearLayout
-                android:id="@+id/layoutTrackInfo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">

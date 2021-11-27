@@ -3,10 +3,13 @@ package com.example.spotifydemo.ListAdapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,11 +30,18 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         public TextView txtName;
         public TextView txtNumTracks;
         public ImageView imgView;
+        public LinearLayout layoutPlaylist;
+
+        // has the user selected the playlist? clicking on a playlist -> isSelected = true
+        public boolean isSelected;
 
         // Playlist object being stored in this row of the recycler view list
         private Playlist playlist;
-        // context for PlaylistActivity
+
+        // context for PlaylistActivity, as well as sharedPreferences
         private Context context;
+        private SharedPreferences sharedPref;
+        private SharedPreferences.Editor editor;
 
         // each item in the recycler view is a ViewHolder
         public ViewHolder(View itemView, Context context) {
@@ -39,6 +49,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
             // get the sharedPreferences from PlaylistActivity
             this.context = context;
+            this.sharedPref = context.getSharedPreferences("SPOTIFY",0);
 
             // set clickable
             itemView.setOnClickListener(this);
@@ -47,6 +58,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             imgView = (ImageView) itemView.findViewById(R.id.imgPlaylist);
             txtName = (TextView) itemView.findViewById(R.id.txtPlaylistName);
             txtNumTracks = (TextView) itemView.findViewById(R.id.txtNumTracks);
+            layoutPlaylist = (LinearLayout) itemView.findViewById(R.id.layoutPlaylistInfo);
+
         }
 
         // User clicked on a playlist from the list of playlists
@@ -55,13 +68,30 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             // Toast notifies which playlist was clicked
             Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
 
-            // Go to TrackActivity to see the list of tracks for the selected playlist
-            Intent trackIntent = new Intent(context, TrackActivity.class);
-            // put the playlist id and name in the intent bundle
-            // we will use playlist id to get the tracks later
-            trackIntent.putExtra("playlistName", playlist.getName());
-            trackIntent.putExtra("playlistId", playlist.getId());
-            context.startActivity(trackIntent);
+            // if isSelected is false, set to true, and vice versa
+            isSelected = !isSelected;
+
+            // if isSelected is true, set the background color of the track to green to indicate
+            // that it has been selected
+            if (isSelected) {
+                // Make a toast indicating which track was selected at which bpm
+                Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
+                layoutPlaylist.setBackgroundColor(Color.GREEN);
+                // save the selected tempo in sharedPreferences
+                // we will use it in TrackActivity when the filter tempos button is clicked
+                editor = sharedPref.edit();
+                editor.putString("PLAYLISTNAME", playlist.getName());
+                editor.putString("PLAYLISTID", playlist.getId());
+                editor.commit();
+
+            } else {    // if the item is clicked twice, background is set to transparent (unselecting)
+                layoutPlaylist.setBackgroundColor(Color.TRANSPARENT);
+                // clear previously selected track from sharedPreferences
+                editor = sharedPref.edit();
+                editor.putString("PLAYLISTNAME", "");
+                editor.putString("PLAYLISTID", "");
+                editor.commit();
+            }
 
         }
 
