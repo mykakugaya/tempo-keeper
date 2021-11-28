@@ -65,31 +65,36 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         // User clicked on a playlist from the list of playlists
         @Override
         public void onClick(View view) {
-            // Toast notifies which playlist was clicked
-            Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
-
             // if isSelected is false, set to true, and vice versa
             isSelected = !isSelected;
 
             // if isSelected is true, set the background color of the track to green to indicate
             // that it has been selected
             if (isSelected) {
-                // Make a toast indicating which track was selected at which bpm
-                Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
-                layoutPlaylist.setBackgroundColor(Color.GREEN);
-                // save the selected tempo in sharedPreferences
-                // we will use it in TrackActivity when the filter tempos button is clicked
-                editor = sharedPref.edit();
-                editor.putString("PLAYLISTNAME", playlist.getName());
-                editor.putString("PLAYLISTID", playlist.getId());
-                editor.commit();
+                // if there is no current track saved, this is the first selection made
+                if(sharedPref.getString("curPlaylistName","").equals("")) {
+                    // Make a toast indicating which playlist
+                    Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
+                    layoutPlaylist.setBackgroundColor(Color.GREEN);
+                    // save the selected tempo in sharedPreferences
+                    // we will use it in TrackActivity when the filter tempos button is clicked
+                    editor = sharedPref.edit();
+                    editor.putString("curPlaylistName", playlist.getName());
+                    editor.putString("curPlaylistId", playlist.getId());
+                    editor.commit();
+                } else {
+                    // user has previously clicked on a different playlist, ask to unselect before selecting another
+                    Toast.makeText(context,
+                            "Only one selection allowed. Please unselect the previously selected playlist first.",
+                            Toast.LENGTH_SHORT).show();
+                }
 
             } else {    // if the item is clicked twice, background is set to transparent (unselecting)
                 layoutPlaylist.setBackgroundColor(Color.TRANSPARENT);
                 // clear previously selected track from sharedPreferences
                 editor = sharedPref.edit();
-                editor.putString("PLAYLISTNAME", "");
-                editor.putString("PLAYLISTID", "");
+                editor.putString("curPlaylistName", "");
+                editor.putString("curPlaylistId", "");
                 editor.commit();
             }
 

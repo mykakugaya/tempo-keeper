@@ -46,6 +46,8 @@ public class TrackService {
 
     public ArrayList<Track> getTracks() {return tracks;}
 
+    public void setTracks(ArrayList<Track> newTracks) {tracks = newTracks; }
+
     // get the tracks of a specific playlist
     // pass in the specific playlist id
     public void getPlaylistTracks(String id) {

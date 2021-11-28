@@ -17,11 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.spotifydemo.Model.Track;
 import com.example.spotifydemo.R;
+import com.example.spotifydemo.SpotifyConnector.TrackService;
 
 import java.util.ArrayList;
 
-public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> {
-    private ArrayList<Track> playlistTracks;
+public class PlayingTrackAdapter extends RecyclerView.Adapter<PlayingTrackAdapter.ViewHolder> {
+    private ArrayList<Track> playingTracks;
     private Context mContext;
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -31,7 +32,6 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         public TextView txtTempo;
         public ImageView imgTrack;
         public LinearLayout layoutTrack;
-        public boolean isSelected;
 
         // sharedPreferences and editor for saving the selected track
         private SharedPreferences sharedPreferences;
@@ -68,43 +68,11 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
             layoutTrack = (LinearLayout) itemView.findViewById(R.id.layoutTrackInfo);
         }
 
-        // Clicked on a track in the list of user's tracks
-        // Go to TrackActivity to see the tracks of the selected track
+        // When user clicks on the playing track adapter, they will get a Toast notifying them
+        // which track is currently playing
         @Override
         public void onClick(View view) {
-            // if isSelected is false, set to true, and vice versa
-            isSelected = !isSelected;
-
-            // if isSelected is true, set the background color of the track to green to indicate
-            // that it has been selected
-            if (isSelected) {
-                // if there is no current track saved, this is the first selection made
-                if(sharedPreferences.getString("curTrack","").equals("")) {
-                    // Make a toast indicating which track was selected at which bpm
-                    Toast.makeText(context, "Track " + track.getName() + " selected: " + track.getTempo() + " bpm", Toast.LENGTH_SHORT).show();
-                    layoutTrack.setBackgroundColor(Color.GREEN);
-                    // save the selected tempo in sharedPreferences
-                    // we will use it in TrackActivity when the filter tempos button is clicked
-                    editor = sharedPreferences.edit();
-                    editor.putFloat("curTempo", (float) track.getTempo());
-                    editor.putString("curTrack", track.getName());
-                    editor.commit();
-
-                    Log.d("TRACK", "SELECTED TEMPO: " + track.getTempo());
-                } else {
-                    // user has already clicked on a different track, ask to unselect before selecting another
-                    Toast.makeText(context,
-                            "Only one selection allowed. Please unselect the previously selected track first.",
-                            Toast.LENGTH_SHORT).show();
-                }
-            } else {    // if the item is clicked twice, background is set to transparent (unselecting)
-                layoutTrack.setBackgroundColor(Color.TRANSPARENT);
-                // clear previously selected track from sharedPreferences
-                editor = sharedPreferences.edit();
-                editor.putFloat("curTempo", 0.0f);
-                editor.putString("curTrack", "");
-                editor.commit();
-            }
+            Toast.makeText(context, "Track " + track.getName() + " playing: " + track.getTempo() + " bpm", Toast.LENGTH_SHORT).show();
 
         }
 
@@ -112,9 +80,9 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
     // constructor for TrackAdapter
     // pass in tracks to show and the trackActivity context
-    public TrackAdapter(ArrayList<Track> tracks, Context context) {
+    public PlayingTrackAdapter(ArrayList<Track> tracks, Context context) {
         mContext = context;
-        playlistTracks = tracks;
+        playingTracks = tracks;
     }
 
     // inflate the adapter_track layout to the ViewHolder
@@ -134,11 +102,11 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // set the track, its name, and tempo (in bpm)
-        holder.track = playlistTracks.get(position);
-        holder.txtName.setText(playlistTracks.get(position).getName());
-        holder.txtArtist.setText(playlistTracks.get(position).getArtist());
-        holder.txtAlbum.setText(playlistTracks.get(position).getAlbumName());
-        holder.txtTempo.setText(playlistTracks.get(position).getTempo()+" BPM");
+        holder.track = playingTracks.get(position);
+        holder.txtName.setText(playingTracks.get(position).getName());
+        holder.txtArtist.setText(playingTracks.get(position).getArtist());
+        holder.txtAlbum.setText(playingTracks.get(position).getAlbumName());
+        holder.txtTempo.setText(playingTracks.get(position).getTempo()+" BPM");
 
         // if the track has an image url, load the image using Glide framework
         if (holder.track.getImageURL() != null) {
@@ -146,27 +114,14 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
              * primary focus is on making scrolling any kind of a list of images as smooth and fast as possible
              * also effective for any case where you need to fetch, resize, and display a remote image
              */
-            Glide.with(mContext).load(playlistTracks.get(position).getImageURL()).into(holder.imgTrack);
-        }
-
-        // Was the track selected by the user?
-        // Get currently selected track id from sharedPreferences if available
-        String selectedTrack = holder.sharedPreferences.getString("curTrack","");
-        if(!selectedTrack.equals("") && holder.track.getId().equals(selectedTrack)) {
-            // if the saved track id = this holder's track id, the track has previously been clicked
-            // set background color to green
-            holder.layoutTrack.setBackgroundColor(Color.GREEN);
-            holder.isSelected = true;
-        } else {
-            // else, it has not been clicked and background color is transparent
-            holder.layoutTrack.setBackgroundColor(Color.TRANSPARENT);
-            holder.isSelected = false;
+            Glide.with(mContext).load(playingTracks.get(position).getImageURL()).into(holder.imgTrack);
         }
     }
 
     // get the number of tracks displayed in the list
     @Override
     public int getItemCount() {
-        return playlistTracks.size();
+        return playingTracks.size();
     }
 }
+

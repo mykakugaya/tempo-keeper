@@ -28,16 +28,8 @@ public class PedometerSettings {
 
     SharedPreferences mSettings;
     
-    public static int M_NONE = 1;
-    public static int M_PACE = 2;
-    public static int M_SPEED = 3;
-    
     public PedometerSettings(SharedPreferences settings) {
         mSettings = settings;
-    }
-
-    public boolean isRunning() {
-        return mSettings.getString("exercise_type", "running").equals("running");
     }
 
     // Internal

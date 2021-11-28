@@ -37,22 +37,19 @@ public class StepDetector implements SensorEventListener
     }
 
     public void setSensitivity(float sensitivity) {
-        mLimit = sensitivity; // 1.97  2.96  4.44  6.66  10.00  15.00  22.50  33.75  50.62
+        mLimit = sensitivity;
     }
 
     public void addStepListener(StepListener sl) {
         mStepListeners.add(sl);
     }
 
-    //public void onSensorChanged(int sensor, float[] values) {
+    // Detect steps using the accelerometer
     public void onSensorChanged(SensorEvent event) {
         Sensor sensor = event.sensor;
         synchronized (this) {
-            if (sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            }
-            else {
                 int j = (sensor.getType() == Sensor.TYPE_ACCELEROMETER) ? 1 : 0;
-                if (j == 1) {
+                if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     float vSum = 0;
                     for (int i=0 ; i<3 ; i++) {
                         final float v = mYOffset + event.values[i] * mScale[j];
@@ -61,9 +58,11 @@ public class StepDetector implements SensorEventListener
                     int k = 0;
                     float v = vSum / 3;
 
+                    // Is the direction up or down
                     float direction = (v > mLastValues[k] ? 1 : (v < mLastValues[k] ? -1 : 0));
+
+                    // Direction has changed if it is -(lastDirection)
                     if (direction == - mLastDirections[k]) {
-                        // Direction changed
                         int extType = (direction > 0 ? 0 : 1); // minumum or maximum?
                         mLastExtremes[extType][k] = mLastValues[k];
                         float diff = Math.abs(mLastExtremes[extType][k] - mLastExtremes[1 - extType][k]);
@@ -74,6 +73,7 @@ public class StepDetector implements SensorEventListener
                             boolean isPreviousLargeEnough = mLastDiff[k] > (diff/3);
                             boolean isNotContra = (mLastMatch != 1 - extType);
 
+                            // meets the conditions to be one "step", call stepListener.onStep()
                             if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra) {
                                 Log.i(TAG, "step");
                                 for (StepListener stepListener : mStepListeners) {
@@ -91,7 +91,7 @@ public class StepDetector implements SensorEventListener
                     mLastValues[k] = v;
                 }
             }
-        }
+
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

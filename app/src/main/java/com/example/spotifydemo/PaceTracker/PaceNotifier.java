@@ -36,7 +36,9 @@ public class PaceNotifier implements StepListener {
     int mCounter = 0;
     
     private long mLastStepTime = 0;
+    // stores the
     private long[] mLastStepDeltas = {-1, -1, -1, -1};
+    // index for the array above
     private int mLastStepDeltasIndex = 0;
     private long mPace = 0;
     
@@ -68,10 +70,13 @@ public class PaceNotifier implements StepListener {
             long delta = thisStepTime - mLastStepTime;
             
             mLastStepDeltas[mLastStepDeltasIndex] = delta;
+            // update array index
             mLastStepDeltasIndex = (mLastStepDeltasIndex + 1) % mLastStepDeltas.length;
             
             long sum = 0;
             boolean isSignificant = true;
+
+            // sum the values in the lastStepDeltas array
             for (int i = 0; i < mLastStepDeltas.length; i++) {
                 if (mLastStepDeltas[i] < 0) {
                     isSignificant = false;
@@ -79,6 +84,8 @@ public class PaceNotifier implements StepListener {
                 }
                 sum += mLastStepDeltas[i];
             }
+
+            // get the pace by dividing the step array sum by its length
             if (isSignificant && sum > 0) {
                 long avg = sum / mLastStepDeltas.length;
                 mPace = 60*1000 / avg;
@@ -88,6 +95,7 @@ public class PaceNotifier implements StepListener {
             }
         }
         mLastStepTime = thisStepTime;
+        // new step, must notify pace listener to update the pace
         notifyListener();
     }
     

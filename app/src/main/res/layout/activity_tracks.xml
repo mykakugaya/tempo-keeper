@@ -1,111 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="628dp">
+
+        <TextView
+            android:id="@+id/txtSpotifyUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnFilterTempo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/btnSelectTrack"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtSelectedPlaylist" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTracks"
+            android:layout_width="412dp"
+            android:layout_height="473dp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/btnLoadTracks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:text="@string/btnLoadTracks"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtSelectedPlaylist" />
+
+        <TextView
+            android:id="@+id/txtSelectedPlaylist"
+            android:layout_width="390dp"
+            android:layout_height="47dp"
+            android:layout_marginTop="12dp"
+            android:textAlignment="center"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtSpotifyUser" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/txtSpotifyUser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="32dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTracks"
-        android:layout_width="415dp"
-        android:layout_height="487dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoadTracks" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="74dp"
+        android:orientation="horizontal"
+        android:padding="10dp">
 
-    <TextView
-        android:id="@+id/txtSelectedPlaylist"
-        android:layout_width="390dp"
-        android:layout_height="47dp"
-        android:layout_marginTop="16dp"
-        android:textAlignment="center"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtSpotifyUser" />
+        <ImageButton
+            android:id="@+id/btnPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/roundedbutton"
+            android:padding="5dp"
+            app:srcCompat="@android:drawable/ic_media_play"
+            tools:ignore="SpeakableTextPresentCheck" />
 
-    <Button
-        android:id="@+id/btnLoadTracks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/btnLoadTracks"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtSelectedPlaylist" />
+        <ImageButton
+            android:id="@+id/btnPause"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/roundedbutton"
+            android:padding="5dp"
+            app:srcCompat="@android:drawable/ic_media_pause"
+            tools:ignore="SpeakableTextPresentCheck" />
 
-    <Button
-        android:id="@+id/btnFilterTempo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/btnSelectTrack"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtSelectedPlaylist" />
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/roundedbutton"
+            android:padding="5dp"
+            app:srcCompat="@android:drawable/ic_media_next"
+            tools:ignore="SpeakableTextPresentCheck" />
+    </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="203dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintStart_toEndOf="@+id/btnPause"
-        app:layout_constraintTop_toBottomOf="@+id/rvTracks" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnPlay"
-        android:layout_width="60dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="12dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/ic_media_play" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnPause"
-        android:layout_width="60dp"
-        android:layout_height="53dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="12dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnPlay"
-        app:srcCompat="@android:drawable/ic_media_pause" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnNext"
-        android:layout_width="53dp"
-        android:layout_height="68dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="12dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_media_next" />
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="409dp"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvTracks" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -35,6 +35,7 @@ public class StepService extends Service {
     private PedometerSettings mPedometerSettings;
     private SharedPreferences mState;
     private SharedPreferences.Editor mStateEditor;
+
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private StepDetector mStepDetector;
@@ -64,25 +65,27 @@ public class StepService extends Service {
         // Load settings
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         mPedometerSettings = new PedometerSettings(mSettings);
-        mState = getSharedPreferences("state", 0);
+        mState = getSharedPreferences("SPOTIFY", 0);
 
-        // Start detecting steps
+        // Initialize the step detector
         mStepDetector = new StepDetector();
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         registerDetector();
 
+        // Initialize the step displayer
         mStepDisplayer = new StepDisplayer(mPedometerSettings);
         mStepDisplayer.setSteps(mSteps = mState.getInt("steps", 0));
         mStepDisplayer.addListener(mStepListener);
         mStepDetector.addStepListener(mStepDisplayer);
 
+        // pace is tracked based on step count/min
         mPaceNotifier = new PaceNotifier(mPedometerSettings);
         mPaceNotifier.setPace(mPace = mState.getInt("pace", 0));
         mPaceNotifier.addListener(mPaceListener);
         mStepDetector.addStepListener(mPaceNotifier);
 
-        // Tell the user we started.
-        Toast.makeText(this, "Pedometer Started", Toast.LENGTH_SHORT).show();
+        // Tell the user we started the pedometer
+        Toast.makeText(this, "Pedometer Running", Toast.LENGTH_SHORT).show();
     }
     
     @Override
@@ -155,8 +158,8 @@ public class StepService extends Service {
             );
         }
         
-        if (mStepDisplayer    != null) mStepDisplayer.notifyListener();
-        if (mPaceNotifier     != null) mPaceNotifier.notifyListener();
+        if (mStepDisplayer != null) mStepDisplayer.notifyListener();
+        if (mPaceNotifier != null) mPaceNotifier.notifyListener();
     }
     
     public void resetValues() {

@@ -57,7 +57,7 @@ public class SpotifyOAuth extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
-        setContentView(R.layout.activity_spotifyoauth);
+        setContentView(R.layout.activity_oauth);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         btnLogin = (Button) findViewById(R.id.btnLogin);
@@ -88,7 +88,7 @@ public class SpotifyOAuth extends AppCompatActivity {
             information such as username, country, etc. */
         userService.getUserProfile(() -> {
             User user = userService.getUser();  // get current user
-            editor.putString("USERID", user.id);  // save user ID in sharedPreferences
+            editor.putString("userId", user.id);  // save user ID in sharedPreferences
             editor.apply();
 
             // Alert user that they are logged in as: userid

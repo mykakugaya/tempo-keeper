@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.spotifydemo.ListAdapters.PlaylistAdapter;
 import com.example.spotifydemo.Model.Playlist;
@@ -29,6 +30,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     private String userId;  // current logged in user
     private SharedPreferences sharedPref;   // sharedPreferences for id and token
+    private SharedPreferences.Editor editor;
 
     // playlist service instance to get user playlists
     private PlaylistService playlistService;
@@ -59,8 +61,15 @@ public class PlaylistActivity extends AppCompatActivity {
         // sharedPref has the token for API calls
         sharedPref = getSharedPreferences("SPOTIFY", 0);
         // get current user's Spotify id
-        userId = sharedPref.getString("USERID", "User Not Found");
+        userId = sharedPref.getString("userId", "User Not Found");
         txtUser.setText("Spotify User: " + userId);
+
+        editor = sharedPref.edit();
+        editor.putString("curPlaylistName", "");
+        editor.putString("curPlaylistId", "");
+        editor.putFloat("curTempo", 0.0f);
+        editor.putString("curTrack", "");
+        editor.commit();
 
         // Set recycler view to have linear layout and no fixed size
         rvPlaylists.setHasFixedSize(false);
@@ -84,9 +93,14 @@ public class PlaylistActivity extends AppCompatActivity {
         btnTargetBpm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Go to TrackActivity to see the list of tracks for the selected playlist
-                Intent trackIntent = new Intent(PlaylistActivity.this, TrackActivity.class);
-                startActivity(trackIntent);
+                if(sharedPref.getString("curPlaylistName","").equals("")) {
+                    // If user has not selected a playlist, toast
+                    Toast.makeText(PlaylistActivity.this, "Please select a playlist first.", Toast.LENGTH_LONG).show();
+                } else {
+                    // Go to TrackActivity to see the list of tracks for the selected playlist
+                    Intent trackIntent = new Intent(PlaylistActivity.this, TrackActivity.class);
+                    startActivity(trackIntent);
+                }
             }
         });
 
@@ -97,10 +111,15 @@ public class PlaylistActivity extends AppCompatActivity {
         btnDynamicBpm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Go to PedometerActivity to start calculating the number of steps taken
-                // and your pace (in steps per minute)
-                Intent pedometerIntent = new Intent(PlaylistActivity.this, PedometerActivity.class);
-                startActivity(pedometerIntent);
+                if(sharedPref.getString("curPlaylistName","").equals("")) {
+                    // If user has not selected a playlist, toast
+                    Toast.makeText(PlaylistActivity.this, "Please select a playlist first.", Toast.LENGTH_LONG).show();
+                } else {
+                    // Go to PedometerActivity to start calculating the number of steps taken
+                    // and your pace (in steps per minute)
+                    Intent pedometerIntent = new Intent(PlaylistActivity.this, PedometerActivity.class);
+                    startActivity(pedometerIntent);
+                }
             }
         });
 

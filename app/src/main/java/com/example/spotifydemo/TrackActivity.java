@@ -1,34 +1,29 @@
 package com.example.spotifydemo;
 
-import static java.lang.Double.parseDouble;
-
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.spotifydemo.ListAdapters.PlaylistAdapter;
 import com.example.spotifydemo.ListAdapters.TrackAdapter;
-import com.example.spotifydemo.Model.Playlist;
 import com.example.spotifydemo.Model.Track;
-import com.example.spotifydemo.Model.User;
 import com.example.spotifydemo.SpotifyConnector.PlaybackService;
-import com.example.spotifydemo.SpotifyConnector.PlaylistService;
 import com.example.spotifydemo.SpotifyConnector.TrackService;
-import com.example.spotifydemo.SpotifyConnector.UserService;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
 
 public class TrackActivity extends AppCompatActivity {
 
@@ -36,21 +31,28 @@ public class TrackActivity extends AppCompatActivity {
     private TextView txtSelectedPlaylist;
     private Button btnLoadTracks;
     private Button btnFilterTempo;
-    private FloatingActionButton btnPlay;
-    private FloatingActionButton btnPause;
-    private FloatingActionButton btnNext;
+
+    // Playback control buttons
+    private ImageButton btnPlay;
+    private ImageButton btnPause;
+    private ImageButton btnNext;
 
     private String userId;  // current logged in user
     private SharedPreferences sharedPref;   // sharedPreferences for id and token
+    private SharedPreferences.Editor editor;
 
     // track service instance to get playlist tracks
     private TrackService trackService;
+    private ArrayList<Track> currentTracks;
     private ArrayList<Track> filteredTracks;
-    private String selectedTrackId;
+    private String selectedTrackName;
 
     // Remote playback variables
     private PlaybackService playbackService;
-    private Track currentlyPlayingTrack;
+    private boolean isPaused;
+    private Track prevTrack;
+    private Track curTrack;
+    private Track nextTrack;
 
 
     // Id and name of the selected playlist, passed in through the intent
@@ -76,18 +78,20 @@ public class TrackActivity extends AppCompatActivity {
         btnFilterTempo = (Button) findViewById(R.id.btnFilterTempo);
         rvTracks = (RecyclerView) findViewById(R.id.rvTracks);
 
-        btnPlay = (FloatingActionButton) findViewById(R.id.btnPlay);
-        btnPause = (FloatingActionButton) findViewById(R.id.btnPause);
-        btnNext = (FloatingActionButton) findViewById(R.id.btnNext);
+        btnPlay = (ImageButton) findViewById(R.id.btnPlay);
+        btnPause = (ImageButton) findViewById(R.id.btnPause);
+        btnNext = (ImageButton) findViewById(R.id.btnNext);
+
+        isPaused = false;
 
         // sharedPref stores userId, API token, etc.
         sharedPref = getSharedPreferences("SPOTIFY", 0);
-        userId = sharedPref.getString("USERID", "User Not Found");
+        userId = sharedPref.getString("userId", "User Not Found");
         txtSpotifyUser.setText("Spotify User: " + userId);
 
         // set the playlist name by getting it from sharedPreferences
-        playlistId = sharedPref.getString("PLAYLISTID","");
-        playlistName = sharedPref.getString("PLAYLISTNAME","");
+        playlistId = sharedPref.getString("curPlaylistId","");
+        playlistName = sharedPref.getString("curPlaylistName","");
         txtSelectedPlaylist.setText(playlistName);
 
         // Set recycler view to have linear layout and no fixed size
@@ -102,13 +106,24 @@ public class TrackActivity extends AppCompatActivity {
         // create playbackService, which controls the remote playback for Spotify
         playbackService = new PlaybackService(TrackActivity.this);
 
+        // Toast to user telling to click Load Tracks button
+        Toast.makeText(TrackActivity.this, "Click \"Load Tracks\" to view playlist tracks", Toast.LENGTH_LONG).show();
+
         // Buttons
         // Load tracks of the selected playlist
         btnLoadTracks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // no selected track yet
+                editor = sharedPref.edit();
+                editor.putString("curTrack","");
+                editor.commit();
+
                 // set the tracks in the playlist to recyclerView
                 setPlaylistTracks();
+
+                // Instruct the user to select a track through a toast
+                Toast.makeText(TrackActivity.this, "Select a track and click \"Filter by Tempo\"", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -116,11 +131,17 @@ public class TrackActivity extends AppCompatActivity {
         btnFilterTempo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // First, filter the tracks and set to RecyclerView
-                filterByTempo();
+                // If user has selected a track/tempo,
+                // filter the tracks by tempo and set to RecyclerView
+                if(sharedPref.getFloat("curTempo",0) != 0) {
+                    filterByTempo();
 
-                // Enable the play, pause, and next buttons for playback
-                enablePlaybackControls();
+                    // Toast that the playback controls have been enabled
+                    Toast.makeText(TrackActivity.this, "Songs have been filtered and queued! Click the play button.", Toast.LENGTH_LONG).show();
+
+                    // Enable the play, pause, and next buttons for playback
+                    enablePlaybackControls();
+                }
             }
         });
 
@@ -138,27 +159,30 @@ public class TrackActivity extends AppCompatActivity {
         trackAdapter = new TrackAdapter(trackService.getTracks(), this);
         trackAdapter.notifyDataSetChanged();
         rvTracks.setAdapter(trackAdapter);
+
+        // set the playlist tracks to current tracks
+        currentTracks = trackService.getTracks();
     }
 
     // triggered when filter by tempo button is clicked
     // get the selected tempo and filter the playlist tracks to include only
     // tracks within 10bpm of the selected tempo
     public void filterByTempo() {
-        String strTempo = sharedPref.getString("TEMPO","");
-        selectedTrackId = sharedPref.getString("TRACK","");
+        double selectedTempo = (double) sharedPref.getFloat("curTempo",0); // target BPM
+
+        selectedTrackName = sharedPref.getString("curTrack","");     // the selected track to filter by
+
         // if no track is selected, make a toast notifying the user to click on a track
-        if(strTempo.equals("")) {
-            Toast.makeText(TrackActivity.this, "You must select a track.", Toast.LENGTH_LONG).show();
+        if(selectedTempo == 0) {
+            Toast.makeText(TrackActivity.this, "Tempo not selected.", Toast.LENGTH_LONG).show();
         } else {    // else, we have clicked a track (aka selected the target tempo)
-            double selectedTempo = parseDouble(strTempo);   // the target BPM
-            double minTempo = selectedTempo - 10;   // lower bound for BPM
-            double maxTempo = selectedTempo + 10;   // upper bound for BPM
+            double minTempo = selectedTempo - 10;   // lower bound for BPM = target BPM - 10
+            double maxTempo = selectedTempo + 10;   // upper bound for BPM = target BPM + 10
 
             // initialize the new array to hold the tracks filtered by BPM
             filteredTracks = new ArrayList<>();
 
             // Loop over the current playlist tracks and filter tracks by tempo
-            ArrayList<Track> currentTracks = trackService.getTracks();
             int numTracks = trackService.getTracks().size();
             for (int i=0; i<numTracks; i++) {
                 double trackTempo = currentTracks.get(i).getTempo();
@@ -169,8 +193,8 @@ public class TrackActivity extends AppCompatActivity {
 
                 // if the track's id matches the selected track saved in sharedPreferences,
                 // set the currently playing track to the Track item
-                if(currentTracks.get(i).getId().equals(selectedTrackId)) {
-                    currentlyPlayingTrack = currentTracks.get(i);
+                if(currentTracks.get(i).getName().equals(selectedTrackName)) {
+                    setCurTrack(currentTracks.get(i));
                 }
             }
 
@@ -179,19 +203,27 @@ public class TrackActivity extends AppCompatActivity {
             trackAdapter.notifyDataSetChanged();
             // set the adapter to the RecyclerView list
             rvTracks.setAdapter(trackAdapter);
+
         }
     }
 
+    // Enable the remote player when starting
     @Override
     protected void onStart() {
         super.onStart();
-        playbackService.enableRemote();
+        playbackService.enableRemote(); // PlaybackService
     }
 
+    // Disable the remote player when stopping
     @Override
     protected void onStop() {
         super.onStop();
         playbackService.disableRemote();
+    }
+
+    // set the current track whenever we change the playing track
+    public void setCurTrack(Track track) {
+        curTrack = track;
     }
 
     // Enable playback controls once tracks have been filtered and a target BPM has been selected
@@ -205,7 +237,15 @@ public class TrackActivity extends AppCompatActivity {
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playbackService.play(currentlyPlayingTrack);
+                // if previous track = current track, we have paused and now resuming playback
+                if(isPaused) {
+                    isPaused = false;
+                    playbackService.resume();
+                } else {
+                    playbackService.play(curTrack);
+                    playbackService.getPlayingTrack();
+                }
+
             }
         });
 
@@ -213,7 +253,9 @@ public class TrackActivity extends AppCompatActivity {
         btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                playbackService.pause();
+                isPaused = true;
+                playbackService.getPlayingTrack();
+                playbackService.pause();
             }
         });
 
@@ -221,7 +263,9 @@ public class TrackActivity extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Go to next track and set new current track
                 playbackService.nextTrack();
+                playbackService.getPlayingTrack();
             }
         });
     }

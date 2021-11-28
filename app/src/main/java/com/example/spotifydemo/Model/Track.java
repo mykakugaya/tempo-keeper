@@ -7,7 +7,7 @@ public class Track {
     private String artist;
     private String albumName;
     private String imageURL;
-    private Long timestamp;
+    private int duration_ms;    // duration of track in ms
     private String playlistId;
     private double tempo;
 
@@ -68,12 +68,12 @@ public class Track {
         this.imageURL = imageURL;
     }
 
-    public Long getTimestamp() {
-        return timestamp;
+    public int getDuration() {
+        return duration_ms;
     }
 
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
+    public void setDuration(int duration) {
+        this.duration_ms = duration;
     }
 }
 
