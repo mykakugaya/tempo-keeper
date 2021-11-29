@@ -1,18 +1,19 @@
 <resources>
     <string name="app_name">SpotifyDemo</string>
     <string name="btnLogin">Connect Spotify Account</string>
-    <string name="btnStartRun">Start Run</string>
+    <string name="btnStartRun">Start Music</string>
     <string name="optionsDirections">Choose a Music Option Below:</string>
     <string name="option1">Match My Run BPM</string>
     <string name="option3">Select a Playlist</string>
     <string name="selectSong">Select a Song</string>
-    <string name="upNext">Up Next:</string>
+    <string name="curTrack">Current Track:</string>
+    <string name="upNext">Queue:</string>
     <string name="searchResults">Search Results:</string>
     <string name="btnLoadPlaylists">Load My Playlists</string>
     <string name="btnTargetBpm">Set Target BPM</string>
     <string name="btnPedometerBpm">Dynamic Pedometer BPM</string>
     <string name="btnLoadTracks">Load Tracks</string>
-    <string name="btnSelectTrack">Filter by Tempo</string>
+    <string name="btnSelectTempo">Filter Tracks</string>
     <string name="btnFinishRun">Finish Run</string>
 
 </resources>

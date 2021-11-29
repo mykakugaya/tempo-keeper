@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTracks"
+        android:id="@+id/rvQueue"
         android:layout_width="412dp"
         android:layout_height="496dp"
         android:layout_marginTop="16dp"
@@ -44,7 +44,7 @@
         android:text="@string/btnTargetBpm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvTracks"
+        app:layout_constraintTop_toBottomOf="@+id/rvQueue"
         app:layout_constraintVertical_bias="0.483" />
 
     <Button
@@ -55,7 +55,7 @@
         android:text="@string/btnPedometerBpm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvTracks"
+        app:layout_constraintTop_toBottomOf="@+id/rvQueue"
         app:layout_constraintVertical_bias="0.448" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

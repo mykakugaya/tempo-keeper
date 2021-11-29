@@ -16,9 +16,7 @@ import android.widget.Toast;
 
 import com.example.spotifydemo.ListAdapters.PlaylistAdapter;
 import com.example.spotifydemo.Model.Playlist;
-import com.example.spotifydemo.Model.User;
 import com.example.spotifydemo.SpotifyConnector.PlaylistService;
-import com.example.spotifydemo.SpotifyConnector.UserService;
 
 import java.util.ArrayList;
 
@@ -53,7 +51,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
 
         txtUser = (TextView) findViewById(R.id.txtUser);
-        rvPlaylists = (RecyclerView) findViewById(R.id.rvTracks);
+        rvPlaylists = (RecyclerView) findViewById(R.id.rvQueue);
         btnUserPlaylists = (Button) findViewById(R.id.btnGetUserPlaylists);
         btnTargetBpm = (Button) findViewById(R.id.btnTargetBpm);
         btnDynamicBpm = (Button) findViewById(R.id.btnPedometerBpm);
@@ -78,6 +76,8 @@ public class PlaylistActivity extends AppCompatActivity {
 
         // get an instance of playlist service
         playlistService = new PlaylistService(sharedPref);
+
+        Toast.makeText(PlaylistActivity.this, "Click \"Load Playlists\" then select a playlist", Toast.LENGTH_LONG).show();
 
         // click the "My Playlists" button to generate a list of user's playlists
         btnUserPlaylists.setOnClickListener(new View.OnClickListener() {
@@ -133,5 +133,6 @@ public class PlaylistActivity extends AppCompatActivity {
         playlistAdapter = new PlaylistAdapter(playlistService.getPlaylists(), this);
         playlistAdapter.notifyDataSetChanged();
         rvPlaylists.setAdapter(playlistAdapter);
+        Toast.makeText(PlaylistActivity.this, "Select a playlist then click one of the two music options.", Toast.LENGTH_LONG).show();
     }
 }

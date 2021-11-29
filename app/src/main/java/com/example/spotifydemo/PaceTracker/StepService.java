@@ -115,6 +115,7 @@ public class StepService extends Service {
         Toast.makeText(this, "Pedometer Stopped", Toast.LENGTH_SHORT).show();
     }
 
+    // Register the StepDetector using SensorManager and accelerometer
     private void registerDetector() {
         mSensor = mSensorManager.getDefaultSensor(
             Sensor.TYPE_ACCELEROMETER);
@@ -123,6 +124,7 @@ public class StepService extends Service {
             SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    // Unregister the step detector
     private void unregisterDetector() {
         mSensorManager.unregisterListener(mStepDetector);
     }

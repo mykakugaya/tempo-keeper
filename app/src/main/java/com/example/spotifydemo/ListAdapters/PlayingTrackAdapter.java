@@ -31,11 +31,6 @@ public class PlayingTrackAdapter extends RecyclerView.Adapter<PlayingTrackAdapte
         public TextView txtAlbum;
         public TextView txtTempo;
         public ImageView imgTrack;
-        public LinearLayout layoutTrack;
-
-        // sharedPreferences and editor for saving the selected track
-        private SharedPreferences sharedPreferences;
-        private SharedPreferences.Editor editor;
 
         // track object being stored in this row of the recycler view list
         private Track track;
@@ -46,12 +41,9 @@ public class PlayingTrackAdapter extends RecyclerView.Adapter<PlayingTrackAdapte
         public ViewHolder(View itemView, Context context) {
             super(itemView);
 
-            // ViewHolder context is the same as TrackAdapter mContext
+            // ViewHolder context is the same as PlayingTrackAdapter mContext
             // both the context of TrackActivity
             this.context = context;
-
-            // create new sharedPreferences to store the selected tempo
-            sharedPreferences = context.getSharedPreferences("SPOTIFY", 0);
 
             // set clickable
             itemView.setOnClickListener(this);
@@ -60,12 +52,11 @@ public class PlayingTrackAdapter extends RecyclerView.Adapter<PlayingTrackAdapte
             // we can set the color of the track information background
 
             // each track ViewHolder has an image, name, and number of tracks
-            imgTrack = (ImageView) itemView.findViewById(R.id.imgTrack);
-            txtName = (TextView) itemView.findViewById(R.id.txtTrackName);
-            txtArtist = (TextView) itemView.findViewById(R.id.txtArtist);
-            txtAlbum = (TextView) itemView.findViewById(R.id.txtAlbum);
-            txtTempo = (TextView) itemView.findViewById(R.id.txtTempo);
-            layoutTrack = (LinearLayout) itemView.findViewById(R.id.layoutTrackInfo);
+            imgTrack = (ImageView) itemView.findViewById(R.id.imgPlayingTrack);
+            txtName = (TextView) itemView.findViewById(R.id.txtPlayingTrack);
+            txtArtist = (TextView) itemView.findViewById(R.id.txtPlayingArtist);
+            txtAlbum = (TextView) itemView.findViewById(R.id.txtPlayingAlbum);
+            txtTempo = (TextView) itemView.findViewById(R.id.txtPlayingTempo);
         }
 
         // When user clicks on the playing track adapter, they will get a Toast notifying them
@@ -73,23 +64,22 @@ public class PlayingTrackAdapter extends RecyclerView.Adapter<PlayingTrackAdapte
         @Override
         public void onClick(View view) {
             Toast.makeText(context, "Track " + track.getName() + " playing: " + track.getTempo() + " bpm", Toast.LENGTH_SHORT).show();
-
         }
 
     }
 
-    // constructor for TrackAdapter
-    // pass in tracks to show and the trackActivity context
+    // constructor for PlayingTrackAdapter
+    // pass in currently playing track array (one item) and the PedometerActivity context
     public PlayingTrackAdapter(ArrayList<Track> tracks, Context context) {
         mContext = context;
         playingTracks = tracks;
     }
 
-    // inflate the adapter_track layout to the ViewHolder
+    // inflate the adapter_playingtrack layout to the ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent,
                                          int viewType) {
-        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_track, null, false);
+        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_playingtrack, null, false);
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
 

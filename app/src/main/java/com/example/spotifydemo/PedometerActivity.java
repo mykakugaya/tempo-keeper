@@ -18,9 +18,6 @@
 
 package com.example.spotifydemo;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -33,13 +30,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,15 +46,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.spotifydemo.ListAdapters.PlayingTrackAdapter;
-import com.example.spotifydemo.ListAdapters.TrackAdapter;
 import com.example.spotifydemo.Model.Track;
 import com.example.spotifydemo.PaceTracker.PedometerSettings;
 import com.example.spotifydemo.PaceTracker.StepService;
 import com.example.spotifydemo.SpotifyConnector.PlaybackService;
-import com.example.spotifydemo.SpotifyConnector.SpotifyBroadcastReceiver;
 import com.example.spotifydemo.SpotifyConnector.TrackService;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -77,8 +69,9 @@ public class PedometerActivity extends AppCompatActivity {
     private TextView mStepValueView;
     private TextView mPaceValueView;
 
-    private ProgressBar trackProgressBar;
+    private SeekBar sbTrackProgress;
     private TextView txtDuration;
+    private TextView txtPlaybackPosition;
     private ImageButton btnPlay;
     private ImageButton btnPause;
     private ImageButton btnNext;
@@ -95,7 +88,7 @@ public class PedometerActivity extends AppCompatActivity {
     private int paceValuesIndex;    // index of paceValues array, start at 0
     private double lastPaceAverage;
 
-    private StepService mService;
+    private StepService stepService;
 
     // true when the service is quitting
     private boolean mQuitting; // Set with finish button click
@@ -104,7 +97,7 @@ public class PedometerActivity extends AppCompatActivity {
     private boolean mIsRunning;
 
     // SPOTIFY
-    private SpotifyBroadcastReceiver broadcastReceiver;
+    // Handlers to run threads
     private Handler trackInfoHandler;
     private Handler progressHandler;
 
@@ -121,9 +114,6 @@ public class PedometerActivity extends AppCompatActivity {
     // Remote playback variables
     private PlaybackService playbackService;
     private boolean isPaused;
-    private Track prevTrack;
-    private Track curTrack;
-    private Track nextTrack;
 
     // rv and adapter to display a track's info while it is playing
     private ArrayList<Track> curTrackArray;
@@ -145,8 +135,9 @@ public class PedometerActivity extends AppCompatActivity {
         txtPlaylistName = (TextView) findViewById(R.id.txtCurPlaylist);
         mStepValueView = (TextView) findViewById(R.id.txtSteps);
         mPaceValueView = (TextView) findViewById(R.id.txtPace);
-        rvTrack = (RecyclerView) findViewById(R.id.rvCurTrack);
-        trackProgressBar = (ProgressBar) findViewById(R.id.trackProgressBar);
+        rvTrack = (RecyclerView) findViewById(R.id.rvTrack);
+        sbTrackProgress = (SeekBar) findViewById(R.id.sbTrackProgress);
+        txtPlaybackPosition = (TextView) findViewById(R.id.txtPlaybackPosition);
         txtDuration = (TextView) findViewById(R.id.txtDuration);
         btnPlay = (ImageButton) findViewById(R.id.btnPlay2);
         btnPause = (ImageButton) findViewById(R.id.btnPause2);
@@ -159,8 +150,8 @@ public class PedometerActivity extends AppCompatActivity {
         trackLayout = new LinearLayoutManager(this);
         rvTrack.setLayoutManager(trackLayout);
 
-        // Set progress bar minimum to 0
-        trackProgressBar.setMin(0);
+        // Set track progress seek bar minimum to 0
+        sbTrackProgress.setMin(0);
 
         // Get sharedPreferences
         sharedPreferences = getSharedPreferences("SPOTIFY",0);
@@ -180,6 +171,7 @@ public class PedometerActivity extends AppCompatActivity {
         paceValues = new int[30];
         paceValuesIndex = 0;
         lastPaceAverage = 0;
+        resetValues();
 
         mQuitting = false;
 
@@ -187,7 +179,8 @@ public class PedometerActivity extends AppCompatActivity {
         tempoService = new TrackService(sharedPreferences);
         trackService = new TrackService(sharedPreferences);
         playbackService = new PlaybackService(this);
-        broadcastReceiver = new SpotifyBroadcastReceiver(this);
+
+        Toast.makeText(PedometerActivity.this, "Click \"Start Music\" to enable dynamic playback", Toast.LENGTH_LONG).show();
 
         // Gets the playlist tracks and starts running two threads
         // One consistently updates the progress bar
@@ -196,7 +189,7 @@ public class PedometerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startSpotify();
-                Toast.makeText(PedometerActivity.this, "Dynamic queueing started!", Toast.LENGTH_LONG).show();
+                Toast.makeText(PedometerActivity.this, "Dynamic playback started!", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -205,8 +198,17 @@ public class PedometerActivity extends AppCompatActivity {
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // pause playbackService and disable remote player
+                playbackService.pause();
                 playbackService.disableRemote();
+
+                // reset pedometer values on screen to 0
+                resetValues();
+                // Stop the pedometer step service
+                unbindStepService();
+                stopStepService();
                 mQuitting = true;
+
                 // Toast user that run is finished
                 Toast.makeText(PedometerActivity.this, "You have finished your run!", Toast.LENGTH_LONG).show();
             }
@@ -286,15 +288,15 @@ public class PedometerActivity extends AppCompatActivity {
     // mConnection is used to bind the service to this context
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            mService = ((StepService.StepBinder)service).getService();
+            stepService = ((StepService.StepBinder)service).getService();
 
-            mService.registerCallback(mCallback);
-            mService.reloadSettings();
+            stepService.registerCallback(mCallback);
+            stepService.reloadSettings();
             
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            mService = null;
+            stepService = null;
         }
     };
     
@@ -323,7 +325,7 @@ public class PedometerActivity extends AppCompatActivity {
     
     private void stopStepService() {
         Log.i(TAG, "[SERVICE] Stop");
-        if (mService != null) {
+        if (stepService != null) {
             Log.i(TAG, "[SERVICE] stopService");
             stopService(new Intent(PedometerActivity.this,
                   StepService.class));
@@ -331,19 +333,14 @@ public class PedometerActivity extends AppCompatActivity {
         mIsRunning = false;
     }
 
-    // Reset steps and pace to 0
+    // Reset steps and pace values on screen to 0
     private void resetValues() {
-        if (mService != null && mIsRunning) {
-            mService.resetValues();                    
-        }
-        else {
-            mStepValueView.setText("Steps: 0");
-            mPaceValueView.setText("Pace (steps/min): 0");
-            editor = sharedPreferences.edit();
-            editor.putInt("steps", 0);
-            editor.putInt("pace", 0);
-            editor.commit();
-        }
+        mStepValueView.setText("Steps: 0");
+        mPaceValueView.setText("Pace (steps/min): 0");
+        editor = sharedPreferences.edit();
+        editor.putInt("steps", 0);
+        editor.putInt("pace", 0);
+        editor.commit();
     }
 
     // Callback interface for the stepService - when methods are called, use Handler to obtain message
@@ -438,7 +435,7 @@ public class PedometerActivity extends AppCompatActivity {
 
     // SPOTIFY METHODS NEXT
 
-    // Start Spotify by getting selected playlist tracks and starting the Spotify thread
+    // Start Spotify dynamic queueing by getting selected playlist tracks and starting the Spotify threads
     private void startSpotify() {
         // Get the selected playlist tracks with trackService
         // save tracks in playlistTracks array
@@ -449,9 +446,9 @@ public class PedometerActivity extends AppCompatActivity {
 
         // Start running the spotify threads to update the currently playing track in the adapter
         // and also update the progress bar to track's current playback position
-        // Each thread runs every second
-        setTrackInfoThread();
-        setProgressThread();
+        // Each thread updates something every second
+        setTrackInfoThread();   // update the track adapter showing track information
+        setProgressThread();    // update the seek bar showing track playback progress
     }
 
     // Get all tracks in a playlist
@@ -462,6 +459,7 @@ public class PedometerActivity extends AppCompatActivity {
 
         // set the playlist tracks to current tracks
         playlistTracks = trackService.getTracks();
+
     }
 
     // get the current run pace and filter the playlist tracks to include only
@@ -469,16 +467,16 @@ public class PedometerActivity extends AppCompatActivity {
     private void dynamicTrackSelection(double curTempo) {
         // if current run pace cannot be detected, curTempo is 0, so send toast
         if(curTempo == 0) {
-            Toast.makeText(PedometerActivity.this, "Cannot detect run pace.", Toast.LENGTH_LONG).show();
+            Toast.makeText(PedometerActivity.this, "Could not detect run pace", Toast.LENGTH_LONG).show();
         } else {    // else, we have gotten the current run pace/tempo
             double minTempo = curTempo - 10;   // lower bound for BPM = target BPM - 10
             double maxTempo = curTempo + 10;   // upper bound for BPM = target BPM + 10
 
             // initialize the new array to hold the tracks filtered by BPM
             filteredTracks = new ArrayList<>();
-
+            getAllTracks();
             // Loop over the current playlist tracks and add appropriate tempo tracks to filteredTracks
-            int numTracks = trackService.getTracks().size();
+            int numTracks = playlistTracks.size();
             for (int i=0; i<numTracks; i++) {
                 double trackTempo = playlistTracks.get(i).getTempo();
                 // if current track tempo is > min and < max, add to filteredTracks
@@ -489,6 +487,7 @@ public class PedometerActivity extends AppCompatActivity {
 
             // Select a random song from the filtered tracks array, then play song
             Random rand = new Random();
+            // get randomIndex: a random integer between 0 and filteredTracks.size()-1
             int randomIndex = rand.nextInt(filteredTracks.size());
             Track nextTrack = filteredTracks.get(randomIndex);
             playbackService.play(nextTrack);
@@ -498,6 +497,7 @@ public class PedometerActivity extends AppCompatActivity {
         }
     }
 
+    // SPOTIFY THREADS
     // Run the setTrackInfo Thread - updates the track info every second
     private void setTrackInfoThread() {
         trackInfoHandler = new Handler();
@@ -513,35 +513,49 @@ public class PedometerActivity extends AppCompatActivity {
 
     // Called every second to update the currently playing track info
     public void setCurTrackInfo() {
-        // These fields are obtained from SpotifyBroadcastReceiver after a meta-data change
-        String trackId = sharedPreferences.getString("curTrack","");
-        String artistName = sharedPreferences.getString("curArtist","");
-        String albumName = sharedPreferences.getString("curAlbum","");
-        String trackName = sharedPreferences.getString("curTrackName","");
-        int duration = sharedPreferences.getInt("curDuration",0);
-
-
-        // Create new track object to display as currently playing track
-        Track newTrack = new Track(trackId,trackName);
-        newTrack.setArtist(artistName);
-        newTrack.setAlbumName(albumName);
-        newTrack.setDuration(duration);
-
+        // instantiate new curTrackArray and add the currently playing track to the array
         curTrackArray = new ArrayList<>();
-        curTrackArray.add(newTrack);    // add to array, which we set to recyclerView
 
-        tempoService.setTracks(curTrackArray);
-        tempoService.setTrackTempos();
+        // use getPlayingTrack to get the currently playing track name
+        playbackService.getPlayingTrack();
+        String trackName = sharedPreferences.getString("curTrack","");
 
-        // set the current track array to the TrackAdapter
-        trackAdapter = new PlayingTrackAdapter(tempoService.getTracks(), this);
-        trackAdapter.notifyDataSetChanged();
-        // set the adapter to the RecyclerView list
-        rvTrack.setAdapter(trackAdapter);
+        Track newTrack = null;
+        // Loop over playlist tracks to find track by name
+        // Set the image URL and tempo of the playing track
+        for (int i=0; i<playlistTracks.size(); i++) {
+            if(playlistTracks.get(i).getName().equals(trackName)) {
+                newTrack = playlistTracks.get(i);
+                break;
+            }
+        }
 
-        // set the progress bar max to the duration of the track
-        trackProgressBar.setMax(duration);
-        txtDuration.setText(duration+ " ms");
+        if(newTrack!=null) {
+            curTrackArray.add(newTrack);    // add to array, which we then set to recyclerView
+
+            // set the tracks of TrackService tempoService to this array of one item
+            tempoService.setTracks(curTrackArray);
+
+            // set the current track array to the PlayingTrackAdapter
+            trackAdapter = new PlayingTrackAdapter(tempoService.getTracks(), this);
+            trackAdapter.notifyDataSetChanged();
+            // set the adapter to the RecyclerView list
+            rvTrack.setAdapter(trackAdapter);
+
+            // set the track progress seek bar max to the duration of the track
+            int trackDuration = newTrack.getDuration(); // this is the duration in ms
+            sbTrackProgress.setMax(trackDuration);
+
+            // convert duration to minutes:seconds (e.g. 1:31) so that we can display
+            // to right of seekbar
+            int minutes = (trackDuration / 1000) / 60;
+            int seconds = (trackDuration / 1000) % 60;
+            if(seconds>=10) {
+                txtDuration.setText(minutes+":"+seconds);
+            } else {
+                txtDuration.setText(minutes+":0"+seconds);
+            }
+        }
     }
 
     // Run the setProgress Thread - updates the track progress bar every second
@@ -560,26 +574,38 @@ public class PedometerActivity extends AppCompatActivity {
     // Called every second to update the progress bar of the currently playing track
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void updatePlaybackProgress() {
-        int progress = sharedPreferences.getInt("curPosition",0);
-        trackProgressBar.setProgress(progress,true);
+        // Get the current player's playback position (progress of track being played)
+        playbackService.getPlaybackProgress();  // saves playbackPosition in sharedPreferences
+        // progress = playback position in ms
+        int progress = Math.round(sharedPreferences.getLong("playbackPosition",0));
+        // set progress in seekbar
+        sbTrackProgress.setProgress(progress,true);
+
+        // convert playback position to minutes:seconds (e.g. 1:31) so that we can display
+        // to left of seek bar
+        int minutes = (progress / 1000) / 60;
+        int seconds = (progress / 1000) % 60;
+        if(seconds>=10) {
+            txtPlaybackPosition.setText(minutes+":"+seconds);
+        } else {
+            txtPlaybackPosition.setText(minutes+":0"+seconds);
+        }
     }
 
-    // Enable playback controls once tracks have been filtered and a target BPM has been selected
+    // SPOTIFY PLAY CONTROLS
+    // Enable playback controls once playlist tracks have been fetched
     public void enablePlaybackControls() {
-        // Track play control buttons - enable once current track has been set
-        // Play button starts/resumes playing track
+        // Play button resumes playing track.
+        // This button will always be used to resume playback (not play track from the beginning),
+        // since that is handled by dynamicTrackSelection
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // if previous track = current track, we have paused and now resuming playback
+                // if playback has been paused, now resuming playback
                 if(isPaused) {
                     isPaused = false;
                     playbackService.resume();
-                } else {
-                    playbackService.play(curTrack);
-                    playbackService.getPlayingTrack();
                 }
-
             }
         });
 
@@ -588,7 +614,9 @@ public class PedometerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 isPaused = true;
-                playbackService.getPlayingTrack();
+                // getPlayingTrack gets the current PlayerState of the PlayerApi
+                // and saves the currently playing track name in sharedPreferences under "curTrack"
+                playbackService.getPlayingTrack();  // save the current track to sharedPref
                 playbackService.pause();
             }
         });
@@ -599,7 +627,21 @@ public class PedometerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Go to next track and set new current track
                 playbackService.nextTrack();
+                // getPlayingTrack saves playing track name in sharedPref "curTrack"
                 playbackService.getPlayingTrack();
+
+                String trackName = sharedPreferences.getString("curTrack","");
+                double trackTempo = 0;
+                // Loop through the available tracks and find the current track by name
+                // Then, get the track's tempo for the toast
+                // Toast notifying the user of track and tempo change
+                for (int i=0; i<playlistTracks.size(); i++) {
+                    if(playlistTracks.get(i).getName().equals(trackName)) {
+                        trackTempo = playlistTracks.get(i).getTempo();
+                        break;
+                    }
+                }
+                Toast.makeText(PedometerActivity.this, "Track changed to: "+trackName+" ("+trackTempo+" bpm)", Toast.LENGTH_LONG).show();
             }
         });
     }

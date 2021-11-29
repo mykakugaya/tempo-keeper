@@ -51,7 +51,7 @@ public class StepDisplayer implements StepListener {
 
     //-----------------------------------------------------
     // Listener
-    
+    // receives messages from StepService
     public interface Listener {
         public void stepsChanged(int value);
         public void passValue();

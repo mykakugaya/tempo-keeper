@@ -120,7 +120,7 @@ public class TrackService {
         for (int n = 0; n < jsonArray.length(); n++) {
             try {
                 // Convert each JSON object into a Track object
-                // This sets the track's id and name
+                // This sets the track's id and name, duration, etc.
                 JSONObject jsonObject = jsonArray.getJSONObject(n).getJSONObject("track");
                 Track track = gson.fromJson(jsonObject.toString(), Track.class);
 

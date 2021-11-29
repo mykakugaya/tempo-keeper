@@ -27,6 +27,7 @@ import java.util.ArrayList;
  */
 public class PaceNotifier implements StepListener {
 
+    // Listener receives messages from StepService
     public interface Listener {
         public void paceChanged(int value);
         public void passValue();
@@ -36,7 +37,7 @@ public class PaceNotifier implements StepListener {
     int mCounter = 0;
     
     private long mLastStepTime = 0;
-    // stores the
+    // stores the previous step changes
     private long[] mLastStepDeltas = {-1, -1, -1, -1};
     // index for the array above
     private int mLastStepDeltasIndex = 0;

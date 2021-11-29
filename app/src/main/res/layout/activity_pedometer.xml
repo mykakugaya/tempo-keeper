@@ -36,8 +36,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="81dp"
-        android:layout_marginBottom="15dp">
+        android:layout_height="81dp">
 
         <TextView
             android:id="@+id/txtSteps"
@@ -65,47 +64,58 @@
         android:id="@+id/txtCurTrack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
         android:background="#B7CCFF"
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Current Track:"
+        android:text="@string/curTrack"
         android:textSize="18sp"
         android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCurTrack"
+        android:id="@+id/rvTrack"
         android:layout_width="match_parent"
-        android:layout_height="139dp"
-        android:layout_marginBottom="15dp">
+        android:layout_height="191dp"
+        android:padding="10dp"
+        android:paddingTop="10dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:orientation="horizontal">
 
-        <ProgressBar
-            android:id="@+id/trackProgressBar"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="367dp"
+        <TextView
+            android:id="@+id/txtPlaybackPosition"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:progress="0"
-            android:progressBackgroundTint="#CFD1FD"
-            android:progressTint="#3B2298" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:textAlignment="textEnd" />
+
+        <SeekBar
+            android:id="@+id/sbTrackProgress"
+            android:layout_width="284dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:thumbTint="@android:color/transparent" />
 
         <TextView
             android:id="@+id/txtDuration"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:textAlignment="textStart" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         android:orientation="horizontal"
         android:padding="5dp">
 
@@ -146,16 +156,16 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="93dp"
-        android:layout_marginTop="40dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="15dp"
             android:padding="10dp"
             android:text="@string/btnStartRun" />
@@ -164,8 +174,8 @@
             android:id="@+id/btnFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="10dp"
             android:padding="10dp"
             android:text="@string/btnFinishRun" />
     </LinearLayout>
