@@ -69,6 +69,7 @@
         android:textSize="18sp" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvHistory"
         android:layout_width="match_parent"
         android:layout_height="413dp"
         android:padding="5dp" />

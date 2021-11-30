@@ -3,6 +3,7 @@ package com.example.tempokeeper;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -13,8 +14,10 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -27,21 +30,58 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 public class RouteFormActivity extends AppCompatActivity {
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
     private EditText edtDestination;
     private String TAG = "RunningFormActivity";
     private String origin = "&origin=";
-    private LatLng originPoint;
-    private double longitude;
-    private double latitude;
+    private RadioGroup radioGroup;
     private Button btnCalculate;
 
     //Distance is used after getting routes back
+    /**
+     * Distance Strategy:
+     * 1. get an array of route arrays of distances between each leg from the JSONParser
+     * 2. sum up the distance of each route and compare it with the distance parameter
+     * 3. if there exists a route that fulfills the distance parameter, show that route
+     *          set some boolean as true so we know there is a route
+     * 4. if the boolean is true: do nothing
+     *      if the boolean is false (if the JSONParser routes arent within the distance parameter)
+     *          compare the difference between the latitude of the origin and destination to the
+     *          difference in longitude
+     *      if difference in latitude is less than the difference in longitude
+     *          find a midpoint at the same latitude and change the longitude to make a triangle
+     *          between the origin, midpoint, and destination westwise(anything is fine). Do math so the midpoint causes
+     *          the route to be within the distance parameter
+     *      request an API call with the route with the midpoint we created and check if such a route is possible
+     *      if not possible, try eastwise. if that doesnt work, return error
+     *      if a route is found, return that route.
+     */
     private EditText edtDistance;
+
+    /**
+     * Elevation Strategy:
+     * 1. get an array of route arrays of latlngs from the JSONParser
+     * 2. traverse each route, find the elevation of each latlng, and add the elevation to an array
+     * 3. get the difference in elevation for the whole route and compare it with the other routes
+     * 4. return the one with the greatest or smallest difference
+     */
     private RadioButton rbtnHilly;
     private RadioButton rbtnFlat;
     private RadioButton rbtnNA;
+    private RadioButton rbtnElevation;
+
+    /**
+     * New Route Strategy:
+     * 1. get an array of route arrays of latlngs from the JSONParser
+     * 2. check if any of the routes are in the database
+     * 3. get a random int 1-whatever and add that many waypoints
+     *    at random points between the latitude or longitude
+     *    depending on which one has a smallest difference between
+     *    the origin and destination
+     */
     private Switch swcNewRoute;
+
+    private static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9001;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
 
 
     @Override
@@ -49,16 +89,18 @@ public class RouteFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_route_form);
 
         //reference views
         edtDestination = (EditText) findViewById(R.id.edtDestination);
         edtDistance = (EditText) findViewById(R.id.edtDistance);
-        rbtnHilly = (RadioButton) findViewById(R.id.rbtnHilly);
-        rbtnFlat = (RadioButton) findViewById(R.id.rbtnFlat);
-        rbtnNA = (RadioButton) findViewById(R.id.rbtnNA);
+//        rbtnHilly = (RadioButton) findViewById(R.id.rbtnHilly);
+//        rbtnFlat = (RadioButton) findViewById(R.id.rbtnFlat);
+//        rbtnNA = (RadioButton) findViewById(R.id.rbtnNA);
         swcNewRoute = (Switch) findViewById(R.id.swcNewRoute);
         btnCalculate = (Button) findViewById(R.id.btnCalculate);
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
         /**
          * Get destination string and extra parameters and request Google Directions JSONObject
@@ -66,66 +108,35 @@ public class RouteFormActivity extends AppCompatActivity {
         btnCalculate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //get origin point
-                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                //required permission check from Android Studio
-                if (ActivityCompat.checkSelfPermission(RouteFormActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(RouteFormActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                // find the radiobutton by returned id
+                rbtnElevation = (RadioButton) findViewById(selectedId);
+                Toast.makeText(RouteFormActivity.this,
+                        rbtnElevation.getText(), Toast.LENGTH_SHORT).show();
 
-                longitude = location.getLongitude();
-                latitude = location.getLatitude();
-                originPoint = new LatLng(latitude, longitude);
-
-                //get destination string and extra parameters
+//                //get destination string and extra parameters
                 String dest = edtDestination.getText().toString();
-                // Getting URL to the Google Directions API
-                String url = getDirectionsUrl(originPoint, dest);
-
-                //send to preview intent
+//                //send to Route Preview Activity
                 Intent intent = new Intent(RouteFormActivity.this, RoutePreviewActivity.class);
-                intent.putExtra("url", url);
-                intent.putExtra("originLat", latitude);
-                intent.putExtra("originLong", longitude);
+                intent.putExtra("destination", dest);
                 startActivity(intent);
             }
         });
     }
 
-    private String getDirectionsUrl(LatLng origin, String dest) {
-
-        // Origin of route
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-
-        // Destination of route
-        dest.replaceAll("//s", "");
-        String str_dest = "destination=" + dest;
-
-        // Sensor enabled
-        String mode = "mode=walking";
-        // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest;
-
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/json?" + parameters + "&key=AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw&alternatives=true";
-
-        Log.d("URL", url);
-        return url;
-    }
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
+         * device.
          */
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION)
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             //start app
         } else {
+            //reask for permission if denied. If denied and not allowed to ask again, app will not work.
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
@@ -134,5 +145,6 @@ public class RouteFormActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getLocationPermission();
+        Log.d("onResume", " Called");
     }
 }

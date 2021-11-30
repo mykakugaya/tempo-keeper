@@ -34,13 +34,10 @@ public class PlaylistActivity extends AppCompatActivity {
     private PlaylistService playlistService;
     private ArrayList<Playlist> userPlaylists;
 
-    // track service instance to get playlist tracks
-
     // adapter to create custom list of playlists
     private RecyclerView rvPlaylists;
     private RecyclerView.Adapter playlistAdapter;
     private RecyclerView.LayoutManager layoutManager;
-
 
     private PolylineOptions lineOptions;
 
@@ -58,7 +55,7 @@ public class PlaylistActivity extends AppCompatActivity {
         btnUserPlaylists = (Button) findViewById(R.id.btnGetUserPlaylists);
         btnDynamicBpm = (Button) findViewById(R.id.btnPedometerBpm);
 
-        // get the polylines option
+        // get the chosen route
         lineOptions = getIntent().getParcelableExtra("chosenRoute");
 
         // sharedPref has the token for API calls

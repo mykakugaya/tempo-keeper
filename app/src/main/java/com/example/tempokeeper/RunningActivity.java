@@ -28,7 +28,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -59,6 +58,9 @@ import com.example.tempokeeper.PaceTracker.StepService;
 import com.example.tempokeeper.SpotifyConnector.PlaybackService;
 import com.example.tempokeeper.SpotifyConnector.TrackService;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -68,10 +70,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -89,6 +96,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private ImageButton btnNext;
     private Button btnStart;
     private Button btnFinish;
+
+    private Button btnStats;
 
     // PEDOMETER
     // values for the current number of steps and pace
@@ -138,12 +147,34 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     // GOOGLE MAPS
     private GoogleMap mMap;
     private PolylineOptions lineOptions;
-    private FusedLocationProviderClient mFLPC;
-    private Handler handler = new Handler();
-    private Runnable runnable;
-    private int delay = 1000; //1 second
 
-    
+//    Marker userLocationMarker;
+//    Circle userLocationAccuracyCircle;
+
+    FusedLocationProviderClient fusedLocationProviderClient;
+    LocationRequest locationRequest;
+
+    ArrayList<LatLng> runningRoute = new ArrayList<LatLng>();
+    boolean running;
+
+    // FIREBASE
+    private final FirebaseDatabase usersDB = FirebaseDatabase.getInstance();
+    DatabaseReference dbRef = usersDB.getReference().child("Users");
+
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private String firebaseUser = mAuth.getCurrentUser().getUid();
+
+    // used to save routes to user database
+    private String[] tempLst;
+    private String[] timeLst;
+    ArrayList points = null;
+
+    // Start and Finish times of the run
+    private long startTime;
+    private long finishTime;
+    private String duration;
+
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -164,6 +195,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         btnNext = (ImageButton) findViewById(R.id.btnNext2);
         btnFinish = (Button) findViewById(R.id.btnFinish);
         btnStart = (Button) findViewById(R.id.btnStart);
+        btnStats = (Button) findViewById(R.id.btnStats);
+
+        btnStart.setEnabled(false);
+        btnFinish.setEnabled(false);
 
         // Set track info recycler view to have linear layout and a fixed size
         rvTrack.setHasFixedSize(false);
@@ -186,8 +221,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         // Initialize the step and pace values to 0
         mStepValue = 0;
         mPaceValue = 0;
-        paceValues = new int[30];
-        paceValuesIndex = 0;
+        paceValues = new int[30];   // stores the last 30 pace readings in an array
+        paceValuesIndex = 0;    // pace values index ranges from 0-29
         lastPaceAverage = 0;
         resetValues();
 
@@ -201,44 +236,70 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
         Toast.makeText(RunningActivity.this, "Click \"Start Run\" to start your run!", Toast.LENGTH_LONG).show();
 
-        // Gets the playlist tracks and starts running two threads
-        // One consistently updates the progress bar
-        // the other consistently updates the track info
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startSpotify();
-                Toast.makeText(RunningActivity.this, "Dynamic playback started", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         // Clicked finish button, disable remote player
         // also set mQuitting to true so that it clears the step detector service
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // get the finish time
+                finishTime = System.currentTimeMillis();
+                int duration_ms = Math.round(finishTime - startTime); // this is in ms
+
+                // convert ms to mins:secs
+                int minutes = (duration_ms / 1000) / 60;
+                int seconds = (duration_ms / 1000) % 60;
+                if(seconds>=10) {
+                    duration = minutes+":"+seconds;
+                } else {
+                    duration = minutes+":0"+seconds;
+                }
+
                 // pause playbackService and disable remote player
                 playbackService.pause();
 
-                // reset pedometer values on screen to 0
+                // saves route to database
+                getRoutesFromUser();
+
+                // reset pedometer values to 0
                 resetValues();
+
                 // Stop the pedometer step service
                 unbindStepService();
                 stopStepService();
                 mQuitting = true;
 
                 // Toast user that run is finished
-                Toast.makeText(RunningActivity.this, "You have finished your run!", Toast.LENGTH_LONG).show();
+                Toast.makeText(RunningActivity.this, "You have finished your run!", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        // button to go to Stats for this run
+        btnStats.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent finishIntent = new Intent(RunningActivity.this, RunStatsActivity.class);
+                finishIntent.putExtra("runningRoute",runningRoute);
+                startActivity(finishIntent);
             }
         });
 
 
-        // GET POLYLINE OPTIONS FROM BUNDLE
-        lineOptions = getIntent().getParcelableExtra("chosenRoute");
-        mFLPC = LocationServices.getFusedLocationProviderClient(this);
 
+        // GET POLYLINE OPTIONS FROM BUNDLE
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(500);
+        locationRequest.setMaxWaitTime(1000);
+        locationRequest.setFastestInterval(500);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        lineOptions = getIntent().getParcelableExtra("chosenRoute");
+
+        // Connect map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.map2);
         mapFragment.getMapAsync(this);
     }
 
@@ -248,6 +309,11 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         Log.i(TAG, "[ACTIVITY] onStart");
         super.onStart();
         playbackService.enableRemote(); // PlaybackService
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates();
+        } else {
+            // you need to request permissions...
+        }
     }
 
     // Start pedometer service onResume
@@ -255,9 +321,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onResume() {
         Log.i(TAG, "[ACTIVITY] onResume");
         super.onResume();
-
-        // start the map camera
-        animateMapCamera();
 
         mPedometerSettings = new PedometerSettings(sharedPreferences);
 
@@ -280,6 +343,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onPause() {
         Log.i(TAG, "[ACTIVITY] onPause");
         if (mIsRunning) {
+            // disable step service
             unbindStepService();
             stopStepService();
         }
@@ -290,15 +354,19 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             mPedometerSettings.saveServiceRunningWithTimestamp(mIsRunning);
         }
 
-        handler.removeCallbacks(runnable); //stop handler when activity not visible super.onPause();
-
         super.onPause();
     }
 
     @Override
     protected void onStop() {
         Log.i(TAG, "[ACTIVITY] onStop");
+        // disable spotify threads
+        trackInfoHandler.removeCallbacksAndMessages(null);
+        progressHandler.removeCallbacksAndMessages(null);
+        // disable remote player
         playbackService.disableRemote();
+        // stop updating location
+        stopLocationUpdates();
         super.onStop();
     }
 
@@ -319,6 +387,21 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         //enables device location to be shown on the map
         enableMyLocation();
         Polyline polyline = mMap.addPolyline((lineOptions));
+        btnStart.setEnabled(true);
+        // Gets the playlist tracks and starts running two threads
+        // One consistently updates the progress bar
+        // the other consistently updates the track info
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                running = true;
+                btnFinish.setEnabled(true);
+                // get the start time in ms
+                startTime = System.currentTimeMillis();
+                // enable spotify dynamic playback and controls
+                startSpotify();
+            }
+        });
     }
 
     @SuppressLint("MissingPermission")
@@ -334,37 +417,82 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    private void animateMapCamera() {
-        handler.postDelayed(runnable = new Runnable() {
-            public void run() {
-                handler.postDelayed(runnable, delay);
-                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                //required permission check from Android Studio
-                if (ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                                != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                Location locator = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                LatLng originPoint = new LatLng(locator.getLatitude(),locator.getLongitude());
-
-                Task<Location> locationTask = mFLPC.getLastLocation();
-                locationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(point)      // Sets the center of the map to Mountain View
-                                .zoom(18)                   // Sets the zoom
-                                .bearing(90)                // Sets the orientation of the camera to east
-                                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                                .build();                   // Creates a CameraPosition from the builder
-                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                    }
-                });
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            Log.d(TAG, "onLocationResult: " + locationResult.getLastLocation());
+            if (mMap != null) {
+                setUserLocationMarker(locationResult.getLastLocation());
             }
-        }, delay);
+        }
+    };
+
+    private void setUserLocationMarker(Location location) {
+
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        if (running == true){
+            // stores the Lat/Lng values for each point along route ran
+            runningRoute.add(latLng);
+        }
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)      // Sets the center of the map to Mountain View
+                .zoom(19)                   // Sets the zoom
+                .bearing(location.getBearing())                // Sets the orientation of the camera to east
+                .tilt(50)                   // Sets the tilt of the camera to 30 degrees
+                .build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+    }
+
+    private void stopLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    // add the completed route to firebase once the Finish Run button is clicked
+    public void getRoutesFromUser(){
+        DatabaseReference myRef = dbRef.child(firebaseUser);
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    String temp = String.valueOf(Long.valueOf(snapshot.child("Routes").getChildrenCount()));
+                    if (Integer.valueOf(temp)>0) {
+                        String[] routesArray = new String[Integer.valueOf(temp) + 1];
+                        String[] durationArray = new String[Integer.valueOf(temp) + 1];
+                        tempLst = routesArray;
+                        timeLst = durationArray;
+                        for (int i = 0; i < Integer.valueOf(temp); i++) {
+                            String x = String.valueOf(i);
+                            tempLst[i] = String.valueOf(snapshot.child("Routes").child(x).getValue());
+                            timeLst[i] = String.valueOf(snapshot.child("Time").child(x).getValue());
+                        }
+                        tempLst[tempLst.length-1] = String.valueOf(runningRoute);
+                        Log.d("Running Route",""+runningRoute.size());
+                        dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(tempLst));
+                        timeLst[timeLst.length-1] = duration;
+                        dbRef.child(firebaseUser).child("Time").setValue(Arrays.asList(timeLst));
+                    }
+                    else{
+                        dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(runningRoute));
+                        dbRef.child(firebaseUser).child("Time").setValue(Arrays.asList(duration));
+                        Log.d("Running Route",""+runningRoute.size());
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 
@@ -462,27 +590,14 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             // message.what was the first parameter in obtainMessage
             // Is this a message for a change in steps or pace?
             if (message.what == PACE_MSG) {
-                // For both cases, message.arg1 holds the new value for numSteps or pace
-//                case STEPS_MSG:
-//                    mStepValue = message.arg1;
-//                    mStepValueView.setText("Steps: " + mStepValue);
-//                    break;
-//                case PACE_MSG:
+                // message.arg1 holds the new value for pace
+                // pace readings start from the 5th step taken
                     mPaceValue = message.arg1;
 
                     // Every time a new pace is received, add to array of pace values.
                     // Every 30 pace values, an average is calculated and compared to the previous
                     // average to determine if we need to change the playback BPM
                     addToPaceArray(mPaceValue);
-//                    if (mPaceValue <= 0) {
-//                        mPaceValueView.setText("0");
-//                    }
-//                    else {
-//                        mPaceValueView.setText("Pace (steps/min): " + mPaceValue);
-//                    }
-//                    break;
-//                default:
-//                    break;
             }
             return true;
         }
@@ -530,8 +645,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         // Enable play, pause, and next buttons
         enablePlaybackControls();
 
-//        playbackService.play(playlistTracks.get(0));
-
         // Start running the spotify threads to update the currently playing track in the adapter
         // and also update the progress bar to track's current playback position
         // Each thread updates something every second
@@ -554,15 +667,19 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     // tracks within 10bpm of the run pace
     private void dynamicTrackSelection(double curTempo) {
         // if current run pace cannot be detected, curTempo is 0, so send toast
-        if(curTempo == 0) {
+        if(curTempo == 0 || curTempo < 0) {
             Toast.makeText(RunningActivity.this, "Could not detect run pace", Toast.LENGTH_SHORT).show();
         } else {    // else, we have gotten the current run pace/tempo
             double minTempo = curTempo - 10;   // lower bound for BPM = target BPM - 10
+            // EDGE CASE: if minTempo is negative, set to 0
+            if(minTempo < 0) {
+                minTempo = 0;
+            }
             double maxTempo = curTempo + 10;   // upper bound for BPM = target BPM + 10
 
             // initialize the new array to hold the tracks filtered by BPM
             filteredTracks = new ArrayList<>();
-            getAllTracks();
+//            getAllTracks();
             // Loop over the current playlist tracks and add appropriate tempo tracks to filteredTracks
             int numTracks = playlistTracks.size();
             for (int i=0; i<numTracks; i++) {
@@ -572,16 +689,29 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                     filteredTracks.add(playlistTracks.get(i));
                 }
             }
+            // We have a filteredTracks array with tracks that meet the BPM criteria
+            // We select a random track from this array to start playing
+            if(filteredTracks.size() > 0) {
+                // Select a random song from the filtered tracks array, then play song
+                Random rand = new Random();
+                // get randomIndex: a random integer between 0 and filteredTracks.size()-1
+                int randomIndex = rand.nextInt(filteredTracks.size());
+                Track nextTrack = filteredTracks.get(randomIndex);
+                playbackService.play(nextTrack);
 
-            // Select a random song from the filtered tracks array, then play song
-            Random rand = new Random();
-            // get randomIndex: a random integer between 0 and filteredTracks.size()-1
-            int randomIndex = rand.nextInt(filteredTracks.size());
-            Track nextTrack = filteredTracks.get(randomIndex);
-            playbackService.play(nextTrack);
-
-            // Send a toast notifying the user of track change
-            Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
+                // Send a toast notifying the user of track change
+                Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
+            }
+            // EDGE CASE: if filteredTracks is empty because no trackTempo matched the curTempo,
+            // start playing a random song in the entire playlist
+            else {
+                Random rand = new Random();
+                int index = rand.nextInt(playlistTracks.size());
+                Track nextTrack = playlistTracks.get(index);
+                playbackService.play(nextTrack);
+                // Send a toast notifying the user of track change
+                Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

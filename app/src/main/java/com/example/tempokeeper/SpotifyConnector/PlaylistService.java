@@ -71,7 +71,9 @@ public class PlaylistService {
                 // get the response body as new json array object
                 final JSONObject jsonObject = new JSONObject(response.body().string());
                 // convert json array object into array of playlist objects
-                addToPlaylists(jsonObject);
+                if(jsonObject != null) {
+                    addToPlaylists(jsonObject);
+                }
             } catch (JSONException e) {
                 // failed to parse
                 Log.d("Error", String.valueOf(e));
@@ -93,30 +95,31 @@ public class PlaylistService {
         // using Gson again to convert JSON object to Playlist object
         Gson gson = new Gson();
         JSONArray jsonArray = response.optJSONArray("items");
-
-        // loop through the array of playlists, create playlist object instance for each item
-        for (int n = 0; n < jsonArray.length(); n++) {
-            try {
-                // converting to playlist object - this will set the name of the playlist
-                JSONObject jsonObject = jsonArray.getJSONObject(n);
-                Playlist playlist = gson.fromJson(jsonObject.toString(), Playlist.class);
-
-                // set playlist number of tracks by getting the length of the "tracks" field
-                playlist.setNumTracks(jsonObject.optJSONObject("tracks").getInt("total"));
-
-                // set playlist image url if available
+        if(jsonArray != null) {
+            // loop through the array of playlists, create playlist object instance for each item
+            for (int n = 0; n < jsonArray.length(); n++) {
                 try {
-                    playlist.setImageURL(jsonObject.optJSONArray("images").optJSONObject(0).getString("url"));
-                } catch (NullPointerException e) {
-                    playlist.setImageURL(null);
+                    // converting to playlist object - this will set the name of the playlist
+                    JSONObject jsonObject = jsonArray.getJSONObject(n);
+                    Playlist playlist = gson.fromJson(jsonObject.toString(), Playlist.class);
+
+                    // set playlist number of tracks by getting the length of the "tracks" field
+                    playlist.setNumTracks(jsonObject.optJSONObject("tracks").getInt("total"));
+
+                    // set playlist image url if available
+                    try {
+                        playlist.setImageURL(jsonObject.optJSONArray("images").optJSONObject(0).getString("url"));
+                    } catch (NullPointerException e) {
+                        playlist.setImageURL(null);
+                    }
+
+                    // add each playlist object to array of playlists
+                    playlists.add(playlist);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
-                // add each playlist object to array of playlists
-                playlists.add(playlist);
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-
         }
 
     }

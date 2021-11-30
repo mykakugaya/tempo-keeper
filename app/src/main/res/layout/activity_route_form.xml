@@ -73,7 +73,8 @@
             android:id="@+id/rbtnNA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="NA" />
+            android:text="NA"
+            android:checked="true"/>
     </RadioGroup>
 
     <Switch

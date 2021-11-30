@@ -16,9 +16,8 @@
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="15dp"
             android:background="@drawable/roundedbutton"
             android:padding="10dp"
             android:text="@string/btnStartRun" />
@@ -27,22 +26,33 @@
             android:id="@+id/btnFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/roundedbutton"
             android:padding="10dp"
             android:text="@string/btnFinishRun" />
+
+        <Button
+            android:id="@+id/btnStats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/roundedbutton"
+            android:text="Stats" />
     </LinearLayout>
 
     <fragment
         android:id="@+id/map2"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="432dp"
+        android:layout_height="444dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtGeneratedRoute"
-        tools:context=".RoutePreviewActivity" />
+        tools:context=".RunningActivity" />
 
     <View
         android:id="@+id/horizontalDivider"
@@ -53,7 +63,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTrack"
         android:layout_width="match_parent"
-        android:layout_height="147dp"
+        android:layout_height="129dp"
         android:paddingLeft="10dp"
         android:paddingTop="10dp">
 
