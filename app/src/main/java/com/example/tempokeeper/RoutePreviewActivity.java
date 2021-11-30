@@ -1,6 +1,9 @@
 package com.example.tempokeeper;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,9 +11,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,21 +46,16 @@ import java.util.List;
 
 
 public class RoutePreviewActivity extends AppCompatActivity implements OnMapReadyCallback,  GoogleMap.OnPolylineClickListener,
-        GoogleMap.OnPolygonClickListener{
+        GoogleMap.OnPolygonClickListener {
 
     private GoogleMap mMap;
     private Button btnBack;
-    private Button btnSelectMusic;
+    private Button btnRun;
     private LatLng originPoint;
     private ArrayList<Polyline> routesArray;
+    private ArrayList<PolylineOptions> nextActvityArray;
 
-    private FirebaseAuth mAuth;
-    private FirebaseUser firebaseUser;
-
-
-    private final FirebaseDatabase usersDB = FirebaseDatabase.getInstance();
-    DatabaseReference dbRef = usersDB.getReference().child("Users");
-    private String userID;
+    private static final int REQUEST_LOCATION_PERMISSION = 9003;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,14 +71,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         originPoint = new LatLng(latitude, longitude);
 
         btnBack = (Button) findViewById(R.id.btnBack);
-        btnSelectMusic = (Button) findViewById(R.id.btnSelectMusic);
-
-        mAuth = FirebaseAuth.getInstance();
-        firebaseUser = mAuth.getCurrentUser(); //FirebaseUser variable that hsa the currentUser.
-
-        userID = getIntent().getExtras().getString("userID");
-        System.out.println(firebaseUser);
-
+        btnRun = (Button) findViewById(R.id.btnSelectMusic);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -91,23 +85,28 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             }
         });
 
-        btnSelectMusic.setOnClickListener(new View.OnClickListener() {
+        btnRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //idk what to do here lmao
                 //user should get a route to run and run it
                 //camera follows user location on the route
                 //and updates route
-                System.out.println(url);
 
-                // Intent to go to PlaylistActivity
                 Intent intent = new Intent(RoutePreviewActivity.this, PlaylistActivity.class);
-                startActivity(intent);
+                for (int i = 0; i < routesArray.size(); i++) {
+                    if (routesArray.get(i).getColor() == Color.BLUE) {
+                        intent.putExtra("chosenRoute", nextActvityArray.get(i));
+                        startActivity(intent);
+                        break;
+                    }
+                }
             }
         });
 
         // Start downloading json data from Google Directions API
         DownloadTask downloadTask = new DownloadTask();
+        Log.d("RPA", "downloadTasl.execute");
         downloadTask.execute(url);
     }
 
@@ -132,7 +131,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
 
             ParserTask parserTask = new ParserTask();
 
-
+            Log.d("RPA", "parserTask.execute");
             parserTask.execute(result);
 
         }
@@ -167,6 +166,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             ArrayList points = null;
             PolylineOptions lineOptions = null;
             routesArray = new ArrayList<Polyline>();
+            nextActvityArray = new ArrayList<PolylineOptions>();
             MarkerOptions markerOptions = new MarkerOptions();
 
             for (int i = 0; i < result.size(); i++) {
@@ -191,6 +191,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                 lineOptions.color(Color.GRAY);
                 lineOptions.geodesic(true);
                 lineOptions.clickable(true);
+                nextActvityArray.add(lineOptions);
                 Polyline polyline = mMap.addPolyline((lineOptions));
 //                polyline.setTag("");
                 routesArray.add(polyline);
@@ -238,8 +239,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         return data;
     }
 
-
-
     @Override
     public void onPolygonClick(@NonNull Polygon polygon) {
 
@@ -247,14 +246,14 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onPolylineClick(@NonNull Polyline polyline) {
-        for (int i = 0; i < routesArray.size(); i++){
+        for (int i = 0; i < routesArray.size(); i++) {
             routesArray.get(i).setZIndex(0);
             routesArray.get(i).setColor(Color.GRAY);
-            Log.d("onPolylineCLick",  "index: " + routesArray.get(i) + ", Index: " + routesArray.get(i).getZIndex());
+            Log.d("onPolylineCLick", "index: " + routesArray.get(i) + ", Index: " + routesArray.get(i).getZIndex());
         }
         polyline.setZIndex(1);
         polyline.setColor(Color.BLUE);
-        Log.d("onPolylineCLick",  "polyline Index: " + polyline.getZIndex());
+        Log.d("onPolylineCLick", "polyline Index: " + polyline.getZIndex());
     }
 
     @Override
@@ -285,7 +284,20 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         // Set listeners for click events.
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnPolygonClickListener(this);
+
+        enableMyLocation();
     }
 
-
+    @SuppressLint("MissingPermission")
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION_PERMISSION);
+        }
+    }
 }

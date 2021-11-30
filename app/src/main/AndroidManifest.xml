@@ -34,7 +34,7 @@
 
         <activity android:name=".PlaylistActivity"
             android:exported="true" />
-        <activity android:name=".PedometerActivity"
+        <activity android:name=".RunningActivity"
             android:exported="true" />
         <service android:name=".PaceTracker.StepService"/>
 

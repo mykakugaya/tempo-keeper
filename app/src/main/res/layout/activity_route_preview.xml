@@ -7,15 +7,17 @@
     tools:context=".RoutePreviewActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/txtGeneratedRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="Generated Route:"
+        android:text="Your Generated Route:"
         android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display4"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.076"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,10 +26,10 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="413dp"
         android:layout_height="541dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/txtGeneratedRoute"
         tools:context=".RoutePreviewActivity" />
 
     <Space

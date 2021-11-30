@@ -18,12 +18,17 @@
 
 package com.example.tempokeeper;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,6 +47,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,23 +58,28 @@ import com.example.tempokeeper.PaceTracker.PedometerSettings;
 import com.example.tempokeeper.PaceTracker.StepService;
 import com.example.tempokeeper.SpotifyConnector.PlaybackService;
 import com.example.tempokeeper.SpotifyConnector.TrackService;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 
-public class PedometerActivity extends AppCompatActivity {
+public class RunningActivity extends AppCompatActivity implements OnMapReadyCallback {
 	private static final String TAG = "Pedometer";
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private PedometerSettings mPedometerSettings;
-
-
-//    private TextView txtSpotifyUser;
-//    private TextView txtPlaylistName;
-    // Where the current number of steps and pace will be displayed
-//    private TextView mStepValueView;
-//    private TextView mPaceValueView;
 
     private SeekBar sbTrackProgress;
     private TextView txtDuration;
@@ -104,6 +116,7 @@ public class PedometerActivity extends AppCompatActivity {
     // Spotify playback
     private String userId;
     private String playlistId;
+    private String playlistName;
 
     // track service instance to get playlist tracks
     private TrackService tempoService;  // used to fetch the tempo of currently playing song
@@ -120,6 +133,16 @@ public class PedometerActivity extends AppCompatActivity {
     private RecyclerView rvTrack;
     private RecyclerView.Adapter trackAdapter;
     private RecyclerView.LayoutManager trackLayout;
+
+
+    // GOOGLE MAPS
+    private GoogleMap mMap;
+    private PolylineOptions lineOptions;
+    private FusedLocationProviderClient mFLPC;
+    private Handler handler = new Handler();
+    private Runnable runnable;
+    private int delay = 1000; //1 second
+
     
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -131,10 +154,7 @@ public class PedometerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pedometer);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-//        txtSpotifyUser = (TextView) findViewById(R.id.txtPedometerUser);
-//        txtPlaylistName = (TextView) findViewById(R.id.txtCurPlaylist);
-//        mStepValueView = (TextView) findViewById(R.id.txtSteps);
-//        mPaceValueView = (TextView) findViewById(R.id.txtPace);
+
         rvTrack = (RecyclerView) findViewById(R.id.rvTrack);
         sbTrackProgress = (SeekBar) findViewById(R.id.sbTrackProgress);
         txtPlaybackPosition = (TextView) findViewById(R.id.txtPlaybackPosition);
@@ -158,12 +178,10 @@ public class PedometerActivity extends AppCompatActivity {
 
         // set user id at top of screen
         userId = sharedPreferences.getString("userId","User Not Found");
-//        txtSpotifyUser.setText("Spotify User: " + userId);
 
+        // set playlist id and name
         playlistId = sharedPreferences.getString("curPlaylistId","");
-        // set playlist name
-        String playlistName = sharedPreferences.getString("curPlaylistName","");
-//        txtPlaylistName.setText("Playing: "+playlistName);
+        playlistName = sharedPreferences.getString("curPlaylistName","");
 
         // Initialize the step and pace values to 0
         mStepValue = 0;
@@ -181,7 +199,7 @@ public class PedometerActivity extends AppCompatActivity {
         trackService = new TrackService(sharedPreferences);
         playbackService = new PlaybackService(this);
 
-        Toast.makeText(PedometerActivity.this, "Click \"Start Run\" to start your run!", Toast.LENGTH_LONG).show();
+        Toast.makeText(RunningActivity.this, "Click \"Start Run\" to start your run!", Toast.LENGTH_LONG).show();
 
         // Gets the playlist tracks and starts running two threads
         // One consistently updates the progress bar
@@ -190,7 +208,7 @@ public class PedometerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startSpotify();
-                Toast.makeText(PedometerActivity.this, "Dynamic playback started", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RunningActivity.this, "Dynamic playback started", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -210,9 +228,18 @@ public class PedometerActivity extends AppCompatActivity {
                 mQuitting = true;
 
                 // Toast user that run is finished
-                Toast.makeText(PedometerActivity.this, "You have finished your run!", Toast.LENGTH_LONG).show();
+                Toast.makeText(RunningActivity.this, "You have finished your run!", Toast.LENGTH_LONG).show();
             }
         });
+
+
+        // GET POLYLINE OPTIONS FROM BUNDLE
+        lineOptions = getIntent().getParcelableExtra("chosenRoute");
+        mFLPC = LocationServices.getFusedLocationProviderClient(this);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     // Activity LifeCycle methods
@@ -228,6 +255,9 @@ public class PedometerActivity extends AppCompatActivity {
     protected void onResume() {
         Log.i(TAG, "[ACTIVITY] onResume");
         super.onResume();
+
+        // start the map camera
+        animateMapCamera();
 
         mPedometerSettings = new PedometerSettings(sharedPreferences);
 
@@ -260,6 +290,8 @@ public class PedometerActivity extends AppCompatActivity {
             mPedometerSettings.saveServiceRunningWithTimestamp(mIsRunning);
         }
 
+        handler.removeCallbacks(runnable); //stop handler when activity not visible super.onPause();
+
         super.onPause();
     }
 
@@ -280,8 +312,63 @@ public class PedometerActivity extends AppCompatActivity {
         super.onRestart();
     }
 
+    // GOOGLE MAPS METHODS FIRST
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
+        //enables device location to be shown on the map
+        enableMyLocation();
+        Polyline polyline = mMap.addPolyline((lineOptions));
+    }
 
-    // PEDOMETER METHODS FIRST
+    @SuppressLint("MissingPermission")
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
+                    9000);
+        }
+    }
+
+    private void animateMapCamera() {
+        handler.postDelayed(runnable = new Runnable() {
+            public void run() {
+                handler.postDelayed(runnable, delay);
+                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                //required permission check from Android Studio
+                if (ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                Location locator = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                LatLng originPoint = new LatLng(locator.getLatitude(),locator.getLongitude());
+
+                Task<Location> locationTask = mFLPC.getLastLocation();
+                locationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(point)      // Sets the center of the map to Mountain View
+                                .zoom(18)                   // Sets the zoom
+                                .bearing(90)                // Sets the orientation of the camera to east
+                                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                                .build();                   // Creates a CameraPosition from the builder
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    }
+                });
+            }
+        }, delay);
+    }
+
+
+    // PEDOMETER METHODS
 
     // Service Connection for the StepService
     // mConnection is used to bind the service to this context
@@ -305,7 +392,7 @@ public class PedometerActivity extends AppCompatActivity {
         if (! mIsRunning) {
             Log.i(TAG, "[SERVICE] Start");
             mIsRunning = true;
-            startService(new Intent(PedometerActivity.this,
+            startService(new Intent(RunningActivity.this,
                     StepService.class));
         }
     }
@@ -313,7 +400,7 @@ public class PedometerActivity extends AppCompatActivity {
     // Must bind the service to this context before starting it
     private void bindStepService() {
         Log.i(TAG, "[SERVICE] Bind");
-        bindService(new Intent(PedometerActivity.this,
+        bindService(new Intent(RunningActivity.this,
                 StepService.class), mConnection, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
     }
 
@@ -326,7 +413,7 @@ public class PedometerActivity extends AppCompatActivity {
         Log.i(TAG, "[SERVICE] Stop");
         if (stepService != null) {
             Log.i(TAG, "[SERVICE] stopService");
-            stopService(new Intent(PedometerActivity.this,
+            stopService(new Intent(RunningActivity.this,
                   StepService.class));
         }
         mIsRunning = false;
@@ -468,7 +555,7 @@ public class PedometerActivity extends AppCompatActivity {
     private void dynamicTrackSelection(double curTempo) {
         // if current run pace cannot be detected, curTempo is 0, so send toast
         if(curTempo == 0) {
-            Toast.makeText(PedometerActivity.this, "Could not detect run pace", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RunningActivity.this, "Could not detect run pace", Toast.LENGTH_SHORT).show();
         } else {    // else, we have gotten the current run pace/tempo
             double minTempo = curTempo - 10;   // lower bound for BPM = target BPM - 10
             double maxTempo = curTempo + 10;   // upper bound for BPM = target BPM + 10
@@ -494,7 +581,7 @@ public class PedometerActivity extends AppCompatActivity {
             playbackService.play(nextTrack);
 
             // Send a toast notifying the user of track change
-            Toast.makeText(PedometerActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -642,7 +729,7 @@ public class PedometerActivity extends AppCompatActivity {
                         break;
                     }
                 }
-                Toast.makeText(PedometerActivity.this, "Track changed to: "+trackName+" ("+trackTempo+" bpm)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RunningActivity.this, "Track changed to: "+trackName+" ("+trackTempo+" bpm)", Toast.LENGTH_SHORT).show();
             }
         });
     }

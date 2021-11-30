@@ -13,6 +13,7 @@
         android:layout_marginTop="92dp"
         android:text="@string/createAccount"
         android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display4"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

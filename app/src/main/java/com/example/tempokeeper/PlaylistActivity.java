@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tempokeeper.ListAdapters.PlaylistAdapter;
 import com.example.tempokeeper.Model.Playlist;
 import com.example.tempokeeper.SpotifyConnector.PlaylistService;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 
@@ -40,6 +41,9 @@ public class PlaylistActivity extends AppCompatActivity {
     private RecyclerView.Adapter playlistAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
+
+    private PolylineOptions lineOptions;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +57,9 @@ public class PlaylistActivity extends AppCompatActivity {
         rvPlaylists = (RecyclerView) findViewById(R.id.rvQueue);
         btnUserPlaylists = (Button) findViewById(R.id.btnGetUserPlaylists);
         btnDynamicBpm = (Button) findViewById(R.id.btnPedometerBpm);
+
+        // get the polylines option
+        lineOptions = getIntent().getParcelableExtra("chosenRoute");
 
         // sharedPref has the token for API calls
         sharedPref = getSharedPreferences("SPOTIFY", 0);
@@ -98,7 +105,8 @@ public class PlaylistActivity extends AppCompatActivity {
                 } else {
                     // Go to PedometerActivity to start calculating the number of steps taken
                     // and your pace (in steps per minute)
-                    Intent pedometerIntent = new Intent(PlaylistActivity.this, PedometerActivity.class);
+                    Intent pedometerIntent = new Intent(PlaylistActivity.this, RunningActivity.class);
+                    pedometerIntent.putExtra("chosenRoute", lineOptions);
                     startActivity(pedometerIntent);
                 }
             }

@@ -6,58 +6,77 @@
     android:layout_height="match_parent"
     tools:context=".RouteFormActivity">
 
-        <EditText
-            android:id="@+id/edtDestination"
-            android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/txtRouteForm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Create a Custom Route"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edtDestination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:ems="10"
+        android:hint="Destination"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtRouteForm" />
+
+    <EditText
+        android:id="@+id/edtDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="Distance"
+        android:inputType="numberDecimal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtDestination" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="171dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtElevationOpt">
+
+        <RadioButton
+            android:id="@+id/rbtnHilly"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="71TennysonDriveNanuetNY10954"
-            app:layout_constraintBottom_toTopOf="@+id/radioGroup"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="Hilly" />
 
-        <EditText
-            android:id="@+id/edtDistance"
-            android:layout_width="wrap_content"
+        <RadioButton
+            android:id="@+id/rbtnFlat"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="numberDecimal"
-            app:layout_constraintBottom_toTopOf="@+id/radioGroup"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtDestination" />
+            android:text="Flat" />
 
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="171dp"
-            android:layout_height="150dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <RadioButton
+            android:id="@+id/rbtnNA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="NA" />
+    </RadioGroup>
 
-            <RadioButton
-                android:id="@+id/rbtnHilly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Hilly" />
-
-            <RadioButton
-                android:id="@+id/rbtnFlat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Flat" />
-
-            <RadioButton
-                android:id="@+id/rbtnNA"
-                android:layout_width="102dp"
-                android:layout_height="wrap_content"
-                android:text="NA" />
-        </RadioGroup>
-
-        <Switch
+    <Switch
             android:id="@+id/swcNewRoute"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -71,10 +90,23 @@
         android:id="@+id/btnCalculate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/roundedbutton"
         android:text="Calculate Route"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
+    <TextView
+        android:id="@+id/txtElevationOpt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Elevation Options:"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.356"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtDistance" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
