@@ -19,8 +19,8 @@ public class PlaybackService {
 
     // Spotify variables:
     // Client Id and Redirect URI necessary for connection to remote app playback
-    private static final String CLIENT_ID = "ddb62ea700424470a9ddab081ce13836";
-    private static final String REDIRECT_URI = "com.example.spotifydemo://callback/";
+    private static final String CLIENT_ID = "f48deef1d46e49a8a445952351b10216";
+    private static final String REDIRECT_URI = "com.example.tempokeeper://callback/";
     //
     public SpotifyAppRemote mSpotifyAppRemote;
     public ConnectionParams connectionParams;

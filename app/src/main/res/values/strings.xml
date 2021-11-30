@@ -1,15 +1,15 @@
 <resources>
-    <string name="app_name">tempokeeper</string>
+    <string name="app_name">Tempo Keeper</string>
     <string name="google_map_api_key">AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw</string>
 
     <string name="btnLogin">Connect Spotify Account</string>
     <string name="curTrack">Current Track:</string>
     <string name="upNext">Queue:</string>
-    <string name="btnLoadPlaylists">Load My Playlists</string>
+    <string name="btnLoadPlaylists">Load My Playlists Below</string>
     <string name="btnTargetBpm">Set Target BPM</string>
-    <string name="btnPedometerBpm">Dynamic Pedometer BPM</string>
     <string name="btnLoadTracks">Load Tracks</string>
     <string name="btnSelectTempo">Filter Tracks</string>
-    <string name="btnStartRun">Start Music</string>
+    <string name="btnStartRun">Start Run</string>
     <string name="btnFinishRun">Finish Run</string>
+    <string name="createAccount">Create an Account</string>
 </resources>

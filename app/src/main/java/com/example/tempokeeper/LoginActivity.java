@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
     private Button btnlogin;
-    private Button btnregister;
+    private TextView txtRegister;
     private FirebaseAuth mAuth;
 
     // SharedPreferences to save user info
@@ -78,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         btnlogin = (Button) findViewById(R.id.login);
-        btnregister = (Button) findViewById(R.id.register);
+        txtRegister = (TextView) findViewById(R.id.txtRegister);
         mAuth = FirebaseAuth.getInstance(); //A FirebaseDatabase instance.
 
 
@@ -104,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // Register if user does not have an account
-        btnregister.setOnClickListener(new View.OnClickListener() {
+        txtRegister.setOnClickListener(new View.OnClickListener() {
             //when register button is clicked, go to the registration page
             @Override
             public void onClick(View v) {
@@ -115,6 +116,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    // Sign in using Firebase Auth and go to RouteFormActivity
     private void signIn(String email, String password) {
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
@@ -124,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            //when it's signed in correctly, give a Toast with success message and go to Userinfo activity.
+                            //when it's signed in correctly, give a Toast with success message and go to Route form activity.
                             Toast.makeText(LoginActivity.this, "Login Success",
                                     Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(getApplicationContext(), RouteFormActivity.class));
@@ -154,11 +156,6 @@ public class LoginActivity extends AppCompatActivity {
 
             // Alert user that they are logged in as: userid
             Log.d("OAUTH", "GOT USER INFO");
-            Toast.makeText(LoginActivity.this, "Logged in as: "+user.id, Toast.LENGTH_SHORT).show();
-
-            // Go to next activity: SearchByBpm
-            Intent newIntent = new Intent(LoginActivity.this, PlaylistActivity.class);
-            startActivity(newIntent);
         });
     }
 

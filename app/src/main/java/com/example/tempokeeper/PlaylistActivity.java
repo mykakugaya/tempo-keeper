@@ -114,6 +114,6 @@ public class PlaylistActivity extends AppCompatActivity {
         playlistAdapter = new PlaylistAdapter(playlistService.getPlaylists(), this);
         playlistAdapter.notifyDataSetChanged();
         rvPlaylists.setAdapter(playlistAdapter);
-        Toast.makeText(PlaylistActivity.this, "Select a playlist then click one of the two music options.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(PlaylistActivity.this, "Select a playlist then click \"Go to Run\"", Toast.LENGTH_SHORT).show();
     }
 }

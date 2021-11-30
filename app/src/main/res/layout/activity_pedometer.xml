@@ -6,85 +6,62 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txtPedometerUser"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="30dp"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/txtCurPlaylist"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txtPedometer"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#B7CCFF"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:text="Pedometer:"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="81dp">
-
-        <TextView
-            android:id="@+id/txtSteps"
+        <Button
+            android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.163"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginLeft="60dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/roundedbutton"
+            android:padding="10dp"
+            android:text="@string/btnStartRun" />
 
-        <TextView
-            android:id="@+id/txtPace"
+        <Button
+            android:id="@+id/btnFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.551"
-            app:layout_constraintStart_toEndOf="@+id/txtSteps"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/roundedbutton"
+            android:padding="10dp"
+            android:text="@string/btnFinishRun" />
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/txtCurTrack"
+    <fragment
+        android:id="@+id/map2"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:background="#B7CCFF"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:text="@string/curTrack"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_height="425dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:context=".RoutePreviewActivity" />
+
+    <View
+        android:id="@+id/horizontalDivider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTrack"
         android:layout_width="match_parent"
-        android:layout_height="191dp"
-        android:padding="10dp"
+        android:layout_height="147dp"
+        android:paddingLeft="10dp"
         android:paddingTop="10dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="37dp"
         android:orientation="horizontal">
 
         <TextView
@@ -98,8 +75,8 @@
 
         <SeekBar
             android:id="@+id/sbTrackProgress"
-            android:layout_width="284dp"
-            android:layout_height="42dp"
+            android:layout_width="283dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:thumbTint="@android:color/transparent" />
 
@@ -115,14 +92,14 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:orientation="horizontal"
-        android:padding="5dp">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btnPlay2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="15dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
@@ -133,8 +110,8 @@
 
         <ImageButton
             android:id="@+id/btnPause2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="21dp"
+            android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
             android:background="@drawable/roundedbutton"
@@ -144,40 +121,14 @@
 
         <ImageButton
             android:id="@+id/btnNext2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="23dp"
+            android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/roundedbutton"
             android:padding="5dp"
             app:srcCompat="@android:drawable/ic_media_next"
             tools:ignore="SpeakableTextPresentCheck" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="15dp"
-            android:padding="10dp"
-            android:text="@string/btnStartRun" />
-
-        <Button
-            android:id="@+id/btnFinish"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            android:padding="10dp"
-            android:text="@string/btnFinishRun" />
     </LinearLayout>
 
 </LinearLayout>

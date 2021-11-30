@@ -62,12 +62,12 @@ public class PedometerActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     private PedometerSettings mPedometerSettings;
 
-    private TextView txtSpotifyUser;
-    private TextView txtPlaylistName;
 
+//    private TextView txtSpotifyUser;
+//    private TextView txtPlaylistName;
     // Where the current number of steps and pace will be displayed
-    private TextView mStepValueView;
-    private TextView mPaceValueView;
+//    private TextView mStepValueView;
+//    private TextView mPaceValueView;
 
     private SeekBar sbTrackProgress;
     private TextView txtDuration;
@@ -90,7 +90,7 @@ public class PedometerActivity extends AppCompatActivity {
 
     private StepService stepService;
 
-    // true when the service is quitting
+    // true when the step service is quitting
     private boolean mQuitting; // Set with finish button click
     
     // true when the service is running
@@ -131,10 +131,10 @@ public class PedometerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pedometer);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        txtSpotifyUser = (TextView) findViewById(R.id.txtPedometerUser);
-        txtPlaylistName = (TextView) findViewById(R.id.txtCurPlaylist);
-        mStepValueView = (TextView) findViewById(R.id.txtSteps);
-        mPaceValueView = (TextView) findViewById(R.id.txtPace);
+//        txtSpotifyUser = (TextView) findViewById(R.id.txtPedometerUser);
+//        txtPlaylistName = (TextView) findViewById(R.id.txtCurPlaylist);
+//        mStepValueView = (TextView) findViewById(R.id.txtSteps);
+//        mPaceValueView = (TextView) findViewById(R.id.txtPace);
         rvTrack = (RecyclerView) findViewById(R.id.rvTrack);
         sbTrackProgress = (SeekBar) findViewById(R.id.sbTrackProgress);
         txtPlaybackPosition = (TextView) findViewById(R.id.txtPlaybackPosition);
@@ -146,7 +146,7 @@ public class PedometerActivity extends AppCompatActivity {
         btnStart = (Button) findViewById(R.id.btnStart);
 
         // Set track info recycler view to have linear layout and a fixed size
-        rvTrack.setHasFixedSize(true);
+        rvTrack.setHasFixedSize(false);
         trackLayout = new LinearLayoutManager(this);
         rvTrack.setLayoutManager(trackLayout);
 
@@ -158,12 +158,12 @@ public class PedometerActivity extends AppCompatActivity {
 
         // set user id at top of screen
         userId = sharedPreferences.getString("userId","User Not Found");
-        txtSpotifyUser.setText("Spotify User: " + userId);
+//        txtSpotifyUser.setText("Spotify User: " + userId);
 
         playlistId = sharedPreferences.getString("curPlaylistId","");
         // set playlist name
         String playlistName = sharedPreferences.getString("curPlaylistName","");
-        txtPlaylistName.setText("Playing: "+playlistName);
+//        txtPlaylistName.setText("Playing: "+playlistName);
 
         // Initialize the step and pace values to 0
         mStepValue = 0;
@@ -174,13 +174,14 @@ public class PedometerActivity extends AppCompatActivity {
         resetValues();
 
         mQuitting = false;
+        mIsRunning = true;
 
         // Initialize the trackService and playbackService for Spotify playback
         tempoService = new TrackService(sharedPreferences);
         trackService = new TrackService(sharedPreferences);
         playbackService = new PlaybackService(this);
 
-        Toast.makeText(PedometerActivity.this, "Click \"Start Music\" to enable dynamic playback", Toast.LENGTH_LONG).show();
+        Toast.makeText(PedometerActivity.this, "Click \"Start Run\" to start your run!", Toast.LENGTH_LONG).show();
 
         // Gets the playlist tracks and starts running two threads
         // One consistently updates the progress bar
@@ -189,7 +190,7 @@ public class PedometerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startSpotify();
-                Toast.makeText(PedometerActivity.this, "Dynamic playback started!", Toast.LENGTH_LONG).show();
+                Toast.makeText(PedometerActivity.this, "Dynamic playback started", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -200,7 +201,6 @@ public class PedometerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // pause playbackService and disable remote player
                 playbackService.pause();
-                playbackService.disableRemote();
 
                 // reset pedometer values on screen to 0
                 resetValues();
@@ -221,7 +221,6 @@ public class PedometerActivity extends AppCompatActivity {
         Log.i(TAG, "[ACTIVITY] onStart");
         super.onStart();
         playbackService.enableRemote(); // PlaybackService
-        Toast.makeText(PedometerActivity.this, "Remote Player Connected", Toast.LENGTH_SHORT).show();
     }
 
     // Start pedometer service onResume
@@ -335,8 +334,8 @@ public class PedometerActivity extends AppCompatActivity {
 
     // Reset steps and pace values on screen to 0
     private void resetValues() {
-        mStepValueView.setText("Steps: 0");
-        mPaceValueView.setText("Pace (steps/min): 0");
+//        mStepValueView.setText("Steps: 0");
+//        mPaceValueView.setText("Pace (steps/min): 0");
         editor = sharedPreferences.edit();
         editor.putInt("steps", 0);
         editor.putInt("pace", 0);
@@ -375,28 +374,28 @@ public class PedometerActivity extends AppCompatActivity {
         public boolean handleMessage(@NonNull Message message) {
             // message.what was the first parameter in obtainMessage
             // Is this a message for a change in steps or pace?
-            switch (message.what) {
+            if (message.what == PACE_MSG) {
                 // For both cases, message.arg1 holds the new value for numSteps or pace
-                case STEPS_MSG:
-                    mStepValue = message.arg1;
-                    mStepValueView.setText("Steps: " + mStepValue);
-                    break;
-                case PACE_MSG:
+//                case STEPS_MSG:
+//                    mStepValue = message.arg1;
+//                    mStepValueView.setText("Steps: " + mStepValue);
+//                    break;
+//                case PACE_MSG:
                     mPaceValue = message.arg1;
 
                     // Every time a new pace is received, add to array of pace values.
                     // Every 30 pace values, an average is calculated and compared to the previous
                     // average to determine if we need to change the playback BPM
                     addToPaceArray(mPaceValue);
-                    if (mPaceValue <= 0) {
-                        mPaceValueView.setText("0");
-                    }
-                    else {
-                        mPaceValueView.setText("Pace (steps/min): " + mPaceValue);
-                    }
-                    break;
-                default:
-                    break;
+//                    if (mPaceValue <= 0) {
+//                        mPaceValueView.setText("0");
+//                    }
+//                    else {
+//                        mPaceValueView.setText("Pace (steps/min): " + mPaceValue);
+//                    }
+//                    break;
+//                default:
+//                    break;
             }
             return true;
         }

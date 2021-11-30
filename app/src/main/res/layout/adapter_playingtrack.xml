@@ -15,8 +15,8 @@
 
             <ImageView
                 android:id="@+id/imgPlayingTrack"
-                android:layout_width="185dp"
-                android:layout_height="178dp"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
                 android:maxWidth="200dp"
                 tools:ignore="ImageContrastCheck"
                 tools:srcCompat="?android:attr/scrollbarTrackVertical" />

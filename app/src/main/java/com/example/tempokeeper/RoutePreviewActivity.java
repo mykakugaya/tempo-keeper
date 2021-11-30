@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -43,7 +44,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
 
     private GoogleMap mMap;
     private Button btnBack;
-    private Button btnRun;
+    private Button btnSelectMusic;
     private LatLng originPoint;
     private ArrayList<Polyline> routesArray;
 
@@ -58,6 +59,8 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_route_preview);
 
         Bundle bundle = getIntent().getExtras();
@@ -67,16 +70,13 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         originPoint = new LatLng(latitude, longitude);
 
         btnBack = (Button) findViewById(R.id.btnBack);
-        btnRun = (Button) findViewById(R.id.btnRun);
+        btnSelectMusic = (Button) findViewById(R.id.btnSelectMusic);
 
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser(); //FirebaseUser variable that hsa the currentUser.
 
         userID = getIntent().getExtras().getString("userID");
         System.out.println(firebaseUser);
-
-
-
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -91,7 +91,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             }
         });
 
-        btnRun.setOnClickListener(new View.OnClickListener() {
+        btnSelectMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //idk what to do here lmao
@@ -101,7 +101,8 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                 System.out.println(url);
 
                 // Intent to go to PlaylistActivity
-
+                Intent intent = new Intent(RoutePreviewActivity.this, PlaylistActivity.class);
+                startActivity(intent);
             }
         });
 

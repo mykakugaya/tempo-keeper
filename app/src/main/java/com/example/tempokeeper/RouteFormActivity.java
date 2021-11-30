@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -19,7 +20,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 public class RouteFormActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
@@ -30,12 +35,6 @@ public class RouteFormActivity extends AppCompatActivity {
     private double longitude;
     private double latitude;
     private Button btnCalculate;
-
-    //temp tvs to see output
-    private TextView tvSadge;
-    private TextView tv2;
-
-
 
     //Distance is used after getting routes back
     private EditText edtDistance;
@@ -48,10 +47,9 @@ public class RouteFormActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_route_form);
-
-//        tvSadge = (TextView) findViewById(R.id.tvSadge);
-//        tv2 = (TextView) findViewById(R.id.tv2);
 
         //reference views
         edtDestination = (EditText) findViewById(R.id.edtDestination);
@@ -75,6 +73,7 @@ public class RouteFormActivity extends AppCompatActivity {
                     return;
                 }
                 Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
                 longitude = location.getLongitude();
                 latitude = location.getLatitude();
                 originPoint = new LatLng(latitude, longitude);
