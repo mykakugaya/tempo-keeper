@@ -10,9 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Run Statistics"
+        android:drawableEnd="@drawable/ic_stats"
+        android:drawablePadding="10dp"
+        android:text="@string/runStats"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+        android:textColor="@color/title"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,32 +34,22 @@
         tools:context=".RoutePreviewActivity" />
 
     <TextView
-        android:id="@+id/txtDistance"
+        android:id="@+id/txtRunDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:layout_marginTop="28dp"
+        android:textColor="@color/text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mapFinished" />
 
     <TextView
-        android:id="@+id/txtRunDuration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtDistance" />
-
-    <TextView
         android:id="@+id/txtAvgSpeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
+        android:textColor="@color/text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"

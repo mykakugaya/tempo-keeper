@@ -42,7 +42,7 @@ import java.util.List;
 public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
     // TEXTVIEWS DISPLAYING STATS
     private TextView txtDuration;
-    private TextView txtDistance;
+//    private TextView txtDistance;
     private TextView txtAvgSpeed;
     private TextView txtMaxSpeed;
 
@@ -76,7 +76,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         setContentView(R.layout.activity_runstats);
 
         txtDuration = (TextView) findViewById(R.id.txtRunDuration);
-        txtDistance = (TextView) findViewById(R.id.txtDistance);
         txtAvgSpeed = (TextView) findViewById(R.id.txtAvgSpeed);
         txtMaxSpeed = (TextView) findViewById(R.id.txtMaxSpeed);
 

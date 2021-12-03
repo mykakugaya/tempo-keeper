@@ -36,8 +36,8 @@ https://developer.spotify.com/documentation/web-api/reference/#/
 */
 
 /**
- * Flow: LoginActivity/RegistrationActivity -> RouteFormActivity -> RoutePreviewActivity ->
- * PlaylistActivity -> PedometerActivity+Map
+ * Flow of App: LoginActivity/RegistrationActivity -> RouteFormActivity -> RoutePreviewActivity ->
+ * PlaylistActivity -> RunningActivity -> RunStatsActivity
  * */
 
 /* This class uses Firebase authentication to log in, it also
@@ -98,9 +98,12 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = username.getText().toString();
                 String pwd = password.getText().toString();
-                // Authorize this app to access your Spotify app information
-                authenticateSpotify();
-                signIn(email, pwd);
+                // Make sure there is something in both fields before allowing login
+                if(!email.equals("")&&!password.equals("")) {
+                    // Authorize this app to access your Spotify app information
+                    authenticateSpotify();
+                    signIn(email, pwd);
+                }
             }
         });
 

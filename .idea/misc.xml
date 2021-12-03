@@ -3,18 +3,25 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/ic_android_black_24dp.xml" value="0.15833333333333333" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/ic_email.xml" value="0.15833333333333333" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/ic_password.xml" value="0.15833333333333333" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/ic_run.xml" value="0.1" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/ic_spotify.xml" value="0.1" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/ic_user.xml" value="0.15833333333333333" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/roundedbutton.xml" value="0.13055555555555556" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_oauth.xml" value="0.14513677811550152" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_pedometer.xml" value="0.25" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_playlists.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_profile.xml" value="0.11096014492753623" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_registration.xml" value="0.25" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_profile.xml" value="0.25" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_registration.xml" value="0.335" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_route_form.xml" value="0.25" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_route_preview.xml" value="0.165" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_runstats.xml" value="0.25" />
         <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/adapter_playingtrack.xml" value="0.25" />
+        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/adapter_playlist.xml" value="0.25" />
       </map>
     </option>
   </component>

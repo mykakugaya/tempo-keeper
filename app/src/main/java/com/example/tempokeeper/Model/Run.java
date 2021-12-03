@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 public class Run {
     private int index;
-    private long startTime; // in ms
-    private long finishTime;   // in ms
     private long duration;  // in ms
     private double distance;
     private double avgSpeed;
@@ -29,14 +27,6 @@ public class Run {
     public void setDistance(int distance) {this.distance = distance;}
 
     public double getDistance() {return this.distance;}
-
-    public void setStartTime(long startTime) {this.startTime = startTime;}
-
-    public long getStartTime() {return this.startTime;}
-
-    public void setFinishTime(long finishTime) {this.finishTime = finishTime;}
-
-    public long getFinishTime() {return this.finishTime;}
 
     public void setAvgSpeed(double speed) {this.avgSpeed = speed;}
 

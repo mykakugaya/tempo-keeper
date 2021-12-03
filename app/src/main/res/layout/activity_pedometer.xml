@@ -16,9 +16,10 @@
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/roundedbutton"
+            android:drawableStart="@drawable/ic_run"
             android:padding="10dp"
             android:text="@string/btnStartRun" />
 
@@ -26,9 +27,11 @@
             android:id="@+id/btnFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/roundedbutton"
+            android:drawableStart="@drawable/ic_stop"
+            android:drawablePadding="5dp"
             android:padding="10dp"
             android:text="@string/btnFinishRun" />
 
@@ -36,11 +39,13 @@
             android:id="@+id/btnStats"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/roundedbutton"
+            android:drawableEnd="@drawable/ic_next"
+            android:padding="10dp"
             android:text="Stats" />
     </LinearLayout>
 
@@ -115,7 +120,7 @@
             android:layout_weight="1"
             android:background="@drawable/roundedbutton"
             android:padding="5dp"
-            app:srcCompat="@android:drawable/ic_media_play"
+            app:srcCompat="@drawable/ic_play"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <ImageButton
@@ -126,7 +131,7 @@
             android:layout_weight="1"
             android:background="@drawable/roundedbutton"
             android:padding="5dp"
-            app:srcCompat="@android:drawable/ic_media_pause"
+            app:srcCompat="@drawable/ic_pause"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <ImageButton
@@ -137,7 +142,7 @@
             android:layout_weight="1"
             android:background="@drawable/roundedbutton"
             android:padding="5dp"
-            app:srcCompat="@android:drawable/ic_media_next"
+            app:srcCompat="@drawable/ic_skip"
             tools:ignore="SpeakableTextPresentCheck" />
     </LinearLayout>
 

@@ -30,6 +30,8 @@
                     android:id="@+id/txtPlayingTrack"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_track"
+                    android:drawablePadding="10dp"
                     android:textAlignment="center"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -38,6 +40,8 @@
                     android:id="@+id/txtPlayingArtist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_user"
+                    android:drawablePadding="10dp"
                     android:textAlignment="center"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -46,6 +50,8 @@
                     android:id="@+id/txtPlayingAlbum"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_album"
+                    android:drawablePadding="10dp"
                     android:textAlignment="center"
                     android:textSize="14sp" />
 
@@ -53,6 +59,8 @@
                     android:id="@+id/txtPlayingTempo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_tempo"
+                    android:drawablePadding="10dp"
                     android:textAlignment="center"
                     android:textSize="14sp" />
             </LinearLayout>

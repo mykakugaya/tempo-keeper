@@ -13,7 +13,7 @@
 //
 //import java.util.ArrayList;
 //
-//public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> {
+//public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
 //    private ArrayList<Run> pastRuns;
 //    private Context mContext;
 //
@@ -61,7 +61,7 @@
 //
 //    // constructor for PlayingRouteAdapter
 //    // pass in currently playing Route array (one item) and the PedometerActivity context
-//    public RouteAdapter(ArrayList<Run> runs, Context context) {
+//    public RunAdapter(ArrayList<Run> runs, Context context) {
 //        mContext = context;
 //        pastRuns = runs;
 //    }
@@ -70,7 +70,7 @@
 //    @Override
 //    public ViewHolder onCreateViewHolder(ViewGroup parent,
 //                                         int viewType) {
-//        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_playingRoute, null, false);
+//        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_run, null, false);
 //        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 //        layoutView.setLayoutParams(lp);
 //
