@@ -70,6 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
         txtSpotifyUser = (TextView) findViewById(R.id.txtUserSpotify);
         txtUserName = (TextView) findViewById(R.id.txtUserName);
         txtUserEmail = (TextView) findViewById(R.id.txtUserEmail);
+        btnSignOut = (Button) findViewById(R.id.btnSignOut);
 
         sharedPreferences = getSharedPreferences("SPOTIFY",0);
 
@@ -81,6 +82,8 @@ public class ProfileActivity extends AppCompatActivity {
         rvHistory.setHasFixedSize(false);
         layoutManager = new LinearLayoutManager(this);
         rvHistory.setLayoutManager(layoutManager);
+
+        runHistory = new ArrayList<>();
 
         // set the user's email and name
         setUserInfo();
@@ -149,6 +152,7 @@ public class ProfileActivity extends AppCompatActivity {
 //                            newRun.setAvgSpeed();
 //                            newRun.setMaxSpeed();
 
+                            // add this Run to runHistory array
                             runHistory.add(newRun);
                         }
 
