@@ -245,13 +245,29 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 finishTime = System.currentTimeMillis();
                 int duration_ms = Math.round(finishTime - startTime); // this is in ms
 
-                // convert ms to mins:secs
-                int minutes = (duration_ms / 1000) / 60;
-                int seconds = (duration_ms / 1000) % 60;
-                if(seconds>=10) {
-                    duration = minutes+":"+seconds;
-                } else {
-                    duration = minutes+":0"+seconds;
+                if(duration_ms < 3600000) { // duration is less than an hr
+                    // convert ms to mins:secs
+                    int minutes = (duration_ms / 1000) / 60;
+                    int seconds = (duration_ms / 1000) % 60;
+                    if (seconds >= 10) {
+                        duration = minutes + ":" + seconds;
+                    } else {
+                        duration = minutes + ":0" + seconds;
+                    }
+                } else {    // duration exceeds an hour
+                    // convert ms to hrs:mins:secs
+                    int seconds = (int) (duration_ms / 1000) % 60 ;
+                    int minutes = (int) ((duration_ms / (1000*60)) % 60);
+                    int hours = (int) ((duration_ms / (1000*60*60)) % 24);
+                    String strMins = String.valueOf(minutes);
+                    String strSecs = String.valueOf(seconds);
+                    if (seconds < 10) {
+                        strSecs = "0"+strSecs;
+                    }
+                    if(minutes < 10) {
+                        strMins = "0"+strMins;
+                    }
+                    duration = hours+":"+strMins+":"+strSecs;
                 }
 
                 // pause playbackService and disable remote player

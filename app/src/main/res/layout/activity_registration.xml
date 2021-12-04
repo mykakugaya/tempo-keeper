@@ -75,7 +75,7 @@
         android:id="@+id/btnregister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/roundedbutton"
+        android:background="@drawable/button_blue"
         android:text="Register"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -82,7 +82,7 @@
         android:id="@+id/btnCalculate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/roundedbutton"
+        android:background="@drawable/button_blue"
         android:drawableStart="@drawable/ic_directions"
         android:drawablePadding="10dp"
         android:padding="10dp"

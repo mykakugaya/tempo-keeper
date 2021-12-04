@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:background="@drawable/roundedbutton"
+            android:background="@drawable/button_green"
             android:drawableStart="@drawable/ic_run"
             android:padding="10dp"
             android:text="@string/btnStartRun" />
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
-            android:background="@drawable/roundedbutton"
+            android:background="@drawable/button_red"
             android:drawableStart="@drawable/ic_stop"
             android:drawablePadding="5dp"
             android:padding="10dp"
@@ -43,7 +43,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:background="@drawable/roundedbutton"
+            android:background="@drawable/button_blue"
             android:drawableEnd="@drawable/ic_next"
             android:padding="10dp"
             android:text="Stats" />
@@ -118,7 +118,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
-            android:background="@drawable/roundedbutton"
+            android:background="@drawable/button_blue"
             android:padding="5dp"
             app:srcCompat="@drawable/ic_play"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -129,7 +129,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
-            android:background="@drawable/roundedbutton"
+            android:background="@drawable/button_blue"
             android:padding="5dp"
             app:srcCompat="@drawable/ic_pause"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -140,7 +140,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:background="@drawable/roundedbutton"
+            android:background="@drawable/button_blue"
             android:padding="5dp"
             app:srcCompat="@drawable/ic_skip"
             tools:ignore="SpeakableTextPresentCheck" />
