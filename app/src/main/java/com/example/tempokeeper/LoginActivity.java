@@ -36,8 +36,8 @@ https://developer.spotify.com/documentation/web-api/reference/#/
 */
 
 /**
- * Flow: LoginActivity/RegistrationActivity -> RouteFormActivity -> RoutePreviewActivity ->
- * PlaylistActivity -> PedometerActivity+Map
+ * Flow of App: LoginActivity/RegistrationActivity -> RouteFormActivity -> RoutePreviewActivity ->
+ * PlaylistActivity -> RunningActivity -> RunStatsActivity
  * */
 
 /* This class uses Firebase authentication to log in, it also
@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
     private RequestQueue queue;
 
     // Initialize Spotify variables
-    private static final String CLIENT_ID = "f48deef1d46e49a8a445952351b10216";
+    private static final String CLIENT_ID = "88f65e37c8ea46068f52128ed751422c";
     // Scopes from: https://developer.spotify.com/documentation/general/guides/authorization/scopes/
     // Permissions required for API calls
     private static final String SCOPES = "app-remote-control,playlist-read-private,playlist-modify-private,playlist-modify-public,user-read-private,streaming,user-top-read,user-modify-playback-state,user-read-currently-playing,user-read-playback-state";
@@ -98,9 +98,12 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = username.getText().toString();
                 String pwd = password.getText().toString();
-                // Authorize this app to access your Spotify app information
-                authenticateSpotify();
-                signIn(email, pwd);
+                // Make sure there is something in both fields before allowing login
+                if(!email.equals("")&&!password.equals("")) {
+                    // Authorize this app to access your Spotify app information
+                    authenticateSpotify();
+                    signIn(email, pwd);
+                }
             }
         });
 

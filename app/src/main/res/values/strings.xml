@@ -2,14 +2,38 @@
     <string name="app_name">Tempo Keeper</string>
     <string name="google_map_api_key">AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw</string>
 
-    <string name="btnLogin">Connect Spotify Account</string>
-    <string name="curTrack">Current Track:</string>
-    <string name="upNext">Queue:</string>
+    <string name="btnLogin">Login</string>
+    <string name="email">Email</string>
+    <string name="pass">Password</string>
+    <string name="textRegister">Don\'t have an account? Register here</string>
+    <string name="createAccount">Create an Account</string>
+    <string name="name">Name</string>
+    <string name="btnRegister">Register</string>
+
+
+    <string name="customRoute">Create a Custom Route</string>
+    <string name="destination">Destination</string>
+    <string name="elevationOpt">Elevation Options:</string>
+    <string name="hilly">Hilly</string>
+    <string name="flat">Flat</string>
+    <string name="na">N/A</string>
+    <string name="newRoute">New Route</string>
+    <string name="btnCalculateRoute">Calculate Route</string>
+
+    <string name="generatedRoute">Your Generated Route:</string>
+    <string name="btnBackToForm">Back to Form</string>
+    <string name="btnSelectMusic">Select Music</string>
+
     <string name="btnLoadPlaylists">Load My Playlists Below</string>
-    <string name="btnTargetBpm">Set Target BPM</string>
+    <string name="btnGoToRun">Go To Run</string>
     <string name="btnLoadTracks">Load Tracks</string>
     <string name="btnSelectTempo">Filter Tracks</string>
+
     <string name="btnStartRun">Start Run</string>
     <string name="btnFinishRun">Finish Run</string>
-    <string name="createAccount">Create an Account</string>
+    <string name="btnStats">Stats</string>
+
+    <string name="profile">User Profile</string>
+    <string name="runStats">Run Statistics</string>
+    <string name="routeHistory">Route History</string>
 </resources>

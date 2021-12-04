@@ -94,7 +94,6 @@ public class RouteFormActivity extends AppCompatActivity {
 
         //reference views
         edtDestination = (EditText) findViewById(R.id.edtDestination);
-        edtDistance = (EditText) findViewById(R.id.edtDistance);
 //        rbtnHilly = (RadioButton) findViewById(R.id.rbtnHilly);
 //        rbtnFlat = (RadioButton) findViewById(R.id.rbtnFlat);
 //        rbtnNA = (RadioButton) findViewById(R.id.rbtnNA);
