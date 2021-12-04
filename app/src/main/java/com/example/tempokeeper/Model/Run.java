@@ -16,10 +16,6 @@ public class Run {
         this.index = index;
     }
 
-    public void setIndex(int index) {this.index = index;}
-
-    public int getIndex() {return this.index;}
-
     public void setDate(String date) {this.date = date;}
 
     public String getDate() {return this.date;}

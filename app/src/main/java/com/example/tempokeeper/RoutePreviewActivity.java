@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -63,9 +64,10 @@ import java.util.List;
 public class RoutePreviewActivity extends AppCompatActivity implements OnMapReadyCallback,  GoogleMap.OnPolylineClickListener,
         GoogleMap.OnPolygonClickListener{
 
+    private String dest;    // destination string passed in from route form activity
     private GoogleMap mMap;
     private Button btnBack;
-    private Button btnRun;
+    private Button btnMusic;
     private ArrayList<Polyline> routesArray;
     private ArrayList<PolylineOptions> nextActivityArray;
 
@@ -82,10 +84,11 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_preview);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         btnBack = (Button) findViewById(R.id.btnBack);
-        btnRun = (Button) findViewById(R.id.btnSelectMusic);
-        btnRun.setEnabled(false);
+        btnMusic = (Button) findViewById(R.id.btnSelectMusic);
+        btnMusic.setEnabled(false);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -97,6 +100,11 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // get the desired destination from the previous route form activity
+        // could also be from clicking the back button in PlaylistActivity
+        Bundle bundle = getIntent().getExtras();
+        dest = bundle.getString("destination");
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,7 +203,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             }
             routesArray.get(0).setZIndex(1);
             routesArray.get(0).setColor(Color.BLUE);
-            btnRun.setEnabled(true);
+            btnMusic.setEnabled(true);
         }
     }
 
@@ -278,7 +286,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        btnRun.setOnClickListener(new View.OnClickListener() {
+        btnMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //user should get a route to run and run it
@@ -286,6 +294,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                 //and updates route
 
                 Intent intent = new Intent(RoutePreviewActivity.this, PlaylistActivity.class);
+                intent.putExtra("destination", dest);   // add dest just in case we want to come back to this page
                 for (int i = 0; i < routesArray.size(); i++){
                     if (routesArray.get(i).getColor() == Color.BLUE){
                         intent.putExtra("chosenRoute", nextActivityArray.get(i));
@@ -311,8 +320,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             if (mMap != null) {
                 setUserLocationMarker(locationResult.getLastLocation());
                 if (start == false){
-                    Bundle bundle = getIntent().getExtras();
-                    String dest = bundle.getString("destination");
                     String url = getDirectionsUrl(userLocationMarker.getPosition(), dest);
 
                     DownloadTask downloadTask = new DownloadTask();

@@ -1,5 +1,7 @@
 package com.example.tempokeeper;
 
+import static java.lang.Integer.parseInt;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
@@ -33,6 +35,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,8 +45,9 @@ import java.util.List;
 
 public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
     // TEXTVIEWS DISPLAYING STATS
+    private TextView txtDate;
     private TextView txtDuration;
-//    private TextView txtDistance;
+    private TextView txtDistance;
     private TextView txtAvgSpeed;
     private TextView txtMaxSpeed;
 
@@ -52,7 +57,8 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private String[] tempLst;
     private TextView txtHistory;
     ArrayList recentRoute;
-    String recentDuration;
+    private String lastDuration;
+    private String lastDate;
 
     private final FirebaseDatabase usersDB = FirebaseDatabase.getInstance();
     DatabaseReference dbRef = usersDB.getReference().child("Users");
@@ -70,15 +76,16 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_runstats);
 
+        txtDate = (TextView) findViewById(R.id.txtRunDate);
         txtDuration = (TextView) findViewById(R.id.txtRunDuration);
+        txtDistance = (TextView) findViewById(R.id.txtDist);
         txtAvgSpeed = (TextView) findViewById(R.id.txtAvgSpeed);
         txtMaxSpeed = (TextView) findViewById(R.id.txtMaxSpeed);
 
+        // CHANGE THIS INTENT TO GETTING ROUTE FROM FIREBASE
         runningRoute = getIntent().getExtras().getParcelableArrayList("runningRoute");
 
         // Connect the map
@@ -110,17 +117,19 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
 //        });
 //    }
 
-    public void getRecentTime(){
+    public void getDateAndTime(){
         DatabaseReference myRef = dbRef.child(firebaseUser);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
-                    String temp = String.valueOf(Long.valueOf(snapshot.child("Time").getChildrenCount()));
-                    int LAST_INDEX = Integer.valueOf(temp)-1;
-                    if(Integer.valueOf(temp) > 0) {
-                        recentDuration = String.valueOf(snapshot.child("Time").child(String.valueOf(LAST_INDEX)).getValue());
-                        txtDuration.setText("Duration: "+recentDuration);
+                    int count = parseInt(String.valueOf(Long.valueOf(snapshot.child("Time").getChildrenCount())));
+                    int LAST_INDEX = count-1;
+                    if(count > 0) {
+                        lastDuration = String.valueOf(snapshot.child("Time").child(String.valueOf(LAST_INDEX)).getValue());
+                        txtDuration.setText("Duration: "+lastDuration);
+                        lastDate = String.valueOf(snapshot.child("Date").child(String.valueOf(LAST_INDEX)).getValue());
+                        txtDate.setText("Date: "+lastDate);
                     }
                 }
             }
@@ -226,7 +235,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         displayRoute();
 
         //retrieve the duration data from the firebase and show on txtView
-        getRecentTime();
+        getDateAndTime();
     }
 
     @Override

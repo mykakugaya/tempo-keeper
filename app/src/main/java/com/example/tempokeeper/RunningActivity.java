@@ -77,6 +77,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -96,6 +98,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private ImageButton btnNext;
     private Button btnStart;
     private Button btnFinish;
+    private Button btnBack;
 
     private Button btnStats;
 
@@ -148,9 +151,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private GoogleMap mMap;
     private PolylineOptions lineOptions;
 
-//    Marker userLocationMarker;
-//    Circle userLocationAccuracyCircle;
-
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
 
@@ -165,14 +165,16 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private String firebaseUser = mAuth.getCurrentUser().getUid();
 
     // used to save routes to user database
-    private String[] tempLst;
+    private String[] routeLst;
     private String[] timeLst;
+    private String[] dateLst;
     ArrayList points = null;
 
     // Start and Finish times of the run
     private long startTime;
     private long finishTime;
     private String duration;
+    private String startDateTime;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -182,7 +184,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pedometer);
+        setContentView(R.layout.activity_running);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
@@ -195,9 +197,11 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         btnNext = (ImageButton) findViewById(R.id.btnNext2);
         btnFinish = (Button) findViewById(R.id.btnFinish);
         btnStart = (Button) findViewById(R.id.btnStart);
+        btnBack = (Button) findViewById(R.id.btnBackToMusic);
         btnStats = (Button) findViewById(R.id.btnStats);
 
         btnStart.setEnabled(false);
+        btnBack.setEnabled(true);
         btnFinish.setEnabled(false);
 
         // Set track info recycler view to have linear layout and a fixed size
@@ -236,7 +240,40 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
         Toast.makeText(RunningActivity.this, "Click \"Start Run\" to start your run!", Toast.LENGTH_LONG).show();
 
-        // Clicked finish button, disable remote player
+        // GET POLYLINE OPTIONS FROM BUNDLE
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(500);
+        locationRequest.setMaxWaitTime(1000);
+        locationRequest.setFastestInterval(500);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        lineOptions = getIntent().getParcelableExtra("chosenRoute");
+
+        // Connect map
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map2);
+        mapFragment.getMapAsync(this);
+
+
+        // BUTTON ONCLICK
+
+        // Back button clicked - takes us back to PlaylistActivity to select a playlist
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playbackService.disableRemote();
+                unbindStepService();
+                stopStepService();
+
+                Intent backIntent = new Intent(RunningActivity.this, PlaylistActivity.class);
+                backIntent.putExtra("chosenRoute",lineOptions);
+                startActivity(backIntent);
+            }
+        });
+
+        // Finish button clicked, disable remote player
         // also set mQuitting to true so that it clears the step detector service
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -296,27 +333,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View view) {
                 Intent finishIntent = new Intent(RunningActivity.this, RunStatsActivity.class);
                 finishIntent.putExtra("runningRoute",runningRoute);
+//                finishIntent.putExtra("startDateTime",startDateTime);
                 startActivity(finishIntent);
             }
         });
-
-
-
-        // GET POLYLINE OPTIONS FROM BUNDLE
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(500);
-        locationRequest.setMaxWaitTime(1000);
-        locationRequest.setFastestInterval(500);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        lineOptions = getIntent().getParcelableExtra("chosenRoute");
-
-        // Connect map
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map2);
-        mapFragment.getMapAsync(this);
     }
 
     // Activity LifeCycle methods
@@ -408,12 +428,19 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         // One consistently updates the progress bar
         // the other consistently updates the track info
         btnStart.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 running = true;
+                // once we start run, enable finish button and disable back to music button
                 btnFinish.setEnabled(true);
-                // get the start time in ms
+                btnBack.setEnabled(false);
+
+                // get the start time in ms (used to calculate run duration)
                 startTime = System.currentTimeMillis();
+                // also get the date of the run
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                startDateTime = dtf.format(LocalDateTime.now());
                 // enable spotify dynamic playback and controls
                 startSpotify();
             }
@@ -479,25 +506,33 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
                     String temp = String.valueOf(Long.valueOf(snapshot.child("Routes").getChildrenCount()));
-                    if (Integer.valueOf(temp)>0) {
+                    if (Integer.valueOf(temp)>0) {  // if past runs exist, append this run
                         String[] routesArray = new String[Integer.valueOf(temp) + 1];
                         String[] durationArray = new String[Integer.valueOf(temp) + 1];
-                        tempLst = routesArray;
+                        String[] dateArray = new String[Integer.valueOf(temp) + 1];
+                        routeLst = routesArray;
                         timeLst = durationArray;
+                        dateLst = dateArray;
                         for (int i = 0; i < Integer.valueOf(temp); i++) {
                             String x = String.valueOf(i);
-                            tempLst[i] = String.valueOf(snapshot.child("Routes").child(x).getValue());
+                            routeLst[i] = String.valueOf(snapshot.child("Routes").child(x).getValue());
                             timeLst[i] = String.valueOf(snapshot.child("Time").child(x).getValue());
+                            dateLst[i] = String.valueOf(snapshot.child("Date").child(x).getValue());
                         }
-                        tempLst[tempLst.length-1] = String.valueOf(runningRoute);
                         Log.d("Running Route",""+runningRoute.size());
-                        dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(tempLst));
+
+                        // set new values to firebase database
+                        routeLst[routeLst.length-1] = String.valueOf(runningRoute);
+                        dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(routeLst));
                         timeLst[timeLst.length-1] = duration;
                         dbRef.child(firebaseUser).child("Time").setValue(Arrays.asList(timeLst));
+                        dateLst[dateLst.length-1] = startDateTime;
+                        dbRef.child(firebaseUser).child("Date").setValue(Arrays.asList(dateLst));
                     }
-                    else{
+                    else{   // else, this is the first run completed
                         dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(runningRoute));
                         dbRef.child(firebaseUser).child("Time").setValue(Arrays.asList(duration));
+                        dbRef.child(firebaseUser).child("Date").setValue(Arrays.asList(startDateTime));
                         Log.d("Running Route",""+runningRoute.size());
                     }
                 }
@@ -519,10 +554,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             stepService = ((StepService.StepBinder)service).getService();
-
             stepService.registerCallback(mCallback);
             stepService.reloadSettings();
-            
         }
 
         public void onServiceDisconnected(ComponentName className) {

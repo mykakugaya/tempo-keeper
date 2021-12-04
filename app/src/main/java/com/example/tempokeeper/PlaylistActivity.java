@@ -24,7 +24,8 @@ import java.util.ArrayList;
 public class PlaylistActivity extends AppCompatActivity {
     private TextView txtUser;
     private Button btnUserPlaylists;
-    private Button btnDynamicBpm;
+    private Button btnRun;
+    private Button btnBack;
 
     private String userId;  // current logged in user
     private SharedPreferences sharedPref;   // sharedPreferences for id and token
@@ -39,13 +40,12 @@ public class PlaylistActivity extends AppCompatActivity {
     private RecyclerView.Adapter playlistAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    private PolylineOptions lineOptions;
+    private PolylineOptions lineOptions;    // necessary for next running activity
+    private String dest;    // necessary if we're going back to the previous preview activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
         setContentView(R.layout.activity_playlists);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -53,10 +53,12 @@ public class PlaylistActivity extends AppCompatActivity {
         txtUser = (TextView) findViewById(R.id.txtUser);
         rvPlaylists = (RecyclerView) findViewById(R.id.rvQueue);
         btnUserPlaylists = (Button) findViewById(R.id.btnGetUserPlaylists);
-        btnDynamicBpm = (Button) findViewById(R.id.btnPedometerBpm);
+        btnRun = (Button) findViewById(R.id.btnPedometerBpm);
+        btnBack = (Button) findViewById(R.id.btnBackToPreview);
 
         // get the chosen route
         lineOptions = getIntent().getParcelableExtra("chosenRoute");
+        dest = getIntent().getExtras().getString("destination");
 
         // sharedPref has the token for API calls
         sharedPref = getSharedPreferences("SPOTIFY", 0);
@@ -84,7 +86,7 @@ public class PlaylistActivity extends AppCompatActivity {
         // if spotify user not found, disable buttons to prevent crashing
         if(userId.equals("User Not Found")) {
             btnUserPlaylists.setEnabled(false);
-            btnDynamicBpm.setEnabled(false);
+            btnRun.setEnabled(false);
         } else {
             btnUserPlaylists.setEnabled(true);
         }
@@ -94,7 +96,16 @@ public class PlaylistActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 setUserPlaylists();
-                btnDynamicBpm.setEnabled(true);
+                btnRun.setEnabled(true);
+            }
+        });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent previewIntent = new Intent(PlaylistActivity.this, RoutePreviewActivity.class);
+                previewIntent.putExtra("destination", dest);
+                startActivity(previewIntent);
             }
         });
 
@@ -102,7 +113,7 @@ public class PlaylistActivity extends AppCompatActivity {
         // running BPM
         // Whenever a significant change in run pace is detected, the queue of songs will change
         // and a song at the appropriate new tempo will be played
-        btnDynamicBpm.setOnClickListener(new View.OnClickListener() {
+        btnRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(sharedPref.getString("curPlaylistName","").equals("")) {
@@ -111,9 +122,9 @@ public class PlaylistActivity extends AppCompatActivity {
                 } else {
                     // Go to PedometerActivity to start calculating the number of steps taken
                     // and your pace (in steps per minute)
-                    Intent pedometerIntent = new Intent(PlaylistActivity.this, RunningActivity.class);
-                    pedometerIntent.putExtra("chosenRoute", lineOptions);
-                    startActivity(pedometerIntent);
+                    Intent runningIntent = new Intent(PlaylistActivity.this, RunningActivity.class);
+                    runningIntent.putExtra("chosenRoute", lineOptions);
+                    startActivity(runningIntent);
                 }
             }
         });

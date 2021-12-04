@@ -13,10 +13,18 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btnBackToMusic"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/ic_back" />
+
+        <Button
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/button_green"
             android:drawableStart="@drawable/ic_run"
@@ -27,8 +35,9 @@
             android:id="@+id/btnFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/button_red"
             android:drawableStart="@drawable/ic_stop"
             android:drawablePadding="5dp"
@@ -37,9 +46,9 @@
 
         <Button
             android:id="@+id/btnStats"
-            android:layout_width="wrap_content"
+            android:layout_width="37dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
@@ -53,7 +62,7 @@
         android:id="@+id/map2"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="444dp"
+        android:layout_height="429dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtGeneratedRoute"
@@ -68,7 +77,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTrack"
         android:layout_width="match_parent"
-        android:layout_height="129dp"
+        android:layout_height="159dp"
         android:paddingLeft="10dp"
         android:paddingTop="10dp">
 

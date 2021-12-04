@@ -31,7 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableStart="@drawable/ic_track"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="5dp"
                     android:textAlignment="center"
                     android:textSize="18sp"
                     android:textStyle="bold" />

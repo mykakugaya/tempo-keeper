@@ -59,7 +59,7 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         // it will take them to a route preview page so that they can rerun that route
         @Override
         public void onClick(View view) {
-
+            // declare an intent, send in route information
         }
 
     }
@@ -90,10 +90,10 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         // set each run info in holder
         holder.run = pastRuns.get(position);
         holder.txtDate.setText(pastRuns.get(position).getDate());
-        holder.txtDistance.setText(pastRuns.get(position).getDistance()+" miles");
+//        holder.txtDistance.setText(pastRuns.get(position).getDistance()+" miles");
         holder.txtDuration.setText(pastRuns.get(position).getDuration());
-        holder.txtAvgSpeed.setText(pastRuns.get(position).getAvgSpeed()+" MPH");
-        holder.txtMaxSpeed.setText(pastRuns.get(position).getMaxSpeed()+" MPH");
+//        holder.txtAvgSpeed.setText(pastRuns.get(position).getAvgSpeed()+" MPH");
+//        holder.txtMaxSpeed.setText(pastRuns.get(position).getMaxSpeed()+" MPH");
         holder.runIndex = holder.getAdapterPosition();
     }
 

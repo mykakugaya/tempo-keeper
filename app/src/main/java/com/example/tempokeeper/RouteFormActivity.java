@@ -87,8 +87,6 @@ public class RouteFormActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_route_form);
 
@@ -110,8 +108,8 @@ public class RouteFormActivity extends AppCompatActivity {
                 int selectedId = radioGroup.getCheckedRadioButtonId();
                 // find the radiobutton by returned id
                 rbtnElevation = (RadioButton) findViewById(selectedId);
-                Toast.makeText(RouteFormActivity.this,
-                        rbtnElevation.getText(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(RouteFormActivity.this,
+//                        rbtnElevation.getText(), Toast.LENGTH_SHORT).show();
 
 //                //get destination string and extra parameters
                 String dest = edtDestination.getText().toString();

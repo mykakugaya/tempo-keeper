@@ -27,7 +27,7 @@
         parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/buttonText</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="primaryTextColor">@color/primaryText</item>
         <item name="buttonNormalColor">@color/buttonNormal</item>

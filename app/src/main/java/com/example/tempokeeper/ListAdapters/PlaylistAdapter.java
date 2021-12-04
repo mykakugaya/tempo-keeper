@@ -72,7 +72,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
                 if(sharedPref.getString("curPlaylistName","").equals("")) {
                     // Make a toast indicating which playlist
                     Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
-                    layoutPlaylist.setBackgroundColor(Color.GREEN);
+                    layoutPlaylist.setBackgroundColor(context.getResources().getColor(R.color.blue_100));
                     // save the selected tempo in sharedPreferences
                     // we will use it in TrackActivity when the filter tempos button is clicked
                     editor = sharedPref.edit();

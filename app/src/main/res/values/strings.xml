@@ -25,16 +25,17 @@
     <string name="btnSelectMusic">Select Music</string>
 
     <string name="btnLoadPlaylists">Load My Playlists Below</string>
+    <string name="btnBackToPreview">Back to Preview</string>
     <string name="btnGoToRun">Go To Run</string>
     <string name="btnLoadTracks">Load Tracks</string>
     <string name="btnSelectTempo">Filter Tracks</string>
 
-    <string name="btnStartRun">Start Run</string>
-    <string name="btnFinishRun">Finish Run</string>
+    <string name="btnStartRun">Start</string>
+    <string name="btnFinishRun">Finish</string>
     <string name="btnStats">Stats</string>
 
     <string name="profile">User Profile</string>
     <string name="signOut">Sign Out</string>
     <string name="runStats">Run Statistics</string>
-    <string name="routeHistory">Route History</string>
+    <string name="routeHistory">Run History</string>
 </resources>
