@@ -81,11 +81,20 @@ public class PlaylistActivity extends AppCompatActivity {
 
         Toast.makeText(PlaylistActivity.this, "Click \"Load Playlists\" then select a playlist", Toast.LENGTH_SHORT).show();
 
+        // if spotify user not found, disable buttons to prevent crashing
+        if(userId.equals("User Not Found")) {
+            btnUserPlaylists.setEnabled(false);
+            btnDynamicBpm.setEnabled(false);
+        } else {
+            btnUserPlaylists.setEnabled(true);
+        }
+
         // click the "My Playlists" button to generate a list of user's playlists
         btnUserPlaylists.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 setUserPlaylists();
+                btnDynamicBpm.setEnabled(true);
             }
         });
 

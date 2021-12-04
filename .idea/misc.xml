@@ -1,23 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/drawable/roundedbutton.xml" value="0.13055555555555556" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_login.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_oauth.xml" value="0.14513677811550152" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_pedometer.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_playlists.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_profile.xml" value="0.11096014492753623" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_registration.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_route_form.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_route_preview.xml" value="0.165" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/activity_runstats.xml" value="0.25" />
-        <entry key="..\:/Users/mykak/AndroidStudioProjects/tempokeeper/app/src/main/res/layout/adapter_playingtrack.xml" value="0.25" />
-      </map>
-    </option>
-  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
