@@ -39,6 +39,8 @@
         <service android:name=".PaceTracker.StepService"/>
         <activity android:name=".RunStatsActivity"
             android:exported="true" />
+        <activity android:name=".ProfileActivity"
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

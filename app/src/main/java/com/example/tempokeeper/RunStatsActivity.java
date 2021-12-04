@@ -4,6 +4,7 @@ import static java.lang.Integer.parseInt;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,6 +52,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView txtDistance;
     private TextView txtAvgSpeed;
     private TextView txtMaxSpeed;
+    private Button btnProfile;
 
     // FIREBASE
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -84,6 +87,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         txtDistance = (TextView) findViewById(R.id.txtDist);
         txtAvgSpeed = (TextView) findViewById(R.id.txtAvgSpeed);
         txtMaxSpeed = (TextView) findViewById(R.id.txtMaxSpeed);
+        btnProfile = (Button) findViewById(R.id.btnProfile);
 
         // CHANGE THIS INTENT TO GETTING ROUTE FROM FIREBASE
         runningRoute = getIntent().getExtras().getParcelableArrayList("runningRoute");
@@ -93,8 +97,17 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
                 .findFragmentById(R.id.mapFinished);
         mapFragment.getMapAsync(this);
 
-        // show the completed route on map - displayRoute() called in onMapReady()
+        // show the completed route on map
+        // displayRoute() called in onMapReady(), displays the runningRoute
 
+        // profile button
+        btnProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent profileIntent = new Intent(RunStatsActivity.this, ProfileActivity.class);
+                startActivity(profileIntent);
+            }
+        });
     }
 
 //    public void getRecentRoute(){
