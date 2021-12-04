@@ -71,6 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
         txtUserName = (TextView) findViewById(R.id.txtUserName);
         txtUserEmail = (TextView) findViewById(R.id.txtUserEmail);
         btnSignOut = (Button) findViewById(R.id.btnSignOut);
+        rvHistory = (RecyclerView) findViewById(R.id.rvHistory);
 
         sharedPreferences = getSharedPreferences("SPOTIFY",0);
 

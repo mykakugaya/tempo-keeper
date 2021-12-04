@@ -201,7 +201,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         btnStats = (Button) findViewById(R.id.btnStats);
 
         btnStart.setEnabled(false);
-//        btnBack.setEnabled(true);
+        btnBack.setEnabled(true);
         btnFinish.setEnabled(false);
 
         // Set track info recycler view to have linear layout and a fixed size
@@ -260,15 +260,15 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         // BUTTON ONCLICK
 
         // Back button clicked - takes us back to PlaylistActivity to select a playlist
-//        btnBack.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                playbackService.disableRemote();
-//                Intent backIntent = new Intent(RunningActivity.this, PlaylistActivity.class);
-//                backIntent.putExtra("chosenRoute",lineOptions);
-//                startActivity(backIntent);
-//            }
-//        });
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playbackService.disableRemote();
+                Intent backIntent = new Intent(RunningActivity.this, PlaylistActivity.class);
+                backIntent.putExtra("chosenRoute",lineOptions);
+                startActivity(backIntent);
+            }
+        });
 
         // Finish button clicked, disable remote player
         // also set mQuitting to true so that it clears the step detector service
@@ -431,7 +431,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 running = true;
                 // once we start run, enable finish button and disable back to music button
                 btnFinish.setEnabled(true);
-//                btnBack.setEnabled(false);
+                btnBack.setEnabled(false);
 
                 // get the start time in ms (used to calculate run duration)
                 startTime = System.currentTimeMillis();
