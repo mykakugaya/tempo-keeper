@@ -6,23 +6,27 @@ import java.util.ArrayList;
 
 public class Run {
     private int index;
-    private long duration;  // in ms
+    private String date;    // e.g. "12/01/21"
+    private String duration;  // e.g. "2:31:03"
     private double distance;
     private double avgSpeed;
     private double maxSpeed;
-    private ArrayList<PolylineOptions> route;
 
-    public Run() {
-
+    public Run(int index) {
+        this.index = index;
     }
 
     public void setIndex(int index) {this.index = index;}
 
     public int getIndex() {return this.index;}
 
-    public void setDuration(long duration) {this.duration = duration;}
+    public void setDate(String date) {this.date = date;}
 
-    public long getDuration() {return this.duration;}
+    public String getDate() {return this.date;}
+
+    public void setDuration(String duration) {this.duration = duration;}
+
+    public String getDuration() {return this.duration;}
 
     public void setDistance(int distance) {this.distance = distance;}
 

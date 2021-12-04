@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tempokeeper.Model.Run;
 import com.example.tempokeeper.R;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
@@ -20,8 +22,8 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public int runIndex;
         public TextView txtDate;
-        public TextView txtDuration;
         public TextView txtDistance;
+        public TextView txtDuration;
         public TextView txtMaxSpeed;
         public TextView txtAvgSpeed;
 
@@ -46,18 +48,18 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
             // we can set the color of the Route information background
 
             // each Route ViewHolder has an image, name, and number of Routes
-//            imgRoute = (ImageView) itemView.findViewById(R.id.imgPlayingRoute);
-//            txtName = (TextView) itemView.findViewById(R.id.txtPlayingRoute);
-//            txtArtist = (TextView) itemView.findViewById(R.id.txtPlayingArtist);
-//            txtAlbum = (TextView) itemView.findViewById(R.id.txtPlayingAlbum);
-//            txtTempo = (TextView) itemView.findViewById(R.id.txtPlayingTempo);
+            txtDate = (TextView) itemView.findViewById(R.id.txtDate);
+            txtDistance = (TextView) itemView.findViewById(R.id.txtRunDistance);
+            txtDuration = (TextView) itemView.findViewById(R.id.txtRunTime);
+            txtAvgSpeed = (TextView) itemView.findViewById(R.id.txtRunAvg);
+            txtMaxSpeed = (TextView) itemView.findViewById(R.id.txtRunMax);
         }
 
-        // When user clicks on the playing Route adapter, they will get a Toast notifying them
-        // which Route is currently playing
+        // When user clicks on the Run adapter,
+        // it will take them to a route preview page so that they can rerun that route
         @Override
         public void onClick(View view) {
-//            Toast.makeText(context, "Route " + route.getName() + " playing: " + route.getTempo() + " bpm", Toast.LENGTH_SHORT).show();
+
         }
 
     }
@@ -85,21 +87,14 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
     // set the name and image of the Route if available
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        // set the Route, its name, and tempo (in bpm)
+        // set each run info in holder
         holder.run = pastRuns.get(position);
-//        holder.txtName.setText(playingRoutes.get(position).getName());
-//        holder.txtArtist.setText(playingRoutes.get(position).getArtist());
-//        holder.txtAlbum.setText(playingRoutes.get(position).getAlbumName());
-//        holder.txtTempo.setText(playingRoutes.get(position).getTempo()+" BPM");
-
-        // if the Route has an image url, load the image using Glide framework
-//        if (holder.route.getImageURL() != null) {
-//            /* Glide is an image loading framework for Android
-//             * primary focus is on making scrolling any kind of a list of images as smooth and fast as possible
-//             * also effective for any case where you need to fetch, resize, and display a remote image
-//             */
-//            Glide.with(mContext).load(playingRoutes.get(position).getImageURL()).into(holder.imgRoute);
-//        }
+        holder.txtDate.setText(pastRuns.get(position).getDate());
+        holder.txtDistance.setText(pastRuns.get(position).getDistance()+" miles");
+        holder.txtDuration.setText(pastRuns.get(position).getDuration());
+        holder.txtAvgSpeed.setText(pastRuns.get(position).getAvgSpeed()+" MPH");
+        holder.txtMaxSpeed.setText(pastRuns.get(position).getMaxSpeed()+" MPH");
+        holder.runIndex = holder.getAdapterPosition();
     }
 
     // get the number of Routes displayed in the list

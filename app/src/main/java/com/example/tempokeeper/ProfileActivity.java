@@ -9,6 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tempokeeper.Model.Run;
+
+import java.util.ArrayList;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView txtSpotifyUser;
@@ -20,6 +24,8 @@ public class ProfileActivity extends AppCompatActivity {
     private String userEmail;
 
     private SharedPreferences sharedPreferences;
+
+    private ArrayList<Run> runHistory;
 
     private RecyclerView rvHistory;
     private RecyclerView.Adapter runAdapter;
@@ -44,6 +50,9 @@ public class ProfileActivity extends AppCompatActivity {
         rvHistory.setHasFixedSize(false);
         layoutManager = new LinearLayoutManager(this);
         rvHistory.setLayoutManager(layoutManager);
-
     }
+
+//    runAdapter = new RunAdapter(runHistory, this);
+//        runAdapter.notifyDataSetChanged();
+//        rvHistory.setAdapter(runAdapter);
 }
