@@ -203,6 +203,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         btnStart.setEnabled(false);
         btnBack.setEnabled(true);
         btnFinish.setEnabled(false);
+        btnStats.setEnabled(false);
 
         // Set track info recycler view to have linear layout and a fixed size
         rvTrack.setHasFixedSize(false);
@@ -249,6 +250,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         locationRequest.setFastestInterval(500);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+        // This is the map polyline passed in to be displayed on the run map
         lineOptions = getIntent().getParcelableExtra("chosenRoute");
 
         // Connect map
@@ -275,6 +277,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnFinish.setEnabled(false);
+                btnStats.setEnabled(true);
                 // get the finish time
                 finishTime = System.currentTimeMillis();
                 int duration_ms = Math.round(finishTime - startTime); // this is in ms
@@ -379,7 +383,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         if (mIsRunning) {
             // disable step service
             unbindStepService();
-            stopStepService();
+//            stopStepService();
         }
         if (mQuitting) {
             mPedometerSettings.saveServiceRunningWithNullTimestamp(mIsRunning);
@@ -430,7 +434,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 running = true;
-                // once we start run, enable finish button and disable back to music button
+                // once we start run, enable finish button and disable start + back to music buttons
+                btnStart.setEnabled(false);
                 btnFinish.setEnabled(true);
                 btnBack.setEnabled(false);
 
@@ -528,7 +533,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         dbRef.child(firebaseUser).child("Date").setValue(Arrays.asList(dateLst));
                     }
                     else{   // else, this is the first run completed
-                        dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(runningRoute));
+                        dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(String.valueOf(runningRoute)));
                         dbRef.child(firebaseUser).child("Time").setValue(Arrays.asList(duration));
                         dbRef.child(firebaseUser).child("Date").setValue(Arrays.asList(startDateTime));
                         Log.d("Running Route",""+runningRoute.size());

@@ -32,7 +32,7 @@
             android:id="@+id/txtUserSpotify"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="12dp"
             android:drawableStart="@drawable/ic_media_bluetooth"
             android:drawablePadding="10dp"
             android:textAlignment="textStart"
@@ -40,27 +40,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtUserProfile" />
+            app:layout_constraintTop_toBottomOf="@+id/txtUserEmail" />
 
         <TextView
             android:id="@+id/txtUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="24dp"
             android:drawableStart="@drawable/ic_user"
             android:drawablePadding="10dp"
             android:textAlignment="textStart"
             android:textColor="@color/text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtUserSpotify" />
+            app:layout_constraintTop_toBottomOf="@+id/txtUserProfile" />
 
         <TextView
             android:id="@+id/txtUserEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:drawableStart="@drawable/ic_email"
             android:drawablePadding="10dp"
             android:textAlignment="textStart"
@@ -74,13 +73,13 @@
             android:id="@+id/btnSignOut"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/button_blue"
             android:text="@string/signOut"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtUserEmail" />
+            app:layout_constraintTop_toBottomOf="@+id/txtUserSpotify" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView

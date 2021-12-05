@@ -21,6 +21,7 @@ package com.example.tempokeeper.PaceTracker;
 import java.util.ArrayList;
 
 /**
+ * Source code repository: https://github.com/bagilevi/android-pedometer
  * Counts steps provided by StepDetector and passes the current
  * step count to the activity.
  */

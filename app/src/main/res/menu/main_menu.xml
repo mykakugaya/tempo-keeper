@@ -3,22 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menuRoute"
-        android:title="Create Route"
         android:icon="@drawable/ic_route"
-        app:showAsAction="ifRoom">
-    </item>
+        android:title="@string/menuRoute"
+        app:showAsAction="ifRoom"></item>
 
     <item
         android:id="@+id/menuProfile"
-        android:title="Profile"
-        android:icon= "@drawable/ic_face"
-        app:showAsAction="ifRoom">
-    </item>
+        android:icon="@drawable/ic_face"
+        android:title="@string/menuProfile"
+        app:showAsAction="ifRoom"></item>
 
     <item
         android:id="@+id/menuSignOut"
-        android:title="Sign Out"
         android:icon="@drawable/ic_logout"
-        app:showAsAction="ifRoom">
-    </item>
+        android:title="@string/signOut"
+        app:showAsAction="ifRoom"></item>
 </menu>

@@ -43,4 +43,7 @@
     <string name="signOut">Sign Out</string>
     <string name="routeHistory">Run History</string>
 
+    <string name="menuProfile">My Profile</string>
+    <string name="menuRoute">Create Route</string>
+
 </resources>

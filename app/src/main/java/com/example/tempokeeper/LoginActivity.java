@@ -37,7 +37,7 @@ https://developer.spotify.com/documentation/web-api/reference/#/
 
 /**
  * Flow of App: LoginActivity/RegistrationActivity -> RouteFormActivity -> RoutePreviewActivity ->
- * PlaylistActivity -> RunningActivity -> RunStatsActivity
+ * PlaylistActivity -> RunningActivity -> RunStatsActivity -> ProfileActivity
  * */
 
 /* This class uses Firebase authentication to log in, it also
@@ -48,6 +48,10 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnlogin;
     private TextView txtRegister;
     private FirebaseAuth mAuth;
+
+    // firebase email and pass
+    private String email;
+    private String pass;
 
     // SharedPreferences to save user info
     private SharedPreferences sharedPref;
@@ -96,13 +100,13 @@ public class LoginActivity extends AppCompatActivity {
         btnlogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = username.getText().toString();
-                String pwd = password.getText().toString();
+                email = username.getText().toString();
+                pass = password.getText().toString();
                 // Make sure there is something in both fields before allowing login
                 if(!email.equals("")&&!password.equals("")) {
                     // Authorize this app to access your Spotify app information
                     authenticateSpotify();
-                    signIn(email, pwd);
+//                    signIn(email, pass);
                 }
             }
         });
@@ -135,8 +139,8 @@ public class LoginActivity extends AppCompatActivity {
                             //when it's signed in correctly, give a Toast with success message and go to Route form activity.
                             Toast.makeText(LoginActivity.this, "Login Success",
                                     Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), RouteFormActivity.class));
-//                            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+//                            startActivity(new Intent(getApplicationContext(), RouteFormActivity.class));
+                            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -163,6 +167,8 @@ public class LoginActivity extends AppCompatActivity {
 
             // Alert user that they are logged in as: userid
             Log.d("OAUTH", "GOT USER INFO");
+            Toast.makeText(LoginActivity.this, "Logged in as: "+user.id, Toast.LENGTH_SHORT).show();
+            signIn(email, pass);
         });
     }
 

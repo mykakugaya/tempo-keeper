@@ -21,6 +21,7 @@ package com.example.tempokeeper.PaceTracker;
 import android.content.SharedPreferences;
 
 /**
+ * Source code repository: https://github.com/bagilevi/android-pedometer
  * Wrapper for {@link SharedPreferences}, handles preferences-related tasks.
  * @author Levente Bagi
  */

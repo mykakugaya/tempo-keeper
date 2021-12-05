@@ -19,6 +19,7 @@
 package com.example.tempokeeper.PaceTracker;
 
 /**
+ * Source code repository: https://github.com/bagilevi/android-pedometer
  * Interface implemented by classes that can handle notifications about steps.
  * These classes can be passed to StepDetector.
  * @author Levente Bagi

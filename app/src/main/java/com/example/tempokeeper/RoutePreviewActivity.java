@@ -8,6 +8,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -32,13 +34,16 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
@@ -65,7 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class RoutePreviewActivity extends AppCompatActivity implements OnMapReadyCallback,  GoogleMap.OnPolylineClickListener,
-        GoogleMap.OnPolygonClickListener{
+        GoogleMap.OnPolygonClickListener, GoogleMap.OnInfoWindowClickListener{
 
     private String dest;    // destination string passed in from route form activity
     private GoogleMap mMap;
@@ -116,6 +121,11 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onInfoWindowClick(@NonNull Marker marker) {
+
     }
 
     private class DownloadTask extends AsyncTask<String, Void, String> {
@@ -288,6 +298,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnInfoWindowClickListener(RoutePreviewActivity.this);
 
         btnMusic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -320,10 +331,58 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
             Log.d(TAG, "onLocationResult: " + locationResult.getLastLocation());
+
+            LatLng latLng = new LatLng(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
             if (mMap != null) {
-                setUserLocationMarker(locationResult.getLastLocation());
+                if (userLocationMarker == null) {
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng);
+                    markerOptions.anchor((float) 0.5, (float) 0.5);
+                    markerOptions.title("This is you");
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    userLocationMarker = mMap.addMarker(markerOptions);
+                }
+
                 if (start == false){
-                    String url = getDirectionsUrl(userLocationMarker.getPosition(), dest);
+                    Bundle bundle = getIntent().getExtras();
+                    String dest = bundle.getString("destination");
+                    String url = getDirectionsUrl(latLng, dest);
+
+                    List<Address> addressList = null;
+                    MarkerOptions destMarker = new MarkerOptions();
+                    Address myAddress;
+                    LatLng destlatLng;
+
+                    Geocoder geocoder = new Geocoder(RoutePreviewActivity.this);
+                    try {
+                        addressList = geocoder.getFromLocationName(dest, 5);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (addressList != null) {
+                        for (int i = 0; i < addressList.size(); i++) {
+                            myAddress = addressList.get(i);
+                            destlatLng = new LatLng(myAddress.getLatitude(), myAddress.getLongitude());
+                            destMarker.position(destlatLng);
+                            destMarker.title("This is your destination");
+                            mMap.addMarker(destMarker);
+                        }
+                    }
+
+
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    builder.include(userLocationMarker.getPosition());
+                    builder.include(destMarker.getPosition());
+                    LatLngBounds bounds = builder.build();
+
+                    int width = getResources().getDisplayMetrics().widthPixels;
+                    int height = getResources().getDisplayMetrics().heightPixels;
+                    int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+
+                    mMap.animateCamera(cu);
+
 
                     DownloadTask downloadTask = new DownloadTask();
                     Log.d("RPA", "downloadTask.execute");
@@ -334,38 +393,38 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         }
     };
 
-    private void setUserLocationMarker(Location location) {
-
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        if (userLocationMarker == null) {
-            //Create a new marker
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.rotation(location.getBearing());
-            markerOptions.anchor((float) 0.5, (float) 0.5);
-            userLocationMarker = mMap.addMarker(markerOptions);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-        } else {
-            //use the previously created marker
-            userLocationMarker.setPosition(latLng);
-            userLocationMarker.setRotation(location.getBearing());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-        }
-
-        if (userLocationAccuracyCircle == null) {
-            CircleOptions circleOptions = new CircleOptions();
-            circleOptions.center(latLng);
-            circleOptions.strokeWidth(4);
-            circleOptions.strokeColor(Color.argb(255, 255, 0, 0));
-            circleOptions.fillColor(Color.argb(32, 255, 0, 0));
-            circleOptions.radius(location.getAccuracy());
-            userLocationAccuracyCircle = mMap.addCircle(circleOptions);
-        } else {
-            userLocationAccuracyCircle.setCenter(latLng);
-            userLocationAccuracyCircle.setRadius(location.getAccuracy());
-        }
-    }
+//    private void setUserLocationMarker(Location location) {
+//
+//        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//
+//        if (userLocationMarker == null) {
+//            //Create a new marker
+//            MarkerOptions markerOptions = new MarkerOptions();
+//            markerOptions.position(latLng);
+//            markerOptions.rotation(location.getBearing());
+//            markerOptions.anchor((float) 0.5, (float) 0.5);
+//            userLocationMarker = mMap.addMarker(markerOptions);
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+//        } else {
+//            //use the previously created marker
+//            userLocationMarker.setPosition(latLng);
+//            userLocationMarker.setRotation(location.getBearing());
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+//        }
+//
+//        if (userLocationAccuracyCircle == null) {
+//            CircleOptions circleOptions = new CircleOptions();
+//            circleOptions.center(latLng);
+//            circleOptions.strokeWidth(4);
+//            circleOptions.strokeColor(Color.argb(255, 255, 0, 0));
+//            circleOptions.fillColor(Color.argb(32, 255, 0, 0));
+//            circleOptions.radius(location.getAccuracy());
+//            userLocationAccuracyCircle = mMap.addCircle(circleOptions);
+//        } else {
+//            userLocationAccuracyCircle.setCenter(latLng);
+//            userLocationAccuracyCircle.setRadius(location.getAccuracy());
+//        }
+//    }
 
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

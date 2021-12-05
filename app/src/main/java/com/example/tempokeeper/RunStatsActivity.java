@@ -32,6 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -129,6 +130,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
                     String temp = String.valueOf(Long.valueOf(snapshot.child("Routes").getChildrenCount()));
+
                     int LAST_INDEX = Integer.valueOf(temp)-1;
 
                     // get route in string form of "(lat,lng),(lat,lng),(lat,lng)"
@@ -136,8 +138,9 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
 
                     // convert string route to an Arraylist<LatLng>
                     ArrayList<LatLng> newArr = new ArrayList<>();
-                    String[] strRouteArr = strLatLng.split(", ");
+
                     // strRouteArr has the str array form ["(lat,lng)","(lat,lng)","(lat,lng)"]
+                    String[] strRouteArr = strLatLng.split(", ");
 
                     for (int j=0; j<strRouteArr.length; j++) {
                         // replace the '(' and ',' in each "(lat,lng)" array item
@@ -177,7 +180,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
                         lastDuration = String.valueOf(snapshot.child("Time").child(String.valueOf(LAST_INDEX)).getValue());
                         txtDuration.setText("Duration: "+lastDuration);
                         lastDate = String.valueOf(snapshot.child("Date").child(String.valueOf(LAST_INDEX)).getValue());
-                        txtDate.setText("Date: "+lastDate);
+                        txtDate.setText(lastDate);
                     }
                 }
             }
@@ -220,19 +223,33 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         }
 
         // Show route on map by zooming in
-//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//        LatLngBounds bounds = builder.build();
-//        for (LatLng point: points) {
-//            builder.include(point);
-//        }
-//        int padding = 70;
-//        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-//        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-//            @Override
-//            public void onMapLoaded() {
-//                mMap.animateCamera(cu);
-//            }
-//        });
+        //marker for origin point
+        MarkerOptions originMarker = new MarkerOptions();
+        originMarker.position(runningRoute.get(0));
+        originMarker.anchor((float) 0.5, (float) 0.5);
+        originMarker.title("This is you");
+        originMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        mMap.addMarker(originMarker);
+
+        //marker for end point
+        MarkerOptions endMarker = new MarkerOptions();
+        endMarker.position(runningRoute.get(runningRoute.size()-1));
+        endMarker.anchor((float) 0.5, (float) 0.5);
+        endMarker.title("This is your end point");
+        mMap.addMarker(endMarker);
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(originMarker.getPosition());
+        builder.include(endMarker.getPosition());
+        LatLngBounds bounds = builder.build();
+
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, 300);
+
+        mMap.animateCamera(cu);
 
     }
 

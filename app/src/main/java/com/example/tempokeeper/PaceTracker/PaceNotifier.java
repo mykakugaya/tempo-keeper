@@ -21,6 +21,7 @@ package com.example.tempokeeper.PaceTracker;
 import java.util.ArrayList;
 
 /**
+ * Source code repository: https://github.com/bagilevi/android-pedometer
  * Calculates and displays pace (steps / minute), handles input of desired pace,
  * notifies user if he/she has to go faster or slower.  
  * @author Levente Bagi

@@ -24,13 +24,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingLeft="10dp">
 
                 <TextView
                     android:id="@+id/txtPlaylistName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
+                    android:textColor="@color/title"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -39,6 +41,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
+                    android:textColor="@color/title"
                     android:textSize="16sp" />
             </LinearLayout>
 

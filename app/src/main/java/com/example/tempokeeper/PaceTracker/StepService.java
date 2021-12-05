@@ -29,6 +29,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+/** Source code repository: https://github.com/bagilevi/android-pedometer
+ * */
 public class StepService extends Service {
 	private static final String TAG = "StepService";
     private SharedPreferences mSettings;

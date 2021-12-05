@@ -24,7 +24,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingLeft="10dp">
 
                 <TextView
                     android:id="@+id/txtPlayingTrack"
@@ -34,7 +35,9 @@
                     android:drawablePadding="5dp"
                     android:textAlignment="center"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textColor="@color/title"
+                    />
 
                 <TextView
                     android:id="@+id/txtPlayingArtist"
@@ -44,7 +47,8 @@
                     android:drawablePadding="10dp"
                     android:textAlignment="center"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textColor="@color/title"/>
 
                 <TextView
                     android:id="@+id/txtPlayingAlbum"
@@ -53,7 +57,8 @@
                     android:drawableStart="@drawable/ic_album"
                     android:drawablePadding="10dp"
                     android:textAlignment="center"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:textColor="@color/title"/>
 
                 <TextView
                     android:id="@+id/txtPlayingTempo"
@@ -62,7 +67,8 @@
                     android:drawableStart="@drawable/ic_tempo"
                     android:drawablePadding="10dp"
                     android:textAlignment="center"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:textColor="@color/title"/>
             </LinearLayout>
 
         </LinearLayout>

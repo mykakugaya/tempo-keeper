@@ -3,11 +3,14 @@ package com.example.tempokeeper;
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -71,6 +74,7 @@ public class ProfileActivity extends AppCompatActivity {
     private RecyclerView.Adapter runAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,13 +166,16 @@ public class ProfileActivity extends AppCompatActivity {
                             String x = String.valueOf(i);
                             // get route in string form of "(lat,lng),(lat,lng),(lat,lng)"
                             routeLst[i] = String.valueOf(snapshot.child("Routes").child(x).getValue()).replaceAll("lat/lng: ","").replaceAll("\\[", "").replaceAll("\\]", "");
+//                            curRoute = (ArrayList<LatLng>) snapshot.child("Routes").child(x).getValue();
                             durLst[i] = String.valueOf(snapshot.child("Time").child(x).getValue());
                             dateLst[i] = String.valueOf(snapshot.child("Date").child(x).getValue());
 
                             // convert string route to an Arraylist<LatLng>
                             ArrayList<LatLng> curRoute = new ArrayList<>();
-                            String[] strRouteArr = routeLst[i].split(", ");
+
                             // strRouteArr has the str array form ["(lat,lng)","(lat,lng)","(lat,lng)"]
+                            String[] strRouteArr = routeLst[i].split(", ");
+
                             for (int j=0; j<strRouteArr.length; j++) {
                                 // replace the '(' and ',' in each "(lat,lng)" array item
                                 String[] latLngPair = strRouteArr[j].replaceAll("\\(", "").replaceAll("\\)","").split(",", 2);
