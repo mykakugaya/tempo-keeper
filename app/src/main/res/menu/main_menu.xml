@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menuRoute"
+        android:title="Create Route"
+        android:icon="@drawable/ic_route"
+        app:showAsAction="ifRoom">
+    </item>
+
+    <item
+        android:id="@+id/menuProfile"
+        android:title="Profile"
+        android:icon= "@drawable/ic_face"
+        app:showAsAction="ifRoom">
+    </item>
+
+    <item
+        android:id="@+id/menuSignOut"
+        android:title="Sign Out"
+        android:icon="@drawable/ic_logout"
+        app:showAsAction="ifRoom">
+    </item>
+</menu>

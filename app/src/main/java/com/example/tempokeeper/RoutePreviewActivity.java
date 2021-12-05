@@ -21,8 +21,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -402,5 +405,49 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         }
+    }
+
+    // MENU
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    // Handle menu clicks by the user
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        // go to create route form
+        if (id == R.id.menuRoute) {
+            Intent routeIntent = new Intent(RoutePreviewActivity.this, RouteFormActivity.class);
+            startActivity(routeIntent);
+            return true;
+        }
+
+        // go to user profile
+        if (id == R.id.menuProfile) {
+            Intent profileIntent = new Intent(RoutePreviewActivity.this, ProfileActivity.class);
+            startActivity(profileIntent);
+            return true;
+        }
+
+        // sign out of app
+        if (id == R.id.menuSignOut) {
+            FirebaseAuth.getInstance().signOut();
+
+            // user is now signed out
+            Toast.makeText(getBaseContext(), "Signed out.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(RoutePreviewActivity.this, LoginActivity.class));
+            finish();
+
+            return true;
+        }
+
+        // default
+        return super.onOptionsItemSelected(item);
+
     }
 }

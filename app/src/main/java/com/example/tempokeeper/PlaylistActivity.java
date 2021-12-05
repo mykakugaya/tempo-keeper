@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -18,6 +20,7 @@ import com.example.tempokeeper.ListAdapters.PlaylistAdapter;
 import com.example.tempokeeper.Model.Playlist;
 import com.example.tempokeeper.SpotifyConnector.PlaylistService;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
@@ -140,5 +143,49 @@ public class PlaylistActivity extends AppCompatActivity {
         playlistAdapter.notifyDataSetChanged();
         rvPlaylists.setAdapter(playlistAdapter);
         Toast.makeText(PlaylistActivity.this, "Select a playlist then click \"Go to Run\"", Toast.LENGTH_SHORT).show();
+    }
+
+    // MENU
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    // Handle menu clicks by the user
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        // go to create route form
+        if (id == R.id.menuRoute) {
+            Intent routeIntent = new Intent(PlaylistActivity.this, RouteFormActivity.class);
+            startActivity(routeIntent);
+            return true;
+        }
+
+        // go to user profile
+        if (id == R.id.menuProfile) {
+            Intent profileIntent = new Intent(PlaylistActivity.this, ProfileActivity.class);
+            startActivity(profileIntent);
+            return true;
+        }
+
+        // sign out of app
+        if (id == R.id.menuSignOut) {
+            FirebaseAuth.getInstance().signOut();
+
+            // user is now signed out
+            Toast.makeText(getBaseContext(), "Signed out.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(PlaylistActivity.this, LoginActivity.class));
+            finish();
+
+            return true;
+        }
+
+        // default
+        return super.onOptionsItemSelected(item);
+
     }
 }

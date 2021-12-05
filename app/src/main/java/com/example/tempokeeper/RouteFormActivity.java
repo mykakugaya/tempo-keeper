@@ -9,6 +9,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -28,6 +30,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class RouteFormActivity extends AppCompatActivity {
     private EditText edtDestination;
@@ -143,5 +146,48 @@ public class RouteFormActivity extends AppCompatActivity {
         super.onResume();
         getLocationPermission();
         Log.d("onResume", " Called");
+    }
+
+
+    // MENU
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    // Handle menu clicks by the user
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        // if route option selected, don't do anything, already on page
+        if (id == R.id.menuRoute) {
+            return true;
+        }
+
+        // go to user profile
+        if (id == R.id.menuProfile) {
+            Intent profileIntent = new Intent(RouteFormActivity.this, ProfileActivity.class);
+            startActivity(profileIntent);
+            return true;
+        }
+
+        // sign out of app
+        if (id == R.id.menuSignOut) {
+            FirebaseAuth.getInstance().signOut();
+
+            // user is now signed out
+            Toast.makeText(getBaseContext(), "Signed out.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(RouteFormActivity.this, LoginActivity.class));
+            finish();
+
+            return true;
+        }
+
+        // default
+        return super.onOptionsItemSelected(item);
+
     }
 }

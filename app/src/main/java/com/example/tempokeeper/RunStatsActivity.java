@@ -1,5 +1,6 @@
 package com.example.tempokeeper;
 
+import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 
 import android.Manifest;
@@ -12,10 +13,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -23,10 +27,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -44,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
     // TEXTVIEWS DISPLAYING STATS
@@ -53,13 +61,11 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView txtAvgSpeed;
     private TextView txtMaxSpeed;
     private Button btnProfile;
+    private Button btnLoadMap;
 
     // FIREBASE
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private String firebaseUser = mAuth.getCurrentUser().getUid();
-    private String[] tempLst;
-    private TextView txtHistory;
-    ArrayList recentRoute;
+    private String firebaseUser = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
     private String lastDuration;
     private String lastDate;
 
@@ -88,9 +94,14 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         txtAvgSpeed = (TextView) findViewById(R.id.txtAvgSpeed);
         txtMaxSpeed = (TextView) findViewById(R.id.txtMaxSpeed);
         btnProfile = (Button) findViewById(R.id.btnProfile);
+        btnLoadMap = (Button) findViewById(R.id.btnLoadMap);
+
+        btnLoadMap.setEnabled(false);
 
         // CHANGE THIS INTENT TO GETTING ROUTE FROM FIREBASE
-        runningRoute = getIntent().getExtras().getParcelableArrayList("runningRoute");
+        runningRoute = new ArrayList<>();
+        getRecentRoute();   // gets runningRoute
+//        runningRoute = getIntent().getExtras().getParcelableArrayList("runningRoute");
 
         // Connect the map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -110,25 +121,49 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         });
     }
 
-//    public void getRecentRoute(){
-//        DatabaseReference myRef = dbRef.child(firebaseUser);
-//        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists()){
-//                    String temp = String.valueOf(Long.valueOf(snapshot.child("Routes").getChildrenCount()));
-//                    int LAST_INDEX = Integer.valueOf(temp)-1;
-//                        recentRoute.add(String.valueOf(snapshot.child("Routes").child(String.valueOf(LAST_INDEX)).getValue()));
-//                }
-//                Log.d("data change", ""+recentRoute.get(0).getClass());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Log.d("data change", error.toString());
-//            }
-//        });
-//    }
+    // gets the last ran route from user's database
+    public void getRecentRoute(){
+        DatabaseReference myRef = dbRef.child(firebaseUser);
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    String temp = String.valueOf(Long.valueOf(snapshot.child("Routes").getChildrenCount()));
+                    int LAST_INDEX = Integer.valueOf(temp)-1;
+
+                    // get route in string form of "(lat,lng),(lat,lng),(lat,lng)"
+                    String strLatLng = String.valueOf(snapshot.child("Routes").child(String.valueOf(LAST_INDEX)).getValue()).replaceAll("lat/lng: ","").replaceAll("\\[", "").replaceAll("\\]", "");
+
+                    // convert string route to an Arraylist<LatLng>
+                    ArrayList<LatLng> newArr = new ArrayList<>();
+                    String[] strRouteArr = strLatLng.split(", ");
+                    // strRouteArr has the str array form ["(lat,lng)","(lat,lng)","(lat,lng)"]
+
+                    for (int j=0; j<strRouteArr.length; j++) {
+                        // replace the '(' and ',' in each "(lat,lng)" array item
+                        String[] latLngPair = strRouteArr[j].replaceAll("\\(", "").replaceAll("\\)","").split(",", 2);
+                        if(!latLngPair[0].equals("")&&!latLngPair[1].equals("")) {
+                            // parse float values for lat and lng
+                            float lat = parseFloat(latLngPair[0]);
+                            float lng = parseFloat(latLngPair[1]);
+                            // add new LatLng object to ArrayList<LatLng> curRoute
+                            newArr.add(new LatLng(lat, lng));
+                        }
+                    }
+                    runningRoute = newArr;
+                    btnLoadMap.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("data change", error.toString());
+            }
+        });
+//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.mapFinished);
+//        mapFragment.getMapAsync(this);
+    }
 
     public void getDateAndTime(){
         DatabaseReference myRef = dbRef.child(firebaseUser);
@@ -157,7 +192,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     // MAPS
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void displayRoute() {
-        //very bad long term bc we dont have runningRoute always
         points = runningRoute;
 
         PolylineOptions lineOptions = null;
@@ -183,8 +217,22 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
             lineOptions.geodesic(true);
             lineOptions.clickable(true);
             mMap.addPolyline(lineOptions);
-
         }
+
+        // Show route on map by zooming in
+//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//        LatLngBounds bounds = builder.build();
+//        for (LatLng point: points) {
+//            builder.include(point);
+//        }
+//        int padding = 70;
+//        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+//        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+//            @Override
+//            public void onMapLoaded() {
+//                mMap.animateCamera(cu);
+//            }
+//        });
 
     }
 
@@ -244,8 +292,18 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        //use the intent route ArrayList to display the route of the run that just ended
-        displayRoute();
+//        do {
+//            getRecentRoute();
+//        } while(runningRoute.size()==0);
+
+        btnLoadMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // display route on map
+                displayRoute();
+
+            }
+        });
 
         //retrieve the duration data from the firebase and show on txtView
         getDateAndTime();
@@ -268,4 +326,49 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
 //                    9000);
 //        }
 //    }
+
+
+    // MENU
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    // Handle menu clicks by the user
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        // go to create route form
+        if (id == R.id.menuRoute) {
+            Intent routeIntent = new Intent(RunStatsActivity.this, RouteFormActivity.class);
+            startActivity(routeIntent);
+            return true;
+        }
+
+        // go to user profile
+        if (id == R.id.menuProfile) {
+            Intent profileIntent = new Intent(RunStatsActivity.this, ProfileActivity.class);
+            startActivity(profileIntent);
+            return true;
+        }
+
+        // sign out of app
+        if (id == R.id.menuSignOut) {
+            FirebaseAuth.getInstance().signOut();
+
+            // user is now signed out
+            Toast.makeText(getBaseContext(), "Signed out.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(RunStatsActivity.this, LoginActivity.class));
+            finish();
+
+            return true;
+        }
+
+        // default
+        return super.onOptionsItemSelected(item);
+
+    }
 }

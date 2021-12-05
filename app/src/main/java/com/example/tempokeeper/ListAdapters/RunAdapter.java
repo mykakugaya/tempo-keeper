@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tempokeeper.Model.Run;
 import com.example.tempokeeper.R;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.w3c.dom.Text;
 
@@ -27,27 +28,28 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         public TextView txtMaxSpeed;
         public TextView txtAvgSpeed;
 
-        // Route object being stored in this row of the recycler view list
+        // Run object being stored in this row of the recycler view list
         private Run run;
+        public ArrayList<LatLng> route;
 
-        // context for RouteActivity
+        // context for ProfileActivity
         private Context context;
 
         // each item in the recycler view is a ViewHolder
         public ViewHolder(View itemView, Context context) {
             super(itemView);
 
-            // ViewHolder context is the same as PlayingRouteAdapter mContext
-            // both the context of RouteActivity
+            // ViewHolder context is the same as RunAdapter mContext
+            // both the context of ProfileActivity
             this.context = context;
 
             // set clickable
             itemView.setOnClickListener(this);
 
-            // When a user clicks on a Route, isSelected is set to true so that
-            // we can set the color of the Route information background
+            // When a user clicks on a Run, isSelected is set to true so that
+            // we can set the color of the Run information background
 
-            // each Route ViewHolder has an image, name, and number of Routes
+            // each Run ViewHolder has an image, name, and number of Runs
             txtDate = (TextView) itemView.findViewById(R.id.txtDate);
             txtDistance = (TextView) itemView.findViewById(R.id.txtRunDistance);
             txtDuration = (TextView) itemView.findViewById(R.id.txtRunTime);
@@ -56,22 +58,23 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         }
 
         // When user clicks on the Run adapter,
-        // it will take them to a route preview page so that they can rerun that route
+        // it will take them to a Run preview page so that they can rerun that Run
         @Override
         public void onClick(View view) {
-            // declare an intent, send in route information
+            // declare an intent, send in Run information
+
         }
 
     }
 
-    // constructor for PlayingRouteAdapter
-    // pass in currently playing Route array (one item) and the PedometerActivity context
+    // constructor for RunAdapter
+    // pass in current Run array (one item) and the ProfileActivity context
     public RunAdapter(ArrayList<Run> runs, Context context) {
         mContext = context;
         pastRuns = runs;
     }
 
-    // inflate the adapter_playingRoute layout to the ViewHolder
+    // inflate the adapter_run layout to the ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent,
                                          int viewType) {
@@ -79,16 +82,17 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
 
-        // ViewHolder is one row of the list - holds one Route with its information
+        // ViewHolder is one row of the list - holds one Run with its information
         ViewHolder vh = new ViewHolder(layoutView, mContext);
         return vh;
     }
 
-    // set the name and image of the Route if available
+    // set the name and image of the Run if available
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // set each run info in holder
         holder.run = pastRuns.get(position);
+        holder.route = pastRuns.get(position).getRoute();
         holder.txtDate.setText(pastRuns.get(position).getDate());
 //        holder.txtDistance.setText(pastRuns.get(position).getDistance()+" miles");
         holder.txtDuration.setText(pastRuns.get(position).getDuration());
@@ -97,7 +101,7 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         holder.runIndex = holder.getAdapterPosition();
     }
 
-    // get the number of Routes displayed in the list
+    // get the number of Runs displayed in the list
     @Override
     public int getItemCount() {
         return pastRuns.size();

@@ -20,7 +20,7 @@
     <string name="newRoute">New Route</string>
     <string name="btnCalculateRoute">Calculate Route</string>
 
-    <string name="generatedRoute">Generated Route Preview:</string>
+    <string name="generatedRoute">Generated Route Preview</string>
     <string name="btnBackToForm">Back to Form</string>
     <string name="btnSelectMusic">Select Music</string>
 
@@ -34,8 +34,13 @@
     <string name="btnFinishRun">Finish</string>
     <string name="btnStats">Stats</string>
 
+    <string name="runStats">Run Statistics</string>
+    <string name="btnLoadMap">Load Map</string>
+    <string name="btnProfile">View Profile</string>
+
+
     <string name="profile">User Profile</string>
     <string name="signOut">Sign Out</string>
-    <string name="runStats">Run Statistics</string>
     <string name="routeHistory">Run History</string>
+
 </resources>

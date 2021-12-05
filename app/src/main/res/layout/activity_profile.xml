@@ -11,17 +11,18 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="229dp">
+        android:layout_height="262dp">
 
         <TextView
             android:id="@+id/txtUserProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:text="@string/profile"
             android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:textColor="@color/title"
             android:textSize="25sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,9 +32,10 @@
             android:id="@+id/txtUserSpotify"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="28dp"
             android:drawableStart="@drawable/ic_media_bluetooth"
             android:drawablePadding="10dp"
+            android:textAlignment="textStart"
             android:textColor="@color/text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -44,9 +46,10 @@
             android:id="@+id/txtUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:drawableStart="@drawable/ic_user"
             android:drawablePadding="10dp"
+            android:textAlignment="textStart"
             android:textColor="@color/text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -57,9 +60,10 @@
             android:id="@+id/txtUserEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:drawableStart="@drawable/ic_email"
             android:drawablePadding="10dp"
+            android:textAlignment="textStart"
             android:textColor="@color/text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -70,13 +74,13 @@
             android:id="@+id/btnSignOut"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/button_blue"
             android:text="@string/signOut"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.709"
-            app:layout_constraintStart_toEndOf="@+id/txtUserProfile"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtUserEmail" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -90,12 +94,13 @@
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Display4"
         android:textColor="@color/title"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHistory"
         android:layout_width="match_parent"
-        android:layout_height="413dp"
-        android:padding="5dp" />
+        android:layout_height="437dp"
+        android:padding="10dp" />
 
 </LinearLayout>

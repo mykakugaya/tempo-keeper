@@ -21,8 +21,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvQueue"
-        android:layout_width="412dp"
-        android:layout_height="496dp"
+        android:layout_width="413dp"
+        android:layout_height="521dp"
         android:layout_marginTop="16dp"
         android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"

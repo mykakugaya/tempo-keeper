@@ -308,7 +308,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 playbackService.pause();
 
                 // saves route to database
-                getRoutesFromUser();
+                saveRouteToDb();
 
                 // reset pedometer values to 0
                 resetValues();
@@ -317,6 +317,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 unbindStepService();
                 stopStepService();
                 mQuitting = true;
+//                mPedometerSettings.saveServiceRunningWithNullTimestamp(false);
 
                 // Toast user that run is finished
                 Toast.makeText(RunningActivity.this, "You have finished your run!", Toast.LENGTH_SHORT).show();
@@ -496,7 +497,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     // add the completed route to firebase once the Finish Run button is clicked
-    public void getRoutesFromUser(){
+    public void saveRouteToDb(){
         DatabaseReference myRef = dbRef.child(firebaseUser);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

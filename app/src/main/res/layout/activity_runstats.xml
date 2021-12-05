@@ -27,19 +27,19 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="415dp"
         android:layout_height="333dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtRunDate"
+        app:layout_constraintTop_toBottomOf="@+id/btnLoadMap"
         tools:context=".RoutePreviewActivity" />
 
     <TextView
         android:id="@+id/txtDist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        android:layout_marginStart="144dp"
+        android:layout_marginTop="56dp"
+        android:textAlignment="textStart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mapFinished" />
 
@@ -47,10 +47,10 @@
         android:id="@+id/txtRunDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="144dp"
+        android:layout_marginTop="28dp"
+        android:textAlignment="textStart"
         android:textColor="@color/text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtDist" />
 
@@ -58,42 +58,62 @@
         android:id="@+id/txtAvgSpeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="144dp"
+        android:textAlignment="textStart"
         android:textColor="@color/text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtRunDuration" />
+        app:layout_constraintTop_toBottomOf="@+id/mapFinished" />
 
     <TextView
         android:id="@+id/txtMaxSpeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="144dp"
+        android:textAlignment="textStart"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtAvgSpeed" />
-
-    <TextView
-        android:id="@+id/txtRunDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtStats" />
 
     <Button
         android:id="@+id/btnProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
-        android:text="Go to Profile"
+        android:background="@drawable/button_blue"
+        android:drawableEnd="@drawable/ic_next"
+        android:drawablePadding="5dp"
+        android:padding="5dp"
+        android:text="@string/btnProfile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtMaxSpeed" />
+
+    <Button
+        android:id="@+id/btnLoadMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_blue"
+        android:drawableStart="@drawable/ic_load"
+        android:drawablePadding="5dp"
+        android:padding="5dp"
+        android:text="@string/btnLoadMap"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtStats" />
+
+    <TextView
+        android:id="@+id/txtRunDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mapFinished" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

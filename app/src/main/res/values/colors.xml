@@ -14,30 +14,25 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-<!--    <color name="colorPrimary">#0954A5</color>-->
-<!--    <color name="colorPrimaryDark">#052F5C</color>-->
-<!--    <color name="colorAccent">#144D88</color>-->
     <color name="primaryText">#052F5C</color>
     <color name="buttonNormal">#0954A5</color>
     <color name="buttonHighlight">#144D88</color>
     <color name="buttonText">#0E2B47</color>
     <color name="colorPrimary">#B7CCFF</color>
-    <color name="colorPrimaryDark">#4A6F96</color>
+    <color name="colorPrimaryDark">#4A6096</color>
     <color name="colorAccent">#0954A5</color>
-    <color name="toolbarIconColor">#FFFFFF</color>
-    <color name="loginPageBackgroundColor">#FFFFFF</color>
-    <color name="productGridBackgroundColor">#FFFFFF</color>
+    <color name="toolbarIconColor">#0E2B47</color>
     <color name="textInputOutlineColor">#144D88</color>
     <color name="gray">#3F4042</color>
     <color name="darkGray">#1E1E1E</color>
 
-
-    <!--    <color name="mintColorPrimary">#76be2f</color>-->
-<!--    <color name="mintColorPrimaryDark">#289b23</color>-->
-<!--    <color name="mintColorAccent">#f9a825</color>-->
-<!--    <color name="mintPrimaryText">#424242</color>-->
-<!--    <color name="mintButtonNormal">#76be2f</color>-->
-<!--    <color name="mintButtonHighlight">#81c784</color>-->
-<!--    <color name="mintButtonText">#FFFFFF</color>-->
+<!--    <color name="colorPrimary">#b2ebf2</color>-->
+<!--    <color name="colorPrimaryLight">#e5ffff</color>-->
+<!--    <color name="colorPrimaryDark">#81b9bf</color>-->
+<!--    <color name="colorOnPrimary">#000000</color>-->
+<!--    <color name="colorSecondary">#1a237e</color>-->
+<!--    <color name="colorSecondaryLight">#534bae</color>-->
+<!--    <color name="colorSecondaryDark">#000051</color>-->
+<!--    <color name="colorOnSecondary">#FFFFFFFF</color>-->
 
 </resources>

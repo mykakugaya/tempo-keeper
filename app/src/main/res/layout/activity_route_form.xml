@@ -28,7 +28,7 @@
         android:id="@+id/edtDestination"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="56dp"
         android:drawableStart="@drawable/ic_edit_location"
         android:drawablePadding="10dp"
         android:ems="10"
@@ -41,8 +41,8 @@
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="171dp"
-        android:layout_height="150dp"
+        android:layout_width="170dp"
+        android:layout_height="99dp"
         android:layout_marginTop="28dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,8 +72,8 @@
         android:id="@+id/swcNewRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
         android:text="@string/newRoute"
-        app:layout_constraintBottom_toTopOf="@+id/btnCalculate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
@@ -82,15 +82,15 @@
         android:id="@+id/btnCalculate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
         android:background="@drawable/button_blue"
         android:drawableStart="@drawable/ic_directions"
         android:drawablePadding="10dp"
         android:padding="10dp"
         android:text="@string/btnCalculateRoute"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/swcNewRoute" />
 
     <TextView
         android:id="@+id/txtElevationOpt"

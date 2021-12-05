@@ -1,7 +1,9 @@
 package com.example.tempokeeper.Model;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Run {
@@ -11,6 +13,7 @@ public class Run {
     private double distance;
     private double avgSpeed;
     private double maxSpeed;
+    private ArrayList<LatLng> route;
 
     public Run(int index) {
         this.index = index;
@@ -19,6 +22,10 @@ public class Run {
     public void setDate(String date) {this.date = date;}
 
     public String getDate() {return this.date;}
+
+    public void setRoute(ArrayList<LatLng> route) {this.route = route;}
+
+    public ArrayList<LatLng> getRoute() {return this.route;}
 
     public void setDuration(String duration) {this.duration = duration;}
 

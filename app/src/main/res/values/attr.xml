@@ -5,9 +5,5 @@
     <attr name="buttonHighlightColor" format="reference" />
     <attr name="buttonTextColor" format="reference" />
     <attr name="primaryButtonTheme" format="reference" />
-<!--    <attr name="primaryTextColor1" format="reference"/>-->
-<!--    <attr name="buttonNormalColor1" format="reference"/>-->
-<!--    <attr name="buttonHighlightColor1" format="reference" />-->
-<!--    <attr name="buttonTextColor1" format="reference" />-->
-<!--    <attr name="primaryButtonTheme1" format="reference" />-->
+    <attr name="colorPrimaryVariant" format="reference"/>
 </resources>

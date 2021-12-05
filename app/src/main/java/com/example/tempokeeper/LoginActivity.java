@@ -129,10 +129,14 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            editor = sharedPref.edit();
+                            editor.putString("email", email);
+                            editor.commit();
                             //when it's signed in correctly, give a Toast with success message and go to Route form activity.
                             Toast.makeText(LoginActivity.this, "Login Success",
                                     Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(getApplicationContext(), RouteFormActivity.class));
+//                            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
 
                         } else {
                             // If sign in fails, display a message to the user.
