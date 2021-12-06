@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,10 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -47,14 +50,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
+public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener, GoogleMap.SnapshotReadyCallback {
     // TEXTVIEWS DISPLAYING STATS
     private TextView txtDate;
     private TextView txtDuration;
@@ -62,6 +70,9 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView txtAvgSpeed;
     private TextView txtMaxSpeed;
     private Button btnProfile;
+    private byte[] imageInByte;
+    private String[] imageArray;
+    private String imgEncode;
 
     // FIREBASE
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -82,6 +93,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private ArrayList<PolylineOptions> polylineOptArray;
     private ArrayList<LatLng> runningRoute;
     private ArrayList<LatLng> points;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +127,22 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         btnProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onSnapshotReady(@Nullable Bitmap bitmap) {
+
+                        imageView = (ImageView) findViewById(R.id.imageView);
+                        imageView.setImageBitmap(bitmap);
+                        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, boas);
+                        imageInByte = boas.toByteArray();
+                        imgEncode = Base64.getEncoder().encodeToString(imageInByte);
+                        saveImgtoDB();
+
+
+                    }
+                });
                 Intent profileIntent = new Intent(RunStatsActivity.this, ProfileActivity.class);
                 startActivity(profileIntent);
             }
@@ -431,4 +459,54 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         return (double) tmp / factor;
     }
 
+    @Override
+    public void onSnapshotReady(@Nullable Bitmap bitmap) {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream("/mnt/sdcard/map.jpeg");
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+    }
+
+
+    // add the completed route to firebase once the Finish Run button is clicked
+    public void saveImgtoDB(){
+        DatabaseReference myRef = dbRef.child(firebaseUser);
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    String temp = String.valueOf(Long.valueOf(snapshot.child("Maps").getChildrenCount()));
+                    if (Integer.valueOf(temp)>0) {  // if past runs exist, append this run
+                        String[] imgArray = new String[Integer.valueOf(temp) + 1];
+                        imageArray = imgArray;
+
+                        // For each run, save the date, duration, distance, average speed
+                        for (int i = 0; i < Integer.valueOf(temp); i++) {
+                            String x = String.valueOf(i);
+                            imageArray[i] = String.valueOf(snapshot.child("Maps").child(x).getValue());
+                        }
+                        Log.d("Running Route",""+runningRoute.size());
+
+                        // set new values to firebase database
+                        imageArray[imageArray.length-1] = String.valueOf(imgEncode);
+                        dbRef.child(firebaseUser).child("Maps").setValue(Arrays.asList(imageArray));
+                    }
+                    else{   // else, this is the first run completed
+                        dbRef.child(firebaseUser).child("Maps").setValue(Arrays.asList(imgEncode));
+
+                        Log.d("Running Route",""+runningRoute.size());
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 }

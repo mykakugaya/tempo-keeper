@@ -19,42 +19,59 @@
 <!--        app:layout_constraintTop_toBottomOf="@+id/btnLoadMap"-->
 <!--        />-->
 
+    <ImageView
+        android:id="@+id/imgRoute"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        app:srcCompat="?android:attr/scrollbarTrackVertical" />
+
     <LinearLayout
-        android:layout_width="159dp"
+        android:layout_width="211dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="10dp">
+        android:paddingLeft="20dp">
 
         <TextView
             android:id="@+id/txtDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:textColor="@color/text" />
-
-        <TextView
-            android:id="@+id/txtRunAvg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text" />
-
-        <TextView
-            android:id="@+id/txtRunTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text" />
+            android:textColor="@color/title"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtRunDistance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text" />
+            android:layout_marginTop="20dp"
+            android:textColor="@color/text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtRunTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtRunAvg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text"
+            android:textSize="16sp" />
+
 
         <TextView
             android:id="@+id/txtRunMax"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text" />
+            android:text="Max Speed:"
+            android:textColor="@color/text"
+            android:textSize="16sp" />
     </LinearLayout>
 
 </LinearLayout>

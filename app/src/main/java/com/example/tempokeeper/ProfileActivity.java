@@ -70,6 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String[] dateLst;
     private String[] distLst;
     private String[] avgSpdLst;
+    private String[] imgLst;
 
     // recycler view for run history
     private RecyclerView rvHistory;
@@ -165,12 +166,14 @@ public class ProfileActivity extends AppCompatActivity {
                         String[] dateArray = new String[numRuns + 1];
                         String[] distanceArray = new String[numRuns + 1];
                         String[] avgSpeedArray = new String[numRuns + 1];
+                        String[] imageArray = new String[numRuns + 1];
 
                         routeLst = routesArray;
                         durLst = durationArray;
                         dateLst = dateArray;
                         distLst = distanceArray;
                         avgSpdLst = avgSpeedArray;
+                        imgLst = imageArray;
 
                         // Get the route, duration, and date of each run
                         for (int i = 0; i < numRuns; i++) {
@@ -182,6 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
                             dateLst[i] = String.valueOf(snapshot.child("Date").child(x).getValue());
                             distLst[i] = String.valueOf(snapshot.child("Distance").child(x).getValue());
                             avgSpdLst[i] = String.valueOf(snapshot.child("Average").child(x).getValue());
+                            imgLst[i] = String.valueOf(snapshot.child("Maps").child(x).getValue());
 
                             // convert string route to an Arraylist<LatLng>
                             ArrayList<LatLng> curRoute = new ArrayList<>();
@@ -209,6 +213,7 @@ public class ProfileActivity extends AppCompatActivity {
                             newRun.setDistance(distLst[i]);
                             newRun.setAvgSpeed(avgSpdLst[i]);
 //                            newRun.setMaxSpeed();
+                            newRun.setImage(imgLst[i]);
 
                             // add this Run to runHistory array
                             runHistory.add(newRun);

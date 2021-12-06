@@ -44,9 +44,9 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
 
     private String date;
     private String duration;
-    private double distance;
-    private double avgSpd;
-    private double maxSpd;
+    private String distance;
+    private String avgSpd;
+    private String maxSpd;
 
     private GoogleMap mMap;
     private PolylineOptions lineOptions;    // send this to RunningActivity
@@ -84,6 +84,15 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
 
         duration = bundle.getString("pastDur");
         txtDur.setText("Duration: "+duration);
+
+        distance = bundle.getString("pastDist");
+        txtDist.setText("Distance: "+distance);
+
+        avgSpd = bundle.getString("pastAvgSpd");
+        txtAvgSpd.setText("Average Speed: "+avgSpd);
+
+//        maxSpd = bundle.getString("pastMaxSpd");
+//        txtMaxSpd.setText("Average Speed: "+maxSpd);
 
         btnRerun.setEnabled(false);
 

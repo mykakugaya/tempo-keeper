@@ -1,5 +1,7 @@
 package com.example.tempokeeper.Model;
 
+import android.widget.ImageView;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -14,6 +16,7 @@ public class Run {
     private String avgSpeed;
     private String maxSpeed;
     private ArrayList<LatLng> route;
+    private String imgRoute;
 
     public Run(int index) {
         this.index = index;
@@ -42,4 +45,12 @@ public class Run {
     public void setMaxSpeed(String speed) {this.maxSpeed = speed;}
 
     public String getMaxSpeed() {return this.maxSpeed;}
+
+    public String getImage() {
+        return imgRoute;
+    }
+
+    public void setImage(String image) {
+        this.imgRoute = image;
+    }
 }
