@@ -111,14 +111,13 @@ public class RouteFormActivity extends AppCompatActivity {
                 int selectedId = radioGroup.getCheckedRadioButtonId();
                 // find the radiobutton by returned id
                 rbtnElevation = (RadioButton) findViewById(selectedId);
-//                Toast.makeText(RouteFormActivity.this,
-//                        rbtnElevation.getText(), Toast.LENGTH_SHORT).show();
 
 //                //get destination string and extra parameters
                 String dest = edtDestination.getText().toString();
 //                //send to Route Preview Activity
                 Intent intent = new Intent(RouteFormActivity.this, RoutePreviewActivity.class);
                 intent.putExtra("destination", dest);
+                intent.putExtra("elevation", rbtnElevation.getText().toString());
                 startActivity(intent);
             }
         });

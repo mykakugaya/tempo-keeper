@@ -10,9 +10,9 @@ public class Run {
     private int index;
     private String date;    // e.g. "12/01/21"
     private String duration;  // e.g. "2:31:03"
-    private double distance;
-    private double avgSpeed;
-    private double maxSpeed;
+    private String distance;
+    private String avgSpeed;
+    private String maxSpeed;
     private ArrayList<LatLng> route;
 
     public Run(int index) {
@@ -31,15 +31,15 @@ public class Run {
 
     public String getDuration() {return this.duration;}
 
-    public void setDistance(int distance) {this.distance = distance;}
+    public void setDistance(String distance) {this.distance = distance;}
 
-    public double getDistance() {return this.distance;}
+    public String getDistance() {return this.distance;}
 
-    public void setAvgSpeed(double speed) {this.avgSpeed = speed;}
+    public void setAvgSpeed(String speed) {this.avgSpeed = speed;}
 
-    public double getAvgSpeed() {return this.avgSpeed;}
+    public String getAvgSpeed() {return this.avgSpeed;}
 
-    public void setMaxSpeed(double speed) {this.maxSpeed = speed;}
+    public void setMaxSpeed(String speed) {this.maxSpeed = speed;}
 
-    public double getMaxSpeed() {return this.maxSpeed;}
+    public String getMaxSpeed() {return this.maxSpeed;}
 }

@@ -8,26 +8,120 @@
     <fragment
         android:id="@+id/mapPastRoute"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="541dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="413dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="18dp"
+        app:layout_constraintBottom_toTopOf="@+id/txtPastDate"
+        app:layout_constraintEnd_toStartOf="@+id/txtPastDate"
+        app:layout_constraintStart_toStartOf="@+id/txtPastDate"
         app:layout_constraintTop_toBottomOf="@+id/txtPastRoute"
-        tools:context=".RoutePreviewActivity" />
+        tools:context=".PastRoutePreview" />
 
     <TextView
         android:id="@+id/txtPastRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:drawableEnd="@drawable/ic_map"
+        android:drawablePadding="10dp"
         android:text="Past Route Preview"
+        android:textColor="@color/title"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.079"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtPastDist"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        app:layout_constraintBottom_toBottomOf="@+id/txtPastAvgSpd"
+        app:layout_constraintEnd_toEndOf="@+id/txtPastDur"
+        app:layout_constraintStart_toStartOf="@+id/txtPastDur"
+        app:layout_constraintTop_toTopOf="@+id/txtPastAvgSpd" />
+
+    <TextView
+        android:id="@+id/txtPastDur"
+        android:layout_width="110dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="40dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        app:layout_constraintBottom_toBottomOf="@+id/txtPastMaxSpd"
+        app:layout_constraintEnd_toStartOf="@+id/txtPastDate"
+        app:layout_constraintStart_toStartOf="@+id/btnBackProfile"
+        app:layout_constraintTop_toTopOf="@+id/txtPastMaxSpd" />
+
+    <TextView
+        android:id="@+id/txtPastAvgSpd"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="19dp"
+        android:layout_marginBottom="15dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        app:layout_constraintBottom_toTopOf="@+id/txtPastMaxSpd"
+        app:layout_constraintEnd_toEndOf="@+id/txtPastMaxSpd"
+        app:layout_constraintStart_toStartOf="@+id/txtPastMaxSpd"
+        app:layout_constraintTop_toBottomOf="@+id/txtPastDate" />
+
+    <TextView
+        android:id="@+id/txtPastMaxSpd"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="79dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="78dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/mapPastRoute"
+        app:layout_constraintStart_toEndOf="@+id/txtPastDur"
+        app:layout_constraintTop_toBottomOf="@+id/txtPastDate" />
+
+    <TextView
+        android:id="@+id/txtPastDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="202dp"
+        android:textAlignment="center"
+        android:textColor="@color/text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnRerun"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="17dp"
+        android:background="@drawable/button_blue"
+        android:drawableEnd="@drawable/ic_next"
+        android:padding="5dp"
+        android:text="@string/rerunRoute"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btnBackProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="17dp"
+        android:background="@drawable/button_blue"
+        android:drawableStart="@drawable/ic_back"
+        android:padding="5dp"
+        android:text="@string/btnBackProfile"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

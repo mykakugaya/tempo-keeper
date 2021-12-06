@@ -10,7 +10,6 @@
     <string name="name">Name</string>
     <string name="btnRegister">Register</string>
 
-
     <string name="customRoute">Create a Custom Route</string>
     <string name="destination">Destination</string>
     <string name="elevationOpt">Elevation Options:</string>
@@ -42,8 +41,10 @@
     <string name="profile">User Profile</string>
     <string name="signOut">Sign Out</string>
     <string name="routeHistory">Run History</string>
+    <string name="rerunRoute">Rerun this Route</string>
 
     <string name="menuProfile">My Profile</string>
+    <string name="btnBackProfile">Back to Profile</string>
     <string name="menuRoute">Create Route</string>
 
 </resources>

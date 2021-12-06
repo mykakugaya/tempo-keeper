@@ -3,6 +3,7 @@ package com.example.tempokeeper.ListAdapters;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.tempokeeper.Model.Playlist;
 import com.example.tempokeeper.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -60,6 +63,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         }
 
         // User clicked on a playlist from the list of playlists
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onClick(View view) {
             // if isSelected is false, set to true, and vice versa
@@ -71,7 +75,10 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
                 // if there is no current track saved, this is the first selection made
                 if(sharedPref.getString("curPlaylistName","").equals("")) {
                     // Make a toast indicating which playlist
-                    Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar.make(itemView, "Playlist " + playlist.getName() + " selected", Snackbar.LENGTH_SHORT);
+                    snackbar.getView().setBackgroundColor(context.getColor(R.color.colorPrimaryDark));
+                    snackbar.show();
+//                    Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
                     layoutPlaylist.setBackgroundColor(context.getResources().getColor(R.color.blue_100));
                     // save the selected tempo in sharedPreferences
                     // we will use it in TrackActivity when the filter tempos button is clicked

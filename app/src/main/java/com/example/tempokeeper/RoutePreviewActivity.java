@@ -6,21 +6,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
@@ -49,12 +46,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
@@ -65,19 +58,22 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class RoutePreviewActivity extends AppCompatActivity implements OnMapReadyCallback,  GoogleMap.OnPolylineClickListener,
         GoogleMap.OnPolygonClickListener, GoogleMap.OnInfoWindowClickListener{
 
-    private String dest;    // destination string passed in from route form activity
+    private String dest;
     private GoogleMap mMap;
     private Button btnBack;
     private Button btnMusic;
+    private String linePoints;
+    private ArrayList<String> eOArray = new ArrayList<String>();
     private ArrayList<Polyline> routesArray;
     private ArrayList<PolylineOptions> nextActivityArray;
+    private ArrayList<List<Double>>  ElevationArray = new ArrayList<List<Double>>();
+
 
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
@@ -92,7 +88,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_preview);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         btnBack = (Button) findViewById(R.id.btnBack);
         btnMusic = (Button) findViewById(R.id.btnSelectMusic);
@@ -128,11 +123,11 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
 
     }
 
-    private class DownloadTask extends AsyncTask<String, Void, String> {
+    private class DirecDownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... url) {
-//can add getting user location here
+            //can add getting user location here
             String data = "";
 
             try {
@@ -147,10 +142,10 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            ParserTask parserTask = new ParserTask();
+            DirecParserTask direcParserTask = new DirecParserTask();
 
-            Log.d("RPA", "parserTask.execute");
-            parserTask.execute(result);
+            Log.d("RPA", "direcParserTask.execute");
+            direcParserTask.execute(result);
         }
     }
 
@@ -158,7 +153,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     /**
      * A class to parse the Google Places in JSON format
      */
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private class DirecParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
         @Override
@@ -178,6 +173,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             return routes;
         }
 
+        @SuppressLint("ResourceAsColor")
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
             ArrayList points = null;
@@ -185,38 +181,212 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             routesArray = new ArrayList<Polyline>();
             nextActivityArray = new ArrayList<PolylineOptions>();
             MarkerOptions markerOptions = new MarkerOptions();
+            PolylineOptions eO = new PolylineOptions();
+
+            if (result.size() == 0){
+                Snackbar snackbar = Snackbar.make(btnBack, "Route not possible", Snackbar.LENGTH_SHORT);
+                snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
+                snackbar.show();
+//                Toast.makeText(RoutePreviewActivity.this, "Route not possible", Toast.LENGTH_SHORT).show();
+            } else {
+                for (int i = 0; i < result.size(); i++) {
+                    points = new ArrayList();
+                    lineOptions = new PolylineOptions();
+
+                    List<HashMap<String, String>> path = result.get(i);
+                    Log.d("Parser result.get", result.toString());
+
+                    for (int j = 0; j < path.size(); j++) {
+                        HashMap<String, String> point = path.get(j);
+
+                        Double lat = Double.parseDouble(point.get("lat"));
+                        Double lng = Double.parseDouble(point.get("lng"));
+
+                        LatLng position = new LatLng(lat, lng);
+
+                        points.add(position);
+                    }
+
+                    lineOptions.addAll(points);
+                    lineOptions.width(12);
+                    lineOptions.color(Color.GRAY);
+                    lineOptions.geodesic(true);
+                    lineOptions.clickable(true);
+                    nextActivityArray.add(lineOptions);
+                    Polyline polyline = mMap.addPolyline((lineOptions));
+                    //                polyline.setTag("");
+                    routesArray.add(polyline);
+
+                    //            Log.d("bye", "before loop: "+eO.getPoints().size());
+                    int check = lineOptions.getPoints().size();
+                    if (check > 100) {
+                        int y = check / 40;
+                        //                Log.d("bye", "true");
+                        for (int w = 0; w < points.size(); w += y) {
+                            eO.add((LatLng) points.get(w));
+                        }
+                    } else {
+                        eO.addAll(points);
+                    }
+
+                    Log.d("Hello", "" + lineOptions.getPoints().size());
+                    Log.d("bye", "" + eO.getPoints().size());
+                    String strE;
+                    strE = "" + eO.getPoints();
+                    Log.d("good", strE);
+                    strE = strE.replaceAll("lat/lng: ", "");
+                    strE = strE.replaceAll("[()]", "");
+                    strE = strE.replaceAll(", ", "|");
+                    strE = strE.replaceAll("[\\[\\]]", "");
+                    linePoints = "" + lineOptions.getPoints();
+                    eOArray.add(strE);
+                }
+                //            routesArray.get(0).setZIndex(1);
+                //            routesArray.get(0).setColor(Color.BLUE);
+                btnMusic.setEnabled(true);
+                getElevationVals();
+            }
+//            Toast.makeText(getApplicationContext(), "Click the paths to see which is the most hilly", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class ElevDownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            String data = "";
+
+            try {
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ElevParserTask elevParserTask = new ElevParserTask();
+
+            elevParserTask.execute(result);
+        }
+    }
+
+    private class ElevParserTask extends AsyncTask<String, Integer, List<HashMap<String, String>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<HashMap<String, String>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<HashMap<String, String>> elevations = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                ElevJSONParser parser = new ElevJSONParser();
+
+                elevations = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return elevations;
+        }
+
+        @Override
+        protected void onPostExecute(List<HashMap<String, String>> result) {
+            ArrayList<Double> elevations2 = new ArrayList();
 
             for (int i = 0; i < result.size(); i++) {
-                points = new ArrayList();
-                lineOptions = new PolylineOptions();
 
-                List<HashMap<String, String>> path = result.get(i);
-                Log.d("Parser result.get", result.toString());
+                HashMap<String, String> point = result.get(i);
 
-                for (int j = 0; j < path.size(); j++) {
-                    HashMap<String, String> point = path.get(j);
-
-                    Double lat = Double.parseDouble(point.get("lat"));
-                    Double lng = Double.parseDouble(point.get("lng"));
-
-                    LatLng position = new LatLng(lat, lng);
-
-                    points.add(position);
-                }
-
-                lineOptions.addAll(points);
-                lineOptions.width(12);
-                lineOptions.color(Color.GRAY);
-                lineOptions.geodesic(true);
-                lineOptions.clickable(true);
-                nextActivityArray.add(lineOptions);
-                Polyline polyline = mMap.addPolyline((lineOptions));
-//                polyline.setTag("");
-                routesArray.add(polyline);
+                double elev = Double.parseDouble(point.get("elev"));
+                elevations2.add(elev);
             }
-            routesArray.get(0).setZIndex(1);
-            routesArray.get(0).setColor(Color.BLUE);
-            btnMusic.setEnabled(true);
+
+            ElevationArray.add(elevations2);
+
+            Double sum0 = 0.0;
+            Double sum1 = 0.0;
+            Double sum2 = 0.0;
+            for(int i =0;i<ElevationArray.size();i++){
+                for (int j=0;j<ElevationArray.get(i).size();j++) {
+                    if (i == 0){
+                        sum0+=ElevationArray.get(i).get(j);
+                    } else if (i == 1){
+                        sum1+=ElevationArray.get(i).get(j);
+                    } else if (i == 2){
+                        sum2+=ElevationArray.get(i).get(j);
+                    }
+                }
+            }
+            if (sum0 != 0 && sum1 == 0 && sum2 == 0) {
+                routesArray.get(0).setTag("");
+            } else if (sum0 != 0 && sum1 != 0 && sum2 == 0) {
+                if (sum0 >= sum1){
+                    routesArray.get(0).setTag("This route is the most flat");
+                    routesArray.get(1).setTag("This route is the most hilly");
+                } else {
+                    routesArray.get(1).setTag("This route is the most flat");
+                    routesArray.get(0).setTag("This route is the most hilly");
+                }
+            } else if (sum0 != 0 && sum1 != 0 && sum2 != 0) {
+                if (sum0 >= sum1 & sum0 >= sum2) {
+                    routesArray.get(0).setTag("This route is the most hilly");
+                    if (sum1 >= sum2) {
+                        routesArray.get(1).setTag("This route is less hilly");
+                        routesArray.get(2).setTag("This route is the most flat");
+                    } else {
+                        routesArray.get(2).setTag("This route is less hilly");
+                        routesArray.get(1).setTag("This route is the most flat");
+                    }
+                } else if (sum1 >= sum2 & sum1 >= sum0) {
+                    routesArray.get(1).setTag("This route is the most hilly");
+                    if (sum2 >= sum0) {
+                        routesArray.get(2).setTag("This route is less hilly");
+                        routesArray.get(0).setTag("This route is the most flat");
+                    } else {
+                        routesArray.get(0).setTag("This route is less hilly");
+                        routesArray.get(2).setTag("This route is the most flat");
+                    }
+                } else if (sum2 >= sum0 & sum2 >= sum1) {
+                    routesArray.get(2).setTag("This route is the most hilly");
+                    if (sum0 >= sum1) {
+                        routesArray.get(0).setTag("This route is less hilly");
+                        routesArray.get(1).setTag("This route is the most flat");
+                    } else {
+                        routesArray.get(1).setTag("This route is less hilly");
+                        routesArray.get(0).setTag("This route is the most flat");
+                    }
+                }
+            }
+            Bundle bundle = getIntent().getExtras();
+            String elev = bundle.getString("elevation");
+            if (elev.equals("Hilly")){
+                for (int i =0;i<routesArray.size();i++){
+                    if(routesArray.get(i).getTag() == "This route is the most hilly"){
+                        routesArray.get(i).setColor(Color.BLUE);
+                        routesArray.get(i).setZIndex(1);
+                    } else {
+                        routesArray.get(i).setColor(Color.GRAY);
+                        routesArray.get(i).setZIndex(0);
+                    }
+                }
+            } else {
+                for (int i =0;i<routesArray.size();i++){
+                    if(routesArray.get(i).getTag() == "This route is the most flat"){
+                        routesArray.get(i).setColor(Color.BLUE);
+                        routesArray.get(i).setZIndex(1);
+                    } else {
+                        routesArray.get(i).setColor(Color.GRAY);
+                        routesArray.get(i).setZIndex(0);
+                    }
+                }
+            }
+//            Toast.makeText(getApplicationContext(), "Ready for Elevations", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -230,9 +400,9 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         String str_dest = "destination=" + dest;
 
         // Sensor enabled
-        String mode = "mode=walking";
+        String mode = "&mode=walking";
         // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest;
+        String parameters = str_origin + "&" + str_dest + mode;
 
         // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/json?" + parameters + "&key=AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw&alternatives=true";
@@ -293,6 +463,8 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         polyline.setZIndex(1);
         polyline.setColor(Color.BLUE);
         Log.d("onPolylineCLick",  "polyline Index: " + polyline.getZIndex());
+
+        Toast.makeText(getBaseContext(), ""+polyline.getTag(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -308,7 +480,7 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                 //and updates route
 
                 Intent intent = new Intent(RoutePreviewActivity.this, PlaylistActivity.class);
-                intent.putExtra("destination", dest);   // add dest just in case we want to come back to this page
+                intent.putExtra("destination", dest); // add dest just in case we want to come back to this page
                 for (int i = 0; i < routesArray.size(); i++){
                     if (routesArray.get(i).getColor() == Color.BLUE){
                         intent.putExtra("chosenRoute", nextActivityArray.get(i));
@@ -324,6 +496,15 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         googleMap.setOnPolygonClickListener(this);
 
         enableMyLocation();
+    }
+
+    public void getElevationVals() {
+        for (int i = 0; i < routesArray.size(); i++) {
+            String elevURL = "https://maps.googleapis.com/maps/api/elevation/json?samples=40&key=AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw&path=" + eOArray.get(i);
+            ElevDownloadTask elevDownloadTask = new ElevDownloadTask();
+            // Start downloading json data from Google Directions API
+            elevDownloadTask.execute(elevURL);
+        }
     }
 
     LocationCallback locationCallback = new LocationCallback() {
@@ -342,11 +523,10 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
                     userLocationMarker = mMap.addMarker(markerOptions);
                 }
-
-                if (start == false){
+                if (!start){
                     Bundle bundle = getIntent().getExtras();
                     String dest = bundle.getString("destination");
-                    String url = getDirectionsUrl(latLng, dest);
+                    String url = getDirectionsUrl(userLocationMarker.getPosition(), dest);
 
                     List<Address> addressList = null;
                     MarkerOptions destMarker = new MarkerOptions();
@@ -383,48 +563,14 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
 
                     mMap.animateCamera(cu);
 
-
-                    DownloadTask downloadTask = new DownloadTask();
-                    Log.d("RPA", "downloadTask.execute");
-                    downloadTask.execute(url);
+                    DirecDownloadTask direcDownloadTask = new DirecDownloadTask();
+                    Log.d("RPA", "direcDownloadTask.execute");
+                    direcDownloadTask.execute(url);
                     start = true;
                 }
             }
         }
     };
-
-//    private void setUserLocationMarker(Location location) {
-//
-//        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-//
-//        if (userLocationMarker == null) {
-//            //Create a new marker
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(latLng);
-//            markerOptions.rotation(location.getBearing());
-//            markerOptions.anchor((float) 0.5, (float) 0.5);
-//            userLocationMarker = mMap.addMarker(markerOptions);
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-//        } else {
-//            //use the previously created marker
-//            userLocationMarker.setPosition(latLng);
-//            userLocationMarker.setRotation(location.getBearing());
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-//        }
-//
-//        if (userLocationAccuracyCircle == null) {
-//            CircleOptions circleOptions = new CircleOptions();
-//            circleOptions.center(latLng);
-//            circleOptions.strokeWidth(4);
-//            circleOptions.strokeColor(Color.argb(255, 255, 0, 0));
-//            circleOptions.fillColor(Color.argb(32, 255, 0, 0));
-//            circleOptions.radius(location.getAccuracy());
-//            userLocationAccuracyCircle = mMap.addCircle(circleOptions);
-//        } else {
-//            userLocationAccuracyCircle.setCenter(latLng);
-//            userLocationAccuracyCircle.setRadius(location.getAccuracy());
-//        }
-//    }
 
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

@@ -68,6 +68,8 @@ public class ProfileActivity extends AppCompatActivity {
     private String[] routeLst;
     private String[] durLst;
     private String[] dateLst;
+    private String[] distLst;
+    private String[] avgSpdLst;
 
     // recycler view for run history
     private RecyclerView rvHistory;
@@ -99,6 +101,9 @@ public class ProfileActivity extends AppCompatActivity {
         rvHistory.setLayoutManager(layoutManager);
 
         runHistory = new ArrayList<>();
+//        runAdapter = new RunAdapter(runHistory, ProfileActivity.this);
+//        runAdapter.notifyDataSetChanged();
+//        rvHistory.setAdapter(runAdapter);
 
         // set the user's email and name
         setUserInfo();
@@ -158,9 +163,15 @@ public class ProfileActivity extends AppCompatActivity {
                         String[] routesArray = new String[numRuns + 1];
                         String[] durationArray = new String[numRuns + 1];
                         String[] dateArray = new String[numRuns + 1];
+                        String[] distanceArray = new String[numRuns + 1];
+                        String[] avgSpeedArray = new String[numRuns + 1];
+
                         routeLst = routesArray;
                         durLst = durationArray;
                         dateLst = dateArray;
+                        distLst = distanceArray;
+                        avgSpdLst = avgSpeedArray;
+
                         // Get the route, duration, and date of each run
                         for (int i = 0; i < numRuns; i++) {
                             String x = String.valueOf(i);
@@ -169,6 +180,8 @@ public class ProfileActivity extends AppCompatActivity {
 //                            curRoute = (ArrayList<LatLng>) snapshot.child("Routes").child(x).getValue();
                             durLst[i] = String.valueOf(snapshot.child("Time").child(x).getValue());
                             dateLst[i] = String.valueOf(snapshot.child("Date").child(x).getValue());
+                            distLst[i] = String.valueOf(snapshot.child("Distance").child(x).getValue());
+                            avgSpdLst[i] = String.valueOf(snapshot.child("Average").child(x).getValue());
 
                             // convert string route to an Arraylist<LatLng>
                             ArrayList<LatLng> curRoute = new ArrayList<>();
@@ -193,8 +206,8 @@ public class ProfileActivity extends AppCompatActivity {
                             newRun.setDate(dateLst[i]);
                             newRun.setDuration(durLst[i]);
                             newRun.setRoute(curRoute);
-//                            newRun.setDistance();
-//                            newRun.setAvgSpeed();
+                            newRun.setDistance(distLst[i]);
+                            newRun.setAvgSpeed(avgSpdLst[i]);
 //                            newRun.setMaxSpeed();
 
                             // add this Run to runHistory array

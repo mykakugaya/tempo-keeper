@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tempokeeper.ListAdapters.PlaylistAdapter;
 import com.example.tempokeeper.Model.Playlist;
 import com.example.tempokeeper.SpotifyConnector.PlaylistService;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -44,7 +45,12 @@ public class PlaylistActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
 
     private PolylineOptions lineOptions;    // necessary for next running activity
-    private String dest;    // necessary if we're going back to the previous preview activity
+    private String dest;    // necessary if we're going back to the route preview activity (from form)
+
+    // variables necessary if we're going back to the past route preview act (from profile)
+    private ArrayList<LatLng> runningRoute;
+    private String date;
+    private String duration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +65,28 @@ public class PlaylistActivity extends AppCompatActivity {
         btnRun = (Button) findViewById(R.id.btnPedometerBpm);
         btnBack = (Button) findViewById(R.id.btnBackToPreview);
 
-        // get the chosen route
+        // get the chosen route as a polyline
         lineOptions = getIntent().getParcelableExtra("chosenRoute");
-        dest = getIntent().getExtras().getString("destination");
+
+        Bundle bundle = getIntent().getExtras();
+
+        // if we came from RouteForm/RoutePreview activities, save destination for back btn
+        try {
+            dest = bundle.getString("destination");
+        } catch (Exception e) {
+            dest = "";
+        }
+
+        // if we came from the ProfileActivity/Past Route Preview, save runningRoute for back btn
+        try {
+            runningRoute = bundle.getParcelableArrayList("pastRoute");
+            date = bundle.getString("pastDate");
+            duration = bundle.getString("pastDur");
+        } catch (Exception f) {
+            runningRoute = null;
+            date = "";
+            duration = "";
+        }
 
         // sharedPref has the token for API calls
         sharedPref = getSharedPreferences("SPOTIFY", 0);
@@ -106,9 +131,19 @@ public class PlaylistActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent previewIntent = new Intent(PlaylistActivity.this, RoutePreviewActivity.class);
-                previewIntent.putExtra("destination", dest);
-                startActivity(previewIntent);
+                if(runningRoute == null) {
+                    // if runningRoute is null, we came from the RouteFormActivity preview
+                    Intent previewIntent = new Intent(PlaylistActivity.this, RoutePreviewActivity.class);
+                    previewIntent.putExtra("destination", dest);
+                    startActivity(previewIntent);
+                } else {
+                    // if runningRoute exists, we came from the ProfileActivity preview
+                    Intent profileIntent = new Intent(PlaylistActivity.this, PastRoutePreview.class);
+                    profileIntent.putExtra("pastRoute", runningRoute);
+                    profileIntent.putExtra("pastDate", date);
+                    profileIntent.putExtra("pastDur", duration);
+                    startActivity(profileIntent);
+                }
             }
         });
 

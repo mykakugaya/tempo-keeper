@@ -1,5 +1,6 @@
 package com.example.tempokeeper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import com.example.tempokeeper.Model.User;
 import com.example.tempokeeper.SpotifyConnector.UserService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.spotify.sdk.android.auth.AuthorizationClient;
@@ -124,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // Sign in using Firebase Auth and go to RouteFormActivity
+    @SuppressLint("ResourceAsColor")
     private void signIn(String email, String password) {
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
@@ -167,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
 
             // Alert user that they are logged in as: userid
             Log.d("OAUTH", "GOT USER INFO");
-            Toast.makeText(LoginActivity.this, "Logged in as: "+user.id, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(LoginActivity.this, "Spotify User: "+user.id, Toast.LENGTH_SHORT).show();
             signIn(email, pass);
         });
     }

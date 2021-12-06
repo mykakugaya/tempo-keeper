@@ -27,6 +27,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -70,6 +71,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -98,9 +100,9 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private ImageButton btnNext;
     private Button btnStart;
     private Button btnFinish;
-    private Button btnBack;
 
     private Button btnStats;
+    private TextView txtDistance;
 
     // PEDOMETER
     // values for the current number of steps and pace
@@ -168,13 +170,18 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private String[] routeLst;
     private String[] timeLst;
     private String[] dateLst;
+    private String[] distLst;
+    private String[] avgSpdLst;
     ArrayList points = null;
 
     // Start and Finish times of the run
     private long startTime;
     private long finishTime;
     private String duration;
+    private int duration_ms;
     private String startDateTime;
+
+    Double totalDistance = 0.0;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -197,11 +204,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         btnNext = (ImageButton) findViewById(R.id.btnNext2);
         btnFinish = (Button) findViewById(R.id.btnFinish);
         btnStart = (Button) findViewById(R.id.btnStart);
-        btnBack = (Button) findViewById(R.id.btnBackToMusic);
         btnStats = (Button) findViewById(R.id.btnStats);
+        txtDistance = (TextView) findViewById(R.id.txtRunningDist);
 
         btnStart.setEnabled(false);
-        btnBack.setEnabled(true);
         btnFinish.setEnabled(false);
         btnStats.setEnabled(false);
 
@@ -261,17 +267,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
         // BUTTON ONCLICK
 
-        // Back button clicked - takes us back to PlaylistActivity to select a playlist
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playbackService.disableRemote();
-                Intent backIntent = new Intent(RunningActivity.this, PlaylistActivity.class);
-                backIntent.putExtra("chosenRoute",lineOptions);
-                startActivity(backIntent);
-            }
-        });
-
         // Finish button clicked, disable remote player
         // also set mQuitting to true so that it clears the step detector service
         btnFinish.setOnClickListener(new View.OnClickListener() {
@@ -281,7 +276,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 btnStats.setEnabled(true);
                 // get the finish time
                 finishTime = System.currentTimeMillis();
-                int duration_ms = Math.round(finishTime - startTime); // this is in ms
+                duration_ms = Math.round(finishTime - startTime); // this is in ms
 
                 if(duration_ms < 3600000) { // duration is less than an hr
                     // convert ms to mins:secs
@@ -321,7 +316,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 unbindStepService();
                 stopStepService();
                 mQuitting = true;
-//                mPedometerSettings.saveServiceRunningWithNullTimestamp(false);
 
                 // Toast user that run is finished
                 Toast.makeText(RunningActivity.this, "You have finished your run!", Toast.LENGTH_SHORT).show();
@@ -437,7 +431,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 // once we start run, enable finish button and disable start + back to music buttons
                 btnStart.setEnabled(false);
                 btnFinish.setEnabled(true);
-                btnBack.setEnabled(false);
 
                 // get the start time in ms (used to calculate run duration)
                 startTime = System.currentTimeMillis();
@@ -478,6 +471,12 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         if (running == true){
+            if (runningRoute.size()>1){
+                int lastIndex = runningRoute.size()-1;
+                totalDistance += distance(latLng.latitude, runningRoute.get(lastIndex).latitude, latLng.longitude, runningRoute.get(lastIndex).longitude);
+                totalDistance = round(totalDistance, 3);
+                txtDistance.setText(totalDistance.toString());
+            }
             // stores the Lat/Lng values for each point along route ran
             runningRoute.add(latLng);
         }
@@ -513,29 +512,49 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         String[] routesArray = new String[Integer.valueOf(temp) + 1];
                         String[] durationArray = new String[Integer.valueOf(temp) + 1];
                         String[] dateArray = new String[Integer.valueOf(temp) + 1];
+                        String[] distanceArray = new String[Integer.valueOf(temp) + 1];
+                        String[] avgSpeedArray = new String[Integer.valueOf(temp) + 1];
                         routeLst = routesArray;
                         timeLst = durationArray;
                         dateLst = dateArray;
+                        distLst = distanceArray;
+                        avgSpdLst = avgSpeedArray;
+
+                        // For each run, save the date, duration, distance, average speed
                         for (int i = 0; i < Integer.valueOf(temp); i++) {
                             String x = String.valueOf(i);
                             routeLst[i] = String.valueOf(snapshot.child("Routes").child(x).getValue());
                             timeLst[i] = String.valueOf(snapshot.child("Time").child(x).getValue());
                             dateLst[i] = String.valueOf(snapshot.child("Date").child(x).getValue());
+                            distLst[i] = String.valueOf(snapshot.child("Distance").child(x).getValue());
+                            avgSpdLst[i] = String.valueOf(snapshot.child("Average").child(x).getValue());
                         }
                         Log.d("Running Route",""+runningRoute.size());
 
                         // set new values to firebase database
                         routeLst[routeLst.length-1] = String.valueOf(runningRoute);
                         dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(routeLst));
+
                         timeLst[timeLst.length-1] = duration;
                         dbRef.child(firebaseUser).child("Time").setValue(Arrays.asList(timeLst));
+
                         dateLst[dateLst.length-1] = startDateTime;
                         dbRef.child(firebaseUser).child("Date").setValue(Arrays.asList(dateLst));
+
+                        distLst[distLst.length-1] = String.valueOf(totalDistance);
+                        dbRef.child(firebaseUser).child("Distance").setValue(Arrays.asList(distLst));
+
+                        avgSpdLst[avgSpdLst.length-1] = String.valueOf(Math.round(100*totalDistance/(double)(duration_ms/3600))/100);
+                        dbRef.child(firebaseUser).child("Average").setValue(Arrays.asList(avgSpdLst));
+
                     }
                     else{   // else, this is the first run completed
                         dbRef.child(firebaseUser).child("Routes").setValue(Arrays.asList(String.valueOf(runningRoute)));
                         dbRef.child(firebaseUser).child("Time").setValue(Arrays.asList(duration));
                         dbRef.child(firebaseUser).child("Date").setValue(Arrays.asList(startDateTime));
+                        dbRef.child(firebaseUser).child("Distance").setValue(Arrays.asList(totalDistance));
+                        dbRef.child(firebaseUser).child("Average").setValue(Arrays.asList(Math.round(100*totalDistance/(double)(duration_ms/3600))/100));
+
                         Log.d("Running Route",""+runningRoute.size());
                     }
                 }
@@ -717,6 +736,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
     // get the current run pace and filter the playlist tracks to include only
     // tracks within 10bpm of the run pace
+    @SuppressLint("ResourceAsColor")
     private void dynamicTrackSelection(double curTempo) {
         // if current run pace cannot be detected, curTempo is 0, so send toast
         if(curTempo == 0 || curTempo < 0) {
@@ -752,7 +772,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 playbackService.play(nextTrack);
 
                 // Send a toast notifying the user of track change
-                Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
+                Snackbar snackbar = Snackbar.make(sbTrackProgress, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Snackbar.LENGTH_SHORT);
+                snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
+                snackbar.show();
+//                Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
             }
             // EDGE CASE: if filteredTracks is empty because no trackTempo matched the curTempo,
             // start playing a random song in the entire playlist
@@ -762,7 +785,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 Track nextTrack = playlistTracks.get(index);
                 playbackService.play(nextTrack);
                 // Send a toast notifying the user of track change
-                Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
+                Snackbar snackbar = Snackbar.make(sbTrackProgress, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Snackbar.LENGTH_SHORT);
+                snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
+                snackbar.show();
+//                Toast.makeText(RunningActivity.this, "Track changed to: "+nextTrack.getName()+" ("+nextTrack.getTempo()+" bpm)", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -786,18 +812,22 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         // instantiate new curTrackArray and add the currently playing track to the array
         curTrackArray = new ArrayList<>();
 
-        // use getPlayingTrack to get the currently playing track name
-        playbackService.getPlayingTrack();
-        String trackName = sharedPreferences.getString("curTrack","");
-
         Track newTrack = null;
-        // Loop over playlist tracks to find track by name
-        // Set the image URL and tempo of the playing track
-        for (int i=0; i<playlistTracks.size(); i++) {
-            if(playlistTracks.get(i).getName().equals(trackName)) {
-                newTrack = playlistTracks.get(i);
-                break;
+        // use getPlayingTrack to get the currently playing track name
+        try {
+            playbackService.getPlayingTrack();
+             String trackName = sharedPreferences.getString("curTrack","");
+
+            // Loop over playlist tracks to find track by name
+            // Set the image URL and tempo of the playing track
+            for (int i=0; i<playlistTracks.size(); i++) {
+                if(playlistTracks.get(i).getName().equals(trackName)) {
+                    newTrack = playlistTracks.get(i);
+                    break;
+                }
             }
+        } catch (Exception e) {
+            newTrack = playlistTracks.get(0);
         }
 
         if(newTrack!=null) {
@@ -893,6 +923,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
         // Next button skips to next song in queue
         btnNext.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View view) {
                 // Go to next track and set new current track
@@ -911,8 +942,54 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         break;
                     }
                 }
-                Toast.makeText(RunningActivity.this, "Track changed to: "+trackName+" ("+trackTempo+" bpm)", Toast.LENGTH_SHORT).show();
+                Snackbar snackbar = Snackbar.make(sbTrackProgress, "Track changed to: "+trackName+" ("+trackTempo+" bpm)", Snackbar.LENGTH_SHORT);
+                snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
+                snackbar.show();
+//                Toast.makeText(RunningActivity.this, "Track changed to: "+trackName+" ("+trackTempo+" bpm)", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    //getting distance between two points using lat/long
+    //source: https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    public static double distance(double lat1,
+                                  double lat2, double lon1,
+                                  double lon2)
+    {
+
+        // The math module contains a function
+        // named toRadians which converts from
+        // degrees to radians.
+        lon1 = Math.toRadians(lon1);
+        lon2 = Math.toRadians(lon2);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        // Haversine formula
+        double dlon = lon2 - lon1;
+        double dlat = lat2 - lat1;
+        double a = Math.pow(Math.sin(dlat / 2), 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.pow(Math.sin(dlon / 2),2);
+
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        // Radius of earth in kilometers. Use 3956
+        //use 6371 for kilmeters
+        // for miles
+        double r = 3956;
+
+        // calculate the result
+        return(c * r);
+    }
+
+    //for rounding a double to the second decimal point
+    //source: https://stackoverflow.com/questions/2808535/round-a-double-to-2-decimal-places
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 }

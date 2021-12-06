@@ -1,15 +1,19 @@
 package com.example.tempokeeper;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.tempokeeper.Model.Run;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,11 +34,27 @@ import java.util.Collections;
 public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCallback,  GoogleMap.OnPolylineClickListener,
         GoogleMap.OnPolygonClickListener, GoogleMap.OnInfoWindowClickListener{
 
-    private GoogleMap mMap;
+    private TextView txtDate;
+    private TextView txtDist;
+    private TextView txtDur;
+    private TextView txtAvgSpd;
+    private TextView txtMaxSpd;
     private Button btnBack;
+    private Button btnRerun;
+
+    private String date;
+    private String duration;
+    private double distance;
+    private double avgSpd;
+    private double maxSpd;
+
+    private GoogleMap mMap;
+    private PolylineOptions lineOptions;    // send this to RunningActivity
     private ArrayList<Polyline> routesArray;
     private ArrayList<PolylineOptions> polylineOptArray;
     private ArrayList<LatLng> runningRoute;
+    private Run pastRun;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,17 +62,58 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
         setContentView(R.layout.activity_past_preview);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        txtDate = (TextView) findViewById(R.id.txtPastDate);
+        txtDur = (TextView) findViewById(R.id.txtPastDur);
+        txtDist = (TextView) findViewById(R.id.txtPastDist);
+        txtAvgSpd = (TextView) findViewById(R.id.txtPastAvgSpd);
+        txtMaxSpd = (TextView) findViewById(R.id.txtPastMaxSpd);
+        btnBack = (Button) findViewById(R.id.btnBackProfile);
+        btnRerun = (Button) findViewById(R.id.btnRerun);
+
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapPastRoute);
         mapFragment.getMapAsync(PastRoutePreview.this);
 
-        runningRoute = getIntent().getExtras().getParcelableArrayList("runningRoute");
+        Bundle bundle = getIntent().getExtras();
+
+        runningRoute = bundle.getParcelableArrayList("pastRoute");
+
+        date = bundle.getString("pastDate");
+        txtDate.setText(date);
+
+        duration = bundle.getString("pastDur");
+        txtDur.setText("Duration: "+duration);
+
+        btnRerun.setEnabled(false);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent profileIntent = new Intent(PastRoutePreview.this, ProfileActivity.class);
+                startActivity(profileIntent);
+            }
+        });
+
+        btnRerun.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent rerunIntent = new Intent(PastRoutePreview.this, PlaylistActivity.class);
+                // add extras for the back button in PlaylistAct (comes back to this page)
+                rerunIntent.putExtra("pastRoute", runningRoute);
+                rerunIntent.putExtra("pastDate",date);
+                rerunIntent.putExtra("pastDur",duration);
+
+                rerunIntent.putExtra("chosenRoute", lineOptions);   // map route for RunningAct
+                startActivity(rerunIntent);
+            }
+        });
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void displayRoute(ArrayList<LatLng> runningRoute) {
-        PolylineOptions lineOptions = null;
+        lineOptions = null;
         routesArray = new ArrayList<Polyline>();
         polylineOptArray = new ArrayList<PolylineOptions>();
 
@@ -103,6 +164,8 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, 300);
 
         mMap.animateCamera(cu);
+
+        btnRerun.setEnabled(true);
     }
 
     public ArrayList<int[]> setRouteColors(){

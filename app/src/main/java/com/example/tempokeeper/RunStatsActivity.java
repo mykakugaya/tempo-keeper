@@ -62,13 +62,14 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView txtAvgSpeed;
     private TextView txtMaxSpeed;
     private Button btnProfile;
-    private Button btnLoadMap;
 
     // FIREBASE
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private String firebaseUser = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
     private String lastDuration;
     private String lastDate;
+    private String lastDistance;
+    private String lastAverageSpd;
 
     private final FirebaseDatabase usersDB = FirebaseDatabase.getInstance();
     DatabaseReference dbRef = usersDB.getReference().child("Users");
@@ -82,7 +83,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private ArrayList<LatLng> runningRoute;
     private ArrayList<LatLng> points;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,14 +95,13 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         txtAvgSpeed = (TextView) findViewById(R.id.txtAvgSpeed);
         txtMaxSpeed = (TextView) findViewById(R.id.txtMaxSpeed);
         btnProfile = (Button) findViewById(R.id.btnProfile);
-        btnLoadMap = (Button) findViewById(R.id.btnLoadMap);
 
-        btnLoadMap.setEnabled(false);
+        btnProfile.setEnabled(false);
 
-        // CHANGE THIS INTENT TO GETTING ROUTE FROM FIREBASE
-        runningRoute = new ArrayList<>();
-        getRecentRoute();   // gets runningRoute
-//        runningRoute = getIntent().getExtras().getParcelableArrayList("runningRoute");
+        // Get the route to display on map
+//        runningRoute = new ArrayList<>();
+//        getRecentRoute();   // gets runningRoute
+        runningRoute = getIntent().getExtras().getParcelableArrayList("runningRoute");
 
         // Connect the map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -123,52 +122,50 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     // gets the last ran route from user's database
-    public void getRecentRoute(){
-        DatabaseReference myRef = dbRef.child(firebaseUser);
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
-                    String temp = String.valueOf(Long.valueOf(snapshot.child("Routes").getChildrenCount()));
+//    public void getRecentRoute(){
+//        DatabaseReference myRef = dbRef.child(firebaseUser);
+//        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()){
+//                    String temp = String.valueOf(Long.valueOf(snapshot.child("Routes").getChildrenCount()));
+//
+//                    int LAST_INDEX = Integer.valueOf(temp)-1;
+//
+//                    // get route in string form of "(lat,lng),(lat,lng),(lat,lng)"
+//                    String strLatLng = String.valueOf(snapshot.child("Routes").child(String.valueOf(LAST_INDEX)).getValue()).replaceAll("lat/lng: ","").replaceAll("\\[", "").replaceAll("\\]", "");
+//
+//                    // convert string route to an Arraylist<LatLng>
+//                    ArrayList<LatLng> newArr = new ArrayList<>();
+//
+//                    // strRouteArr has the str array form ["(lat,lng)","(lat,lng)","(lat,lng)"]
+//                    String[] strRouteArr = strLatLng.split(", ");
+//
+//                    for (int j=0; j<strRouteArr.length; j++) {
+//                        // replace the '(' and ',' in each "(lat,lng)" array item
+//                        String[] latLngPair = strRouteArr[j].replaceAll("\\(", "").replaceAll("\\)","").split(",", 2);
+//                        if(!latLngPair[0].equals("")&&!latLngPair[1].equals("")) {
+//                            // parse float values for lat and lng
+//                            float lat = parseFloat(latLngPair[0]);
+//                            float lng = parseFloat(latLngPair[1]);
+//                            // add new LatLng object to ArrayList<LatLng> curRoute
+//                            newArr.add(new LatLng(lat, lng));
+//                        }
+//                    }
+//                    runningRoute = newArr;
+////                    btnLoadMap.setEnabled(true);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Log.d("data change", error.toString());
+//            }
+//        });
+//    }
 
-                    int LAST_INDEX = Integer.valueOf(temp)-1;
-
-                    // get route in string form of "(lat,lng),(lat,lng),(lat,lng)"
-                    String strLatLng = String.valueOf(snapshot.child("Routes").child(String.valueOf(LAST_INDEX)).getValue()).replaceAll("lat/lng: ","").replaceAll("\\[", "").replaceAll("\\]", "");
-
-                    // convert string route to an Arraylist<LatLng>
-                    ArrayList<LatLng> newArr = new ArrayList<>();
-
-                    // strRouteArr has the str array form ["(lat,lng)","(lat,lng)","(lat,lng)"]
-                    String[] strRouteArr = strLatLng.split(", ");
-
-                    for (int j=0; j<strRouteArr.length; j++) {
-                        // replace the '(' and ',' in each "(lat,lng)" array item
-                        String[] latLngPair = strRouteArr[j].replaceAll("\\(", "").replaceAll("\\)","").split(",", 2);
-                        if(!latLngPair[0].equals("")&&!latLngPair[1].equals("")) {
-                            // parse float values for lat and lng
-                            float lat = parseFloat(latLngPair[0]);
-                            float lng = parseFloat(latLngPair[1]);
-                            // add new LatLng object to ArrayList<LatLng> curRoute
-                            newArr.add(new LatLng(lat, lng));
-                        }
-                    }
-                    runningRoute = newArr;
-                    btnLoadMap.setEnabled(true);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("data change", error.toString());
-            }
-        });
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.mapFinished);
-//        mapFragment.getMapAsync(this);
-    }
-
-    public void getDateAndTime(){
+    // Get last run information from the database
+    public void getRunStats(){
         DatabaseReference myRef = dbRef.child(firebaseUser);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -179,8 +176,15 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
                     if(count > 0) {
                         lastDuration = String.valueOf(snapshot.child("Time").child(String.valueOf(LAST_INDEX)).getValue());
                         txtDuration.setText("Duration: "+lastDuration);
+
                         lastDate = String.valueOf(snapshot.child("Date").child(String.valueOf(LAST_INDEX)).getValue());
                         txtDate.setText(lastDate);
+
+                        lastDistance = String.valueOf(snapshot.child("Distance").child(String.valueOf(LAST_INDEX)).getValue());
+                        txtDistance.setText("Distance: "+lastDistance+" miles");
+
+                        lastAverageSpd = String.valueOf(snapshot.child("Average").child(String.valueOf(LAST_INDEX)).getValue());
+                        txtAvgSpeed.setText("Average speed: "+lastAverageSpd+" MPH");
                     }
                 }
             }
@@ -197,7 +201,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     public void displayRoute() {
         points = runningRoute;
 
-        PolylineOptions lineOptions = null;
+        lineOptions = null;
         routesArray = new ArrayList<Polyline>();
         polylineOptArray = new ArrayList<PolylineOptions>();
 
@@ -258,8 +262,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         double maxSpeed;
         double minSpeed;
         for (int i = 1;i<points.size();i++){
-            distances.add(Math.abs(points.get(i).latitude) - Math.abs(points.get(i-1).latitude) +
-                    Math.abs(points.get(i).longitude) - Math.abs(points.get(i-1).longitude));
+            distances.add(distance(points.get(i).latitude, points.get(i-1).latitude, points.get(i).longitude, points.get(i-1).longitude));
         }
         maxSpeed = Collections.max(distances);
         // grade = 100
@@ -303,47 +306,43 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         // Colors array should now be full of rgb arr values (e.g. {0,255,76})
         return colorsArray;
     }
+    //for only using red/yellow/green for the color coating
+//    if(proportion < 0.33) {
+//        int[] slowArr = {255,0,0};
+//        rgbArr = slowArr;
+//    } else if(proportion > 0.33 && proportion <0.66) {    // yellow to green range
+//        int[] medArr = {255,255,0};
+//        rgbArr = medArr;
+//    }
+//        else{
+//        int[] fastArr = {0,255,0};
+//        rgbArr = fastArr;
+//    }
+//        colorsArray.add(rgbArr);
+//}
+//
+//// Colors array should now be full of rgb arr values (e.g. {0,255,76})
+//        System.out.println(colorsArray);
+//                return colorsArray;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-//        do {
-//            getRecentRoute();
-//        } while(runningRoute.size()==0);
+        // display route on map
+        displayRoute();
 
-        btnLoadMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // display route on map
-                displayRoute();
+        //retrieve the duration data from the firebase and show on txtViews
+        getRunStats();
 
-            }
-        });
-
-        //retrieve the duration data from the firebase and show on txtView
-        getDateAndTime();
+        btnProfile.setEnabled(true);
     }
 
     @Override
     public void onPolylineClick(@NonNull Polyline polyline) {
 
     }
-
-//    @SuppressLint("MissingPermission")
-//    private void enableMyLocation() {
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.ACCESS_FINE_LOCATION)
-//                == PackageManager.PERMISSION_GRANTED) {
-//            mMap.setMyLocationEnabled(true);
-//        } else {
-//            ActivityCompat.requestPermissions(this, new String[]
-//                            {Manifest.permission.ACCESS_FINE_LOCATION},
-//                    9000);
-//        }
-//    }
-
 
     // MENU
     @Override
@@ -388,4 +387,48 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         return super.onOptionsItemSelected(item);
 
     }
+    //getting distance between two points using lat/long
+    //source: https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    public static double distance(double lat1,
+                                  double lat2, double lon1,
+                                  double lon2)
+    {
+
+        // The math module contains a function
+        // named toRadians which converts from
+        // degrees to radians.
+        lon1 = Math.toRadians(lon1);
+        lon2 = Math.toRadians(lon2);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        // Haversine formula
+        double dlon = lon2 - lon1;
+        double dlat = lat2 - lat1;
+        double a = Math.pow(Math.sin(dlat / 2), 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.pow(Math.sin(dlon / 2),2);
+
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        // Radius of earth in kilometers. Use 3956
+        //use 6371 for kilmeters
+        // for miles
+        double r = 3956;
+
+        // calculate the result
+        return(c * r);
+    }
+
+    //for rounding a double to the second decimal point
+    //source: https://stackoverflow.com/questions/2808535/round-a-double-to-2-decimal-places
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
 }

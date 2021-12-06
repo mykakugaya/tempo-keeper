@@ -91,16 +91,16 @@ public class RegistrationActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         //display success toast and go back to MainActivity.
-                                        Toast.makeText(RegistrationActivity.this, username+" registered successfully!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(RegistrationActivity.this, username+" registered successfully!", Toast.LENGTH_SHORT).show();
                                         startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
                                     } else {
-                                        Toast.makeText(RegistrationActivity.this, "Failed to register", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(RegistrationActivity.this, "Failed to register", Toast.LENGTH_SHORT).show();
 
                                     }
                                 }
                             });
                         } else {
-                            Toast.makeText(RegistrationActivity.this, "Failed to register", Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegistrationActivity.this, "Failed to register", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
