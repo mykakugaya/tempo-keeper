@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txtStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:drawableEnd="@drawable/ic_stats"
+        android:drawablePadding="10dp"
+        android:text="@string/runStats"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+        android:textColor="@color/title"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/mapFinished"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <fragment
+        android:id="@+id/mapFinished"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/txtRunDate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtStats"
+        tools:context=".RoutePreviewActivity" />
+
+    <TextView
+        android:id="@+id/txtDist"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="3dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/txtAvgSpeed"
+        app:layout_constraintEnd_toStartOf="@+id/txtAvgSpeed"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txtRunDuration"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="3dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/txtMaxSpeed"
+        app:layout_constraintEnd_toStartOf="@+id/txtMaxSpeed"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txtAvgSpeed"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/txtMaxSpeed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/txtDist"
+        app:layout_constraintTop_toBottomOf="@+id/txtRunDate" />
+
+    <TextView
+        android:id="@+id/txtMaxSpeed"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/btnProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/txtRunDuration"
+        app:layout_constraintTop_toBottomOf="@+id/txtAvgSpeed" />
+
+    <Button
+        android:id="@+id/btnProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="44dp"
+        android:background="@drawable/button_blue"
+        android:drawableEnd="@drawable/ic_next"
+        android:drawablePadding="5dp"
+        android:padding="5dp"
+        android:text="@string/btnProfile"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txtRunDuration"
+        app:layout_constraintStart_toEndOf="@+id/txtRunDuration"
+        app:layout_constraintTop_toBottomOf="@+id/txtMaxSpeed" />
+
+    <TextView
+        android:id="@+id/txtRunDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/title"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txtAvgSpeed"
+        app:layout_constraintEnd_toEndOf="@+id/txtDist"
+        app:layout_constraintStart_toEndOf="@+id/txtDist"
+        app:layout_constraintTop_toBottomOf="@+id/mapFinished" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

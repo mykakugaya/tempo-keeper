@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">Tempo Keeper</string>
+    <string name="google_map_api_key">AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw</string>
+
+    <string name="btnLogin">Login</string>
+    <string name="email">Email</string>
+    <string name="pass">Password</string>
+    <string name="textRegister">Don\'t have an account? Register here</string>
+    <string name="createAccount">Create an Account</string>
+    <string name="name">Name</string>
+    <string name="btnRegister">Register</string>
+
+    <string name="customRoute">Create a Custom Route</string>
+    <string name="destination">Destination</string>
+    <string name="distance">Target distance (mi)</string>
+    <string name="elevationOpt">Elevation Options:</string>
+    <string name="hilly">Hilly</string>
+    <string name="flat">Flat</string>
+    <string name="na">N/A</string>
+    <string name="newRoute">New Route</string>
+    <string name="btnCalculateRoute">Calculate Route</string>
+
+    <string name="generatedRoute">Generated Route Preview</string>
+    <string name="btnBackToForm">Back to Form</string>
+    <string name="btnSelectMusic">Select Music</string>
+
+    <string name="btnLoadPlaylists">Load My Playlists Below</string>
+    <string name="btnBackToPreview">Back to Preview</string>
+    <string name="btnGoToRun">Go To Run</string>
+    <string name="btnLoadTracks">Load Tracks</string>
+    <string name="btnSelectTempo">Filter Tracks</string>
+
+    <string name="btnStartRun">Start</string>
+    <string name="btnFinishRun">Finish</string>
+    <string name="btnStats">Stats</string>
+
+    <string name="runStats">Run Statistics</string>
+    <string name="btnLoadMap">Load Map</string>
+    <string name="btnProfile">View Profile</string>
+
+
+    <string name="profile">User Profile</string>
+    <string name="signOut">Reload History</string>
+    <string name="routeHistory">Run History</string>
+    <string name="rerunRoute">Rerun this Route</string>
+
+    <string name="menuProfile">My Profile</string>
+    <string name="btnBackProfile">Back to Profile</string>
+    <string name="menuRoute">Create Route</string>
+    <string name="CLIENT_ID">f48deef1d46e49a8a445952351b10216</string>
+    <string name="REDIRECT_URI">com.example.tempokeeper://callback/</string>
+
+</resources>

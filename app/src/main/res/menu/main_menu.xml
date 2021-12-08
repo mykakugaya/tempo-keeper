@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menuRoute"
+        android:icon="@drawable/ic_route"
+        android:title="@string/menuRoute"
+        app:showAsAction="ifRoom"></item>
+
+    <item
+        android:id="@+id/menuProfile"
+        android:icon="@drawable/ic_face"
+        android:title="@string/menuProfile"
+        app:showAsAction="ifRoom"></item>
+
+    <item
+        android:id="@+id/menuSignOut"
+        android:icon="@drawable/ic_logout"
+        android:title="@string/signOut"
+        app:showAsAction="ifRoom"></item>
+</menu>

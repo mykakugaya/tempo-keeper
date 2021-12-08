@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "223000834017",
+    "firebase_url": "https://demoforroutes-default-rtdb.firebaseio.com",
+    "project_id": "demoforroutes",
+    "storage_bucket": "demoforroutes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223000834017:android:5911f58e8a32b052a3aca0",
+        "android_client_info": {
+          "package_name": "com.example.elliotmapapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223000834017-8578pornlgee271c711meu4oegmd3epi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATrhGWMRaPmVkE7mpHnONldCUOY2rbEoI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223000834017-8578pornlgee271c711meu4oegmd3epi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223000834017:android:476119e39cd3474aa3aca0",
+        "android_client_info": {
+          "package_name": "com.example.tempokeeper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223000834017-8578pornlgee271c711meu4oegmd3epi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATrhGWMRaPmVkE7mpHnONldCUOY2rbEoI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223000834017-8578pornlgee271c711meu4oegmd3epi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
