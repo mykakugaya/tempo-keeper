@@ -1,6 +1,6 @@
 # Tempo Keeper
 
-### A Running App with custom routing and dynamic music playback functionalities
+##### A Running App with custom routing and dynamic music playback functionalities
 
 ## Description
 Tempo Keeper is an Android mobile running app with features catering towards competitive and casual
@@ -14,6 +14,7 @@ motivating them to improve and excel in their running, whether it is a leisure o
 ## Spotify API
 In order to enable the music features of this app, you must have a Spotify account (free or premium) 
 and your SHA-1 key must be registered in the app on the Spotify Dashboard (https://developer.spotify.com/dashboard/applications).
+
 For grading purposes, we have already added the grader's SHA-1 key so the app's Spotify features 
 should already be functional.
 
@@ -29,7 +30,7 @@ The top app menu bar has 3 menu items: the Create Route Form (leftmost), User Pr
 ## Activities
 
 ### Create Route Form
-![Create Route Form](./app/assets/routeform.png)
+![Create Route Form](./app/assets/routeform.png){:height="700px"}
 
 To create a running route, enter the desired destination (a real world address) and select an
 elevation option (Hilly, Flat, or N/A). Selecting Hilly will find the route to that destination with
@@ -70,8 +71,10 @@ along the run, the dynamic song playback feature of this app will automatically 
 with a tempo matching your updated running pace. Changing tracks will automatically update the track information
 and playback progress on the screen, as well as notify the user of the track change (and to what tempo) at the
 bottom of the screen.
+
 Also, if the user entered a target distance (miles) in the create route form previously, they will be
 notified when they have reached that goal at the bottom of the screen.
+
 When finished running, click "Finish" to end the run and stop the music. Then, click the "Stats" button
 to go to the Run Statistics activity, where your run route on a map and running statistics such as
 distance, duration, and average speed are displayed. Following this, you can click "View Profile" to see
@@ -86,6 +89,7 @@ page, where you can see your route and stats. This preview page gives the user a
 clicking the "Rerun this Route" button takes you to the Playlist Selection activity again, so that you
 can select a playlist and go to the Running activity to rerun the same route. This way, the user does not have
 to fill out the create route form for routes that they frequently revisit.
+
 Sometimes when coming back to the User Profile after a run (aka coming here from the Run Stats page),
 the most recently added route image (topmost image) in the route history list will not generate on time.
 This is the purpose of the Reload History button, where it will refresh the run history to properly display
@@ -109,4 +113,4 @@ any images that were not generated on time.
   - https://www.geeksforgeeks.org/program-distance-two-points-earth/
     
 ## Questions
-If you have any questions about this repo, please open an issue or contact mykakugaya directly at mykakug129@gmail.com.
+If you have any questions about this repo, please contact Myka Kugaya at mykakug129@gmail.com.
