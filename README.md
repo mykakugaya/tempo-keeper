@@ -30,7 +30,7 @@ The top app menu bar has 3 menu items: the Create Route Form (leftmost), User Pr
 ## Activities
 
 ### Create Route Form
-![Create Route Form](./app/assets/routeform.png){:height="700px"}
+![Create Route Form](./app/assets/routeform.png)
 
 To create a running route, enter the desired destination (a real world address) and select an
 elevation option (Hilly, Flat, or N/A). Selecting Hilly will find the route to that destination with
