@@ -82,7 +82,7 @@ distance, duration, and average speed are displayed.
 The map in Run Statistics will show a color-coded version of the route ran (like below), with red indicating slower
 parts of your run and green indicating faster parts (demonstrates fluctuations in run speed).
 
-![Run Stats](./app/assets/colorcoded.png)
+![Run Stats](./app/assets/colorcoded.PNG)
 
 Following Run Stats, you can click "View Profile" to see the updated list of runs in your run history.
 
