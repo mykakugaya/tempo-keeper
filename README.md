@@ -77,8 +77,14 @@ notified when they have reached that goal at the bottom of the screen.
 
 When finished running, click "Finish" to end the run and stop the music. Then, click the "Stats" button
 to go to the Run Statistics activity, where your run route on a map and running statistics such as
-distance, duration, and average speed are displayed. Following this, you can click "View Profile" to see
-the updated list of runs in your run history.
+distance, duration, and average speed are displayed.
+
+The map in Run Statistics will show a color-coded version of the route ran (like below), with red indicating slower
+parts of your run and green indicating faster parts (demonstrates fluctuations in run speed).
+
+![Run Stats](./app/assets/colorcoded.png)
+
+Following Run Stats, you can click "View Profile" to see the updated list of runs in your run history.
 
 ### User Profile
 The profile page displays the user's name, account email, and Spotify username, as well as a recycler view
