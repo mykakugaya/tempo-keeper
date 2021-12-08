@@ -1,6 +1,6 @@
 # Tempo Keeper
 
-##### A Running App with custom routing and dynamic music playback functionalities
+#### A Running App with custom routing and dynamic music playback functionalities
 
 ## Description
 Tempo Keeper is an Android mobile running app with features catering towards competitive and casual
