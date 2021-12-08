@@ -65,12 +65,6 @@
             android:textSize="16sp" />
 
 
-        <TextView
-            android:id="@+id/txtRunMax"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text"
-            android:textSize="16sp" />
     </LinearLayout>
 
 </LinearLayout>

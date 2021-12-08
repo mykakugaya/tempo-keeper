@@ -39,7 +39,6 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         public TextView txtDate;
         public TextView txtDistance;
         public TextView txtDuration;
-        public TextView txtMaxSpeed;
         public TextView txtAvgSpeed;
         public ImageView imgRoute;
 
@@ -76,7 +75,6 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
             txtDistance = (TextView) itemView.findViewById(R.id.txtRunDistance);
             txtDuration = (TextView) itemView.findViewById(R.id.txtRunTime);
             txtAvgSpeed = (TextView) itemView.findViewById(R.id.txtRunAvg);
-            txtMaxSpeed = (TextView) itemView.findViewById(R.id.txtRunMax);
             imgRoute = (ImageView) itemView.findViewById(R.id.imgRoute);
             layoutAdapter = (LinearLayout) itemView.findViewById(R.id.layoutRunAdapter);
 
@@ -96,7 +94,6 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
             previewIntent.putExtra("pastDur", run.getDuration());
             previewIntent.putExtra("pastDist", run.getDistance());
             previewIntent.putExtra("pastAvgSpd", run.getAvgSpeed());
-//            previewIntent.putExtra("pastMaxSpd",run.getMaxSpeed());
 
             context.startActivity(previewIntent);
         }
@@ -134,7 +131,6 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         holder.txtDuration.setText("Duration: " + holder.run.getDuration());
         holder.txtDistance.setText("Distance: "+pastRuns.get(position).getDistance()+" miles");
         holder.txtAvgSpeed.setText("Avg. Speed: "+pastRuns.get(position).getAvgSpeed()+" MPH");
-//        holder.txtMaxSpeed.setText("Max. speed: "+pastRuns.get(position).getMaxSpeed()+" MPH");
 
         if (holder.run.getImage() != null) {
             /* Bitmap image is a screenshot of the map produced by the run

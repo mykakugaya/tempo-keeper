@@ -69,7 +69,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView txtDuration;
     private TextView txtDistance;
     private TextView txtAvgSpeed;
-    private TextView txtMaxSpeed;
     private Button btnProfile;
 
 
@@ -114,7 +113,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         txtDuration = (TextView) findViewById(R.id.txtRunDuration);
         txtDistance = (TextView) findViewById(R.id.txtDist);
         txtAvgSpeed = (TextView) findViewById(R.id.txtAvgSpeed);
-        txtMaxSpeed = (TextView) findViewById(R.id.txtMaxSpeed);
         btnProfile = (Button) findViewById(R.id.btnProfile);
 
         btnProfile.setEnabled(false);

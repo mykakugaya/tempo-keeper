@@ -43,7 +43,6 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
     private TextView txtDist;
     private TextView txtDur;
     private TextView txtAvgSpd;
-    private TextView txtMaxSpd;
     private Button btnBack;
     private Button btnRerun;
 
@@ -71,7 +70,6 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
         txtDur = (TextView) findViewById(R.id.txtPastDur);
         txtDist = (TextView) findViewById(R.id.txtPastDist);
         txtAvgSpd = (TextView) findViewById(R.id.txtPastAvgSpd);
-        txtMaxSpd = (TextView) findViewById(R.id.txtPastMaxSpd);
         btnBack = (Button) findViewById(R.id.btnBackProfile);
         btnRerun = (Button) findViewById(R.id.btnRerun);
 
