@@ -3,7 +3,7 @@
 #### A Running App with custom routing and dynamic music playback functionalities
 
 ## Description
-Tempo Keeper is an Android mobile running app with features catering towards competitive and casual
+Tempo Keeper is an Android Native mobile running app written in Java with features catering towards competitive and casual
 runners. It has customizable routing, where users can specify parameters such as destination,
 distance, and elevation to create running routes that meet their needs. In addition to routing,
 the app features a dynamic music playback functionality, which connects to the user's Spotify account
