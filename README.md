@@ -131,6 +131,9 @@ any images that were not generated on time.
     
 ## Contact Team Members
 Elliot Cho echochs@bu.edu
+
 Edward Choe edchoe00@bu.edu
+
 Mark Nam marknam@bu.edu
+
 Myka Kugaya mkugaya@bu.edu
