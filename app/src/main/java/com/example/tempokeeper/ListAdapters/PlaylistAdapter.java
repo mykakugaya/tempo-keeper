@@ -78,7 +78,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
                     Snackbar snackbar = Snackbar.make(itemView, "Playlist " + playlist.getName() + " selected", Snackbar.LENGTH_SHORT);
                     snackbar.getView().setBackgroundColor(context.getColor(R.color.colorPrimaryDark));
                     snackbar.show();
-//                    Toast.makeText(context, "Playlist " + playlist.getName() + " selected", Toast.LENGTH_SHORT).show();
                     layoutPlaylist.setBackgroundColor(context.getResources().getColor(R.color.blue_100));
                     // save the selected tempo in sharedPreferences
                     // we will use it in TrackActivity when the filter tempos button is clicked

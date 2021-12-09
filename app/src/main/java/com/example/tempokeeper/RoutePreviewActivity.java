@@ -94,7 +94,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     //ensures the user's starting Marker doesn't move
     boolean start = false;
 
-    private static final int REQUEST_LOCATION_PERMISSION = 9003;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
 
     @Override
@@ -163,8 +162,143 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         enableMyLocation();
     }
 
-    @Override
-    public void onInfoWindowClick(@NonNull Marker marker) {}
+    // location callback to initially run the following code
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            Log.d(TAG, "onLocationResult: " + locationResult.getLastLocation());
+
+            //Get the the LatLng value for the current location in order to place marker at current location
+            LatLng latLng = new LatLng(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
+            //once the map is inflated...
+            if (mMap != null) {
+                //if there is no origin point marker, create one
+                if (userLocationMarker == null) {
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng);
+                    markerOptions.anchor((float) 0.5, (float) 0.5);
+                    markerOptions.title("This is you");
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    userLocationMarker = mMap.addMarker(markerOptions);
+                }
+                //if the origin point marker exists, get the destination and make the Google
+                //Directions API call
+                if (!start){
+                    Bundle bundle = getIntent().getExtras();
+                    String dest = bundle.getString("destination");
+                    String url = getDirectionsUrl(userLocationMarker.getPosition(), dest);
+
+                    //get a list of addresses that could match the user's destination input
+                    List<Address> addressList = null;
+                    MarkerOptions destMarker = new MarkerOptions();
+                    Address myAddress;
+                    LatLng destlatLng;
+
+                    Geocoder geocoder = new Geocoder(RoutePreviewActivity.this);
+                    try {
+                        //add possible adresses to a list
+                        addressList = geocoder.getFromLocationName(dest, 5);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (addressList != null) {
+                        //place a destination marker at the most likely destination
+                        for (int i = 0; i < addressList.size(); i++) {
+                            myAddress = addressList.get(i);
+                            destlatLng = new LatLng(myAddress.getLatitude(), myAddress.getLongitude());
+                            destMarker.position(destlatLng);
+                            destMarker.title("This is your destination");
+                            mMap.addMarker(destMarker);
+                        }
+                    }
+
+                    //Set the camera to include the origin marker and destination marker
+                    //the camera should zoom in so the route is clearly visible
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    builder.include(userLocationMarker.getPosition());
+                    builder.include(destMarker.getPosition());
+                    LatLngBounds bounds = builder.build();
+
+                    int width = getResources().getDisplayMetrics().widthPixels;
+                    int height = getResources().getDisplayMetrics().heightPixels;
+                    int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+
+                    mMap.animateCamera(cu);
+
+                    // Direc Download Task is initialized and executed
+                    //Downloads the url created and prepares to get routes
+                    DirecDownloadTask direcDownloadTask = new DirecDownloadTask();
+                    Log.d("RPA", "direcDownloadTask.execute");
+                    direcDownloadTask.execute(url);
+                    start = true;
+                }
+            }
+        }
+    };
+
+    // format the Directions http url to then recieve the google direction API output
+    private String getDirectionsUrl(LatLng origin, String dest) {
+
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        dest.replaceAll("//s", "");
+        String str_dest = "destination=" + dest;
+
+        // Sensor enabled
+        String mode = "&mode=walking";
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + mode;
+
+        // Building the url to the web service
+        //alternatives=true asks google directions to return at most 3 possible routes
+        String url = "https://maps.googleapis.com/maps/api/directions/json?" + parameters + "&key=AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw&alternatives=true";
+
+        Log.d("URL", url);
+        return url;
+    }
+
+    /**
+     * A method to download json data from url
+     */
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.connect();
+
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
 
     // Directions API Download Task
     // Used to make an AsyncTask that will get the URL of the Google Directions API Request
@@ -196,7 +330,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
             direcParserTask.execute(result);
         }
     }
-
 
     /**
      * A class to parse the Google Places in JSON format
@@ -243,7 +376,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                 Snackbar snackbar = Snackbar.make(btnBack, "Route not possible", Snackbar.LENGTH_SHORT);
                 snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
                 snackbar.show();
-//                Toast.makeText(RoutePreviewActivity.this, "Route not possible", Toast.LENGTH_SHORT).show();
             } else {
                 // begin to loop through the list of the resulting output of the parse JSON Data
                 // this loop should loop through each of the different possible routes
@@ -294,8 +426,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                         eO.addAll(points);
                     }
 
-//                    Log.d("Hello", "" + lineOptions.getPoints().size());
-//                    Log.d("bye", "" + eO.getPoints().size());
                     // prepare a string (strE) for use in the elevation URL request
                     String strE;
                     strE = "" + eO.getPoints();
@@ -307,8 +437,8 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                     // add the string to the list that will hold the elevation url parameters
                     eOArray.add(strE);
                 }
-                //            routesArray.get(0).setZIndex(1);
-                //            routesArray.get(0).setColor(Color.BLUE);
+
+                // enable next button
                 btnMusic.setEnabled(true);
 
                 // finally get the actual elevation values
@@ -317,6 +447,24 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
                 // allows us to work with the values and compare them at different location along the route
                 getElevationVals();
             }
+        }
+    }
+
+    /**
+     * Elevation Strategy:
+     * 1. get an array of route arrays of latlngs from the JSONParser
+     * 2. traverse each route, find the elevation of each latlng, and add the elevation to an array
+     * 3. get the difference in elevation for the whole route and compare it with the other routes
+     * 4. highlight the one with the greatest or smallest difference depending on user preference
+     */
+
+    public void getElevationVals() {
+        // repeat for each of the routes that was parsed from the google Directions API
+        for (int i = 0; i < routesArray.size(); i++) {
+            String elevURL = "https://maps.googleapis.com/maps/api/elevation/json?samples=40&key=AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw&path=" + eOArray.get(i);
+            ElevDownloadTask elevDownloadTask = new ElevDownloadTask();
+            // Start downloading json data from Google Directions API
+            elevDownloadTask.execute(elevURL);
         }
     }
 
@@ -482,67 +630,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    // format the Directions http url to then recieve the google direction API output
-    private String getDirectionsUrl(LatLng origin, String dest) {
-
-        // Origin of route
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-
-        // Destination of route
-        dest.replaceAll("//s", "");
-        String str_dest = "destination=" + dest;
-
-        // Sensor enabled
-        String mode = "&mode=walking";
-        // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + mode;
-
-        // Building the url to the web service
-        //alternatives=true asks google directions to return at most 3 possible routes
-        String url = "https://maps.googleapis.com/maps/api/directions/json?" + parameters + "&key=AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw&alternatives=true";
-
-        Log.d("URL", url);
-        return url;
-    }
-
-    /**
-     * A method to download json data from url
-     */
-    private String downloadUrl(String strUrl) throws IOException {
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(strUrl);
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            urlConnection.connect();
-
-            iStream = urlConnection.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-            StringBuffer sb = new StringBuffer();
-
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-            data = sb.toString();
-
-            br.close();
-
-        } catch (Exception e) {
-            Log.d("Exception", e.toString());
-        } finally {
-            iStream.close();
-            urlConnection.disconnect();
-        }
-        return data;
-    }
-
     @Override
     public void onPolylineClick(@NonNull Polyline polyline) {
         // initialize all routes to gray (deselected mode)
@@ -562,93 +649,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    public void getElevationVals() {
-        // repeat for each of the routes that was parsed from the google Directions API
-        for (int i = 0; i < routesArray.size(); i++) {
-            String elevURL = "https://maps.googleapis.com/maps/api/elevation/json?samples=40&key=AIzaSyDOMa68BrLRKcMLnCVODFd3cwqOxfnB2qw&path=" + eOArray.get(i);
-            ElevDownloadTask elevDownloadTask = new ElevDownloadTask();
-            // Start downloading json data from Google Directions API
-            elevDownloadTask.execute(elevURL);
-        }
-    }
-
-    // location callback to initially run the following code
-    LocationCallback locationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            super.onLocationResult(locationResult);
-            Log.d(TAG, "onLocationResult: " + locationResult.getLastLocation());
-
-            //Get the the LatLng value for the current location in order to place marker at current location
-            LatLng latLng = new LatLng(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
-            //once the map is inflated...
-            if (mMap != null) {
-                //if there is no origin point marker, create one
-                if (userLocationMarker == null) {
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng);
-                    markerOptions.anchor((float) 0.5, (float) 0.5);
-                    markerOptions.title("This is you");
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                    userLocationMarker = mMap.addMarker(markerOptions);
-                }
-                //if the origin point marker exists, get the destination and make the Google
-                //Directions API call
-                if (!start){
-                    Bundle bundle = getIntent().getExtras();
-                    String dest = bundle.getString("destination");
-                    String url = getDirectionsUrl(userLocationMarker.getPosition(), dest);
-
-                    //get a list of addresses that could match the user's destination input
-                    List<Address> addressList = null;
-                    MarkerOptions destMarker = new MarkerOptions();
-                    Address myAddress;
-                    LatLng destlatLng;
-
-                    Geocoder geocoder = new Geocoder(RoutePreviewActivity.this);
-                    try {
-                        //add possible adresses to a list
-                        addressList = geocoder.getFromLocationName(dest, 5);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (addressList != null) {
-                        //place a destination marker at the most likely destination
-                        for (int i = 0; i < addressList.size(); i++) {
-                            myAddress = addressList.get(i);
-                            destlatLng = new LatLng(myAddress.getLatitude(), myAddress.getLongitude());
-                            destMarker.position(destlatLng);
-                            destMarker.title("This is your destination");
-                            mMap.addMarker(destMarker);
-                        }
-                    }
-
-                    //Set the camera to include the origin marker and destination marker
-                    //the camera should zoom in so the route is clearly visible
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    builder.include(userLocationMarker.getPosition());
-                    builder.include(destMarker.getPosition());
-                    LatLngBounds bounds = builder.build();
-
-                    int width = getResources().getDisplayMetrics().widthPixels;
-                    int height = getResources().getDisplayMetrics().heightPixels;
-                    int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
-
-                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
-
-                    mMap.animateCamera(cu);
-
-                    // Direc Download Task is initialized and executed
-                    //Downloads the url created and prepares to get routes
-                    DirecDownloadTask direcDownloadTask = new DirecDownloadTask();
-                    Log.d("RPA", "direcDownloadTask.execute");
-                    direcDownloadTask.execute(url);
-                    start = true;
-                }
-            }
-        }
-    };
-
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -659,6 +659,22 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     private void stopLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
+
+    @SuppressLint("MissingPermission")
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    @Override
+    public void onInfoWindowClick(@NonNull Marker marker) {}
 
     @Override
     protected void onStart() {
@@ -677,19 +693,6 @@ public class RoutePreviewActivity extends AppCompatActivity implements OnMapRead
     protected void onStop() {
         super.onStop();
         stopLocationUpdates();
-    }
-
-    @SuppressLint("MissingPermission")
-    private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]
-                            {Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
     }
 
     // MENU

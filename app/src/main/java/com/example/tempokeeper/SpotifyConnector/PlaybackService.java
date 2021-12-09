@@ -18,7 +18,7 @@ public class PlaybackService {
     private final SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    //
+    // SpotifyAppRemote connects app to the remote player
     public SpotifyAppRemote mSpotifyAppRemote;
     public ConnectionParams connectionParams;
     public Connector.ConnectionListener connectionListener;

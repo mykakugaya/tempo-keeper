@@ -38,7 +38,6 @@
     <string name="btnLoadMap">Load Map</string>
     <string name="btnProfile">View Profile</string>
 
-
     <string name="profile">User Profile</string>
     <string name="signOut">Reload History</string>
     <string name="routeHistory">Run History</string>
@@ -47,6 +46,7 @@
     <string name="menuProfile">My Profile</string>
     <string name="btnBackProfile">Back to Profile</string>
     <string name="menuRoute">Create Route</string>
+
     <string name="CLIENT_ID">f48deef1d46e49a8a445952351b10216</string>
     <string name="REDIRECT_URI">com.example.tempokeeper://callback/</string>
 

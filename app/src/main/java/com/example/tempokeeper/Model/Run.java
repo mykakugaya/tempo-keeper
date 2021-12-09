@@ -16,7 +16,7 @@ public class Run {
     private String avgSpeed;
     private String maxSpeed;
     private ArrayList<LatLng> route;
-    private String imgRoute;
+    private String imgRoute;    // url of bitmap static image
 
     public Run(int index) {
         this.index = index;

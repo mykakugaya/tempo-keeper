@@ -95,8 +95,6 @@ public class ProfileActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         rvHistory.setLayoutManager(layoutManager);
 
-//        runHistory = new ArrayList<>();
-
         // set the user's email and name
         setUserInfo();
 
@@ -175,7 +173,6 @@ public class ProfileActivity extends AppCompatActivity {
                             String x = String.valueOf(i);
                             // get route in string form of "(lat,lng),(lat,lng),(lat,lng)"
                             routeLst[i] = String.valueOf(snapshot.child("Routes").child(x).getValue()).replaceAll("lat/lng: ","").replaceAll("\\[", "").replaceAll("\\]", "");
-//                            curRoute = (ArrayList<LatLng>) snapshot.child("Routes").child(x).getValue();
                             durLst[i] = String.valueOf(snapshot.child("Time").child(x).getValue());
                             dateLst[i] = String.valueOf(snapshot.child("Date").child(x).getValue());
                             distLst[i] = String.valueOf(snapshot.child("Distance").child(x).getValue());
@@ -207,7 +204,6 @@ public class ProfileActivity extends AppCompatActivity {
                             newRun.setRoute(curRoute);
                             newRun.setDistance(distLst[i]);
                             newRun.setAvgSpeed(avgSpdLst[i]);
-//                            newRun.setMaxSpeed();
                             newRun.setImage(imgLst[i]);
 
                             // add this Run to runHistory array

@@ -121,8 +121,6 @@ public class PlaylistActivity extends AppCompatActivity {
         snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
         snackbar.show();
 
-//        Toast.makeText(PlaylistActivity.this, "Click \"Load Playlists\" then select a playlist", Toast.LENGTH_SHORT).show();
-
         // if spotify user not found, disable buttons to prevent crashing
         if(userId.equals("User Not Found")) {
             btnUserPlaylists.setEnabled(false);
@@ -204,7 +202,6 @@ public class PlaylistActivity extends AppCompatActivity {
             Snackbar snackbar = Snackbar.make(rvPlaylists, "Select a playlist then click \"Go to Run\"", Snackbar.LENGTH_SHORT);
             snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
             snackbar.show();
-//            Toast.makeText(PlaylistActivity.this, "Select a playlist then click \"Go to Run\"", Toast.LENGTH_SHORT).show();
         } else {
             Snackbar snackbar = Snackbar.make(rvPlaylists, "No user playlists. Try again.", Snackbar.LENGTH_SHORT);
             snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);

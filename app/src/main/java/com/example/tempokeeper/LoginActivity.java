@@ -96,6 +96,7 @@ public class LoginActivity extends AppCompatActivity {
         // Clicking login will authenticate Spotify and attempt to sign the user in
         // with Firebase auth
         btnlogin.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View v) {
                 email = username.getText().toString();
@@ -104,11 +105,11 @@ public class LoginActivity extends AppCompatActivity {
                 if(!email.equals("")&&!password.equals("")) {
                     // Authorize this app to access your Spotify app information
                     authenticateSpotify();
-//                    signIn(email, pass);
+                } else {
+                    Snackbar snackbar = Snackbar.make(btnlogin, "Please enter an email and password.", Snackbar.LENGTH_SHORT);
+                    snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
+                    snackbar.show();
                 }
-                /**
-                 *                 else say its invalid
-                 */
             }
         });
 
@@ -178,7 +179,6 @@ public class LoginActivity extends AppCompatActivity {
                     Snackbar snackbar = Snackbar.make(btnlogin, "Spotify auth flow returned error.", Snackbar.LENGTH_SHORT);
                     snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
                     snackbar.show();
-//                    Toast.makeText(getApplicationContext(), "Spotify auth flow returned error.", Toast.LENGTH_LONG).show();
                     break;
 
                 // Most likely auth flow was cancelled
@@ -186,7 +186,6 @@ public class LoginActivity extends AppCompatActivity {
                     Snackbar sb = Snackbar.make(btnlogin, "Spotify auth flow cancelled.", Snackbar.LENGTH_SHORT);
                     sb.getView().setBackgroundColor(R.color.colorPrimaryDark);
                     sb.show();
-//                    Toast.makeText(getApplicationContext(), "Spotify auth flow cancelled.", Toast.LENGTH_LONG).show();
                     break;
             }
         }
@@ -208,7 +207,6 @@ public class LoginActivity extends AppCompatActivity {
 
             // Alert user that they are logged in as: userid
             Log.d("OAUTH", "GOT USER INFO");
-//            Toast.makeText(LoginActivity.this, "Spotify User: "+user.id, Toast.LENGTH_SHORT).show();
             signIn(email, pass);
         });
     }
@@ -239,8 +237,6 @@ public class LoginActivity extends AppCompatActivity {
                             Snackbar snackbar = Snackbar.make(btnlogin, "Login Failed: Wrong email or password.", Snackbar.LENGTH_SHORT);
                             snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
                             snackbar.show();
-//                            Toast.makeText(LoginActivity.this, "Login Failed",
-//                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

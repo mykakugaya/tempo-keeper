@@ -79,7 +79,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private String lastDate;
     private String lastDistance;
     private String lastAverageSpd;
-    private String lastMaxSpd;
 
     private final FirebaseDatabase usersDB = FirebaseDatabase.getInstance();
     DatabaseReference dbRef = usersDB.getReference().child("Users");
@@ -93,15 +92,10 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     private ArrayList<LatLng> runningRoute;
     private ArrayList<LatLng> points;
 
-    // Google Maps BitMap
+    // Google Static Maps BitMap
     private byte[] imageInByte;
     private String[] imageArray;
     private String imgEncode;
-
-    /**
-     * NEED BOOLEAN FOR SNAPSHOT
-     */
-//    private boolean snapshot_taken = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +120,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         lastDuration = bundle.getString("runDur","");
         lastDistance = bundle.getString("runDist","");
         lastAverageSpd = bundle.getString("runAvg","");
-//        lastMaxSpd = bundle.getString("runMax","");
 
         // Connect the map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -140,10 +133,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         btnProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if(!snapshot_taken) {
-//                    mMap.snapshot(RunStatsActivity.this);
-//                    snapshot_taken = true;
-//                }
                 Intent profileIntent = new Intent(RunStatsActivity.this, ProfileActivity.class);
                 startActivity(profileIntent);
             }
@@ -156,7 +145,22 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
         txtDuration.setText("Duration: "+lastDuration);
         txtDistance.setText("Distance: "+lastDistance+" miles");
         txtAvgSpeed.setText("Avg. speed: "+lastAverageSpd+" MPH");
-//        txtMaxSpeed.setText("Max. speed: "+lastMaxSpd+" MPH");
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // display route on map
+        displayRoute();
+
+        // set run stats from intent
+        setRunStats();
+        // Disables map gestures to ensure that the proper google static map image is saved
+        mMap.getUiSettings().setAllGesturesEnabled(false);
+
+        btnProfile.setEnabled(true);
     }
 
 
@@ -202,7 +206,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
 
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
-        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+//        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen for other screen sizes
 
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, 300);
 
@@ -222,15 +226,13 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
             distances.add(distance(points.get(i).latitude, points.get(i-1).latitude, points.get(i).longitude, points.get(i-1).longitude));
         }
         maxSpeed = Collections.max(distances);
-        // grade = 100
         minSpeed = Collections.min(distances);
-        // grade = 0
 
         // array list of speed proportions
         // proportion = currentSpeed/maxSpeed
         ArrayList<Double> speedArray = new ArrayList<>();
 
-        // Array list of rgb triplets for color coding
+        // Array list of color ints for color coding
         ArrayList<Integer> colorsArray = new ArrayList<>();
 
         for (int j = 0;j<distances.size();j++){
@@ -250,24 +252,9 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
             }
         }
 
-        // Colors array should now be full of rgb arr values (e.g. {0,255,76})
+        // Colors array should now be full of color ints
         return colorsArray;
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        mMap = googleMap;
-
-        // display route on map
-        displayRoute();
-
-        // set run stats from intent
-        setRunStats();
-//        mMap.getUiSettings().setAllGesturesEnabled(false);
-        btnProfile.setEnabled(true);
-    }
-
 
     //getting distance between two points using lat/long
     //source: https://www.geeksforgeeks.org/program-distance-two-points-earth/
@@ -363,10 +350,6 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-//        if(!snapshot_taken) {
-//            mMap.snapshot(this);
-//            snapshot_taken = true;
-//        }
 
         // go to create route form
         if (id == R.id.menuRoute) {
@@ -402,10 +385,7 @@ public class RunStatsActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     protected void onPause() {
         // save a bitmap snapshot of the rendered map to db
-//        if(!snapshot_taken) {
-            mMap.snapshot(this);
-//            snapshot_taken = true;
-//        }
+        mMap.snapshot(this);
         super.onPause();
     }
 }

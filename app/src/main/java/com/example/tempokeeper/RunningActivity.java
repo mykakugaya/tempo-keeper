@@ -100,8 +100,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private ImageButton btnNext;
     private Button btnStart;
     private Button btnFinish;
-
     private Button btnStats;
+
     private TextView txtRunningDist;
     private TextView txtRunningDur;
 
@@ -183,7 +183,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private String[] dateLst;
     private String[] distLst;
     private String[] avgSpdLst;
-    ArrayList points = null;
 
     // conversion for ms to hours
     private final Double MS_TO_HR = 3600000.0;
@@ -197,7 +196,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private double targetDistance;
     private boolean targetDistReached = false;
 
-    Double totalDistance = 0.0;
+    Double totalDistance = 0.0; // total distance of run, updates on screen
     Double averageSpeed;
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
@@ -290,7 +289,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(1000);
-//        locationRequest.setMaxWaitTime(10000);
         locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -381,87 +379,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         });
     }
 
-    // Activity LifeCycle methods
-    @Override
-    protected void onStart() {
-        Log.i(TAG, "[ACTIVITY] onStart");
-        super.onStart();
-        playbackService.enableRemote(); // PlaybackService
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            startLocationUpdates();
-        } else {
-            // you need to request permissions
-            ActivityCompat.requestPermissions(this, new String[]
-                            {Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-    }
-
-    // Start pedometer service onResume
-    @Override
-    protected void onResume() {
-        Log.i(TAG, "[ACTIVITY] onResume");
-        super.onResume();
-
-        mPedometerSettings = new PedometerSettings(sharedPreferences);
-
-        // Read from preferences if the service was running on the last onPause
-        mIsRunning = mPedometerSettings.isServiceRunning();
-
-        // Start the service if this is considered to be an application start (last onPause was long ago)
-        if (!mIsRunning && mPedometerSettings.isNewStart()) {
-            startStepService();
-            bindStepService();
-        } else if (mIsRunning) {
-            bindStepService();
-        }
-
-        mPedometerSettings.clearServiceRunning();
-    }
-
-    // Stop pedometer service onPause
-    @Override
-    protected void onPause() {
-        Log.i(TAG, "[ACTIVITY] onPause");
-        if (mIsRunning) {
-            // disable step service
-            unbindStepService();
-//            stopStepService();
-        }
-        if (mQuitting) {
-            mPedometerSettings.saveServiceRunningWithNullTimestamp(mIsRunning);
-        }
-        else {
-            mPedometerSettings.saveServiceRunningWithTimestamp(mIsRunning);
-        }
-
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        Log.i(TAG, "[ACTIVITY] onStop");
-        // disable spotify threads
-        trackInfoHandler.removeCallbacksAndMessages(null);
-        progressHandler.removeCallbacksAndMessages(null);
-        // disable remote player
-        playbackService.disableRemote();
-        // stop updating location
-        stopLocationUpdates();
-        super.onStop();
-    }
-
-    protected void onDestroy() {
-        Log.i(TAG, "[ACTIVITY] onDestroy");
-        super.onDestroy();
-    }
-    
-    protected void onRestart() {
-        Log.i(TAG, "[ACTIVITY] onRestart");
-        super.onRestart();
-    }
-
-    // GOOGLE MAPS METHODS FIRST
+    /** GOOGLE MAPS METHODS FIRST */
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -523,6 +441,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
     };
 
+
     @SuppressLint("ResourceAsColor")
     private void setUserLocation(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -539,7 +458,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                     Snackbar snackbar = Snackbar.make(btnPause, "Your target distance of " + targetDistance + " miles has been reached.", Snackbar.LENGTH_SHORT);
                     snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
                     snackbar.show();
-//                    Toast.makeText(getApplicationContext(), "The desired distance has been reached.", Toast.LENGTH_LONG).show();
                     targetDistReached = true;
                 }
             }
@@ -555,6 +473,50 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
+    //getting distance between two points using lat/long
+    //source: https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    public static double distance(double lat1,
+                                  double lat2, double lon1,
+                                  double lon2)
+    {
+
+        // The math module contains a function
+        // named toRadians which converts from
+        // degrees to radians.
+        lon1 = Math.toRadians(lon1);
+        lon2 = Math.toRadians(lon2);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        // Haversine formula
+        double dlon = lon2 - lon1;
+        double dlat = lat2 - lat1;
+        double a = Math.pow(Math.sin(dlat / 2), 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.pow(Math.sin(dlon / 2),2);
+
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        // Radius of earth in kilometers. Use 3956
+        //use 6371 for kilmeters
+        // for miles
+        double r = 3956;
+
+        // calculate the result
+        return(c * r);
+    }
+
+    //for rounding a double to the second decimal point
+    //source: https://stackoverflow.com/questions/2808535/round-a-double-to-2-decimal-places
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -566,6 +528,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
+    // FIREBASE
     // add the completed route to firebase once the Finish Run button is clicked
     public void saveRouteToDb(){
         DatabaseReference myRef = dbRef.child(firebaseUser);
@@ -580,7 +543,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         String[] dateArray = new String[Integer.valueOf(temp) + 1];
                         String[] distanceArray = new String[Integer.valueOf(temp) + 1];
                         String[] avgSpeedArray = new String[Integer.valueOf(temp) + 1];
-                        String[] maxSpeedArray = new String[Integer.valueOf(temp) + 1];
 
                         routeLst = routesArray;
                         timeLst = durationArray;
@@ -596,7 +558,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                             dateLst[i] = String.valueOf(snapshot.child("Date").child(x).getValue());
                             distLst[i] = String.valueOf(snapshot.child("Distance").child(x).getValue());
                             avgSpdLst[i] = String.valueOf(snapshot.child("Average").child(x).getValue());
-//                            maxSpdLst[i] = String.valueOf(snapshot.child("Maximum").child(x).getValue());
 
                         }
                         Log.d("Running Route",""+runningRoute.size());
@@ -642,8 +603,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         });
     }
 
-
-    // PEDOMETER METHODS
+    /** PEDOMETER METHODS */
 
     // Service Connection for the StepService
     // mConnection is used to bind the service to this context
@@ -694,8 +654,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
     // Reset steps and pace values on screen to 0
     private void resetValues() {
-//        mStepValueView.setText("Steps: 0");
-//        mPaceValueView.setText("Pace (steps/min): 0");
         editor = sharedPreferences.edit();
         editor.putInt("steps", 0);
         editor.putInt("pace", 0);
@@ -773,7 +731,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 // with a tempo similar to the newly acquired average pace
                 dynamicTrackSelection(averagePace);
                 lastSignificantAverage = averagePace;
-//                lastPaceAverage = averagePace;
             }
 
             // set the average pace to last average pace, set index back to 0 (we will only
@@ -784,7 +741,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
 
-    // SPOTIFY METHODS NEXT
+    /** SPOTIFY METHODS NEXT */
 
     // Start Spotify dynamic queueing by getting selected playlist tracks and starting the Spotify threads
     private void startSpotify() {
@@ -1021,24 +978,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View view) {
                 // Get another track with the lastPaceAverage using dynamic track selection
                 dynamicTrackSelection(lastPaceAverage);
-
-                // getPlayingTrack saves playing track name in sharedPref "curTrack"
-//                playbackService.getPlayingTrack();
-
-//                String trackName = sharedPreferences.getString("curTrack","");
-//                double trackTempo = 0;
-//                // Loop through the available tracks and find the current track by name
-//                // Then, get the track's tempo for the toast
-//                // Toast notifying the user of track and tempo change
-//                for (int i=0; i<playlistTracks.size(); i++) {
-//                    if(playlistTracks.get(i).getName().equals(trackName)) {
-//                        trackTempo = playlistTracks.get(i).getTempo();
-//                        break;
-//                    }
-//                }
-//                Snackbar snackbar = Snackbar.make(sbTrackProgress, "Track changed to: "+trackName+" ("+trackTempo+" bpm)", Snackbar.LENGTH_SHORT);
-//                snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
-//                snackbar.show();
             }
         });
     }
@@ -1082,47 +1021,83 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         runHandler.postDelayed(r, 1000);
     }
 
-    //getting distance between two points using lat/long
-    //source: https://www.geeksforgeeks.org/program-distance-two-points-earth/
-    public static double distance(double lat1,
-                                  double lat2, double lon1,
-                                  double lon2)
-    {
-
-        // The math module contains a function
-        // named toRadians which converts from
-        // degrees to radians.
-        lon1 = Math.toRadians(lon1);
-        lon2 = Math.toRadians(lon2);
-        lat1 = Math.toRadians(lat1);
-        lat2 = Math.toRadians(lat2);
-
-        // Haversine formula
-        double dlon = lon2 - lon1;
-        double dlat = lat2 - lat1;
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.pow(Math.sin(dlon / 2),2);
-
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        // Radius of earth in kilometers. Use 3956
-        //use 6371 for kilmeters
-        // for miles
-        double r = 3956;
-
-        // calculate the result
-        return(c * r);
+    /** Activity LifeCycle methods */
+    @Override
+    protected void onStart() {
+        Log.i(TAG, "[ACTIVITY] onStart");
+        super.onStart();
+        playbackService.enableRemote(); // PlaybackService
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates();
+        } else {
+            // you need to request permissions
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
     }
 
-    //for rounding a double to the second decimal point
-    //source: https://stackoverflow.com/questions/2808535/round-a-double-to-2-decimal-places
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
+    // Start pedometer service onResume
+    @Override
+    protected void onResume() {
+        Log.i(TAG, "[ACTIVITY] onResume");
+        super.onResume();
 
-        long factor = (long) Math.pow(10, places);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
+        mPedometerSettings = new PedometerSettings(sharedPreferences);
+
+        // Read from preferences if the service was running on the last onPause
+        mIsRunning = mPedometerSettings.isServiceRunning();
+
+        // Start the service if this is considered to be an application start (last onPause was long ago)
+        if (!mIsRunning && mPedometerSettings.isNewStart()) {
+            startStepService();
+            bindStepService();
+        } else if (mIsRunning) {
+            bindStepService();
+        }
+
+        mPedometerSettings.clearServiceRunning();
+    }
+
+    // Stop pedometer service onPause
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "[ACTIVITY] onPause");
+        if (mIsRunning) {
+            // disable step service
+            unbindStepService();
+//            stopStepService();
+        }
+        if (mQuitting) {
+            mPedometerSettings.saveServiceRunningWithNullTimestamp(mIsRunning);
+        }
+        else {
+            mPedometerSettings.saveServiceRunningWithTimestamp(mIsRunning);
+        }
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i(TAG, "[ACTIVITY] onStop");
+        // disable spotify threads
+        trackInfoHandler.removeCallbacksAndMessages(null);
+        progressHandler.removeCallbacksAndMessages(null);
+        // disable remote player
+        playbackService.disableRemote();
+        // stop updating location
+        stopLocationUpdates();
+        super.onStop();
+    }
+
+    protected void onDestroy() {
+        Log.i(TAG, "[ACTIVITY] onDestroy");
+        super.onDestroy();
+    }
+
+    protected void onRestart() {
+        Log.i(TAG, "[ACTIVITY] onRestart");
+        super.onRestart();
     }
 }

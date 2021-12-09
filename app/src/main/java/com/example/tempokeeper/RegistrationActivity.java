@@ -101,8 +101,6 @@ public class RegistrationActivity extends AppCompatActivity {
                                         Snackbar snackbar = Snackbar.make(btnRegister, "Failed to register", Snackbar.LENGTH_SHORT);
                                         snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
                                         snackbar.show();
-//                                        Toast.makeText(RegistrationActivity.this, "Failed to register", Toast.LENGTH_SHORT).show();
-
                                     }
                                 }
                             });
@@ -110,7 +108,6 @@ public class RegistrationActivity extends AppCompatActivity {
                             Snackbar snackbar = Snackbar.make(btnRegister, "Failed to register", Snackbar.LENGTH_SHORT);
                             snackbar.getView().setBackgroundColor(R.color.colorPrimaryDark);
                             snackbar.show();
-//                            Toast.makeText(RegistrationActivity.this, "Failed to register", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

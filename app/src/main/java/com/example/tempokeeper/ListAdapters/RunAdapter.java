@@ -133,8 +133,7 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.ViewHolder> {
         holder.txtAvgSpeed.setText("Avg. Speed: "+pastRuns.get(position).getAvgSpeed()+" MPH");
 
         if (holder.run.getImage() != null) {
-            /* Bitmap image is a screenshot of the map produced by the run
-             */
+            /* Bitmap image is a screenshot of the map produced by the run */
             String strBitmap = pastRuns.get(position).getImage();
             byte[] decode = Base64.getDecoder().decode(strBitmap);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decode,0,decode.length);

@@ -39,20 +39,10 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class RouteFormActivity extends AppCompatActivity {
     private EditText edtDestination;
-    private RadioGroup radioGroup;
-    private Button btnCalculate;
-
     private EditText edtDistance;
-
-    /**
-     * Elevation Strategy:
-     * 1. get an array of route arrays of latlngs from the JSONParser
-     * 2. traverse each route, find the elevation of each latlng, and add the elevation to an array
-     * 3. get the difference in elevation for the whole route and compare it with the other routes
-     * 4. highlight the one with the greatest or smallest difference depending on user preference
-     */
-
+    private RadioGroup radioGroup;
     private RadioButton rbtnElevation;
+    private Button btnCalculate;
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
 

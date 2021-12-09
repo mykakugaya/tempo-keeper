@@ -9,9 +9,6 @@ public enum EndPoints {
     START_PLAYBACK("https://api.spotify.com/v1/me/player/play"),
     PAUSE_PLAYBACK("https://api.spotify.com/v1/me/player/pause"),
     NEXT_TRACK("https://api.spotify.com/v1/me/player/next"),
-
-//    RECENTLY_PLAYED("https://api.spotify.com/v1/me/player/recently-played"),
-//    USER_TRACKS("https://api.spotify.com/v1/me/tracks"),
     ;
 
     private final String endpoint;

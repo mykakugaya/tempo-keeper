@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCallback,  GoogleMap.OnPolylineClickListener,
-        GoogleMap.OnPolygonClickListener, GoogleMap.OnInfoWindowClickListener{
+        GoogleMap.OnInfoWindowClickListener{
 
     private TextView txtDate;
     private TextView txtDist;
@@ -50,15 +50,11 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
     private String duration;
     private String distance;
     private String avgSpd;
-    private String maxSpd;
 
+    // GOOGLE MAPS
     private GoogleMap mMap;
     private PolylineOptions lineOptions;    // send this to RunningActivity
-    private ArrayList<Polyline> routesArray;
-    private ArrayList<PolylineOptions> polylineOptArray;
     private ArrayList<LatLng> runningRoute;
-    private Run pastRun;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +69,13 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
         btnBack = (Button) findViewById(R.id.btnBackProfile);
         btnRerun = (Button) findViewById(R.id.btnRerun);
 
-
+        // Initialize map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapPastRoute);
         mapFragment.getMapAsync(PastRoutePreview.this);
 
+        // Get the run statistics from the last running activity
         Bundle bundle = getIntent().getExtras();
-
         runningRoute = bundle.getParcelableArrayList("pastRoute");
 
         date = bundle.getString("pastDate");
@@ -93,9 +89,6 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
 
         avgSpd = bundle.getString("pastAvgSpd");
         txtAvgSpd.setText("Avg. Speed: "+avgSpd+" MPH");
-
-//        maxSpd = bundle.getString("pastMaxSpd");
-//        txtMaxSpd.setText("Max. Speed: "+maxSpd+" MPH");
 
         btnRerun.setEnabled(false);
 
@@ -133,24 +126,24 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void displayRoute(ArrayList<LatLng> runningRoute) {
         lineOptions = null;
-//        routesArray = new ArrayList<Polyline>();
-//        polylineOptArray = new ArrayList<PolylineOptions>();
-
         lineOptions = new PolylineOptions();
 
-        // color code the polyline based on running speed
-        ArrayList<int[]> colorArr = setRouteColors();
+        // Commented out code is for future functionality to color-code the past route preview route
 
-        for (int i=0; i+1<runningRoute.size(); i++) {
-            // Get each consecutive pair of runningRoute, set color for line connecting them
-            int[] rgbColor = colorArr.get(i);
-            int r = rgbColor[0];
-            int g = rgbColor[1];
-            int b = rgbColor[2];
-            Color curColor = Color.valueOf(r,g,b);
-            lineOptions.add(runningRoute.get(i)).add(runningRoute.get(i+1)).color(Color.BLUE).width(12);
-            mMap.addPolyline(lineOptions);
-        }
+        // color code the polyline based on running speed
+//        ArrayList<int[]> colorArr = setRouteColors();
+
+//        for (int i=0; i+1<runningRoute.size(); i++) {
+//            // Get each consecutive pair of runningRoute, set blue color for line connecting them
+//            lineOptions.add(runningRoute.get(i)).add(runningRoute.get(i+1)).color(Color.BLUE).width(12);
+//            mMap.addPolyline(lineOptions);
+//        }
+
+        // creates the polyline from the saved array of <lat,lng>
+        lineOptions.addAll(runningRoute);
+        lineOptions.color(Color.BLUE).width(12);
+        mMap.addPolyline(lineOptions);
+
         //marker for origin point
         MarkerOptions originMarker = new MarkerOptions();
         originMarker.position(runningRoute.get(0));
@@ -166,6 +159,7 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
         endMarker.title("This is your end point");
         mMap.addMarker(endMarker);
 
+        // Sets camera to zoom into the starting and end point
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(originMarker.getPosition());
         builder.include(endMarker.getPosition());
@@ -173,7 +167,7 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
 
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
-        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+//        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
 
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, 300);
 
@@ -191,9 +185,7 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
                     Math.abs(runningRoute.get(i).longitude) - Math.abs(runningRoute.get(i-1).longitude));
         }
         maxSpeed = Collections.max(distances);
-        // grade = 100
         minSpeed = Collections.min(distances);
-        // grade = 0
 
         // array list of speed proportions
         // proportion = currentSpeed/maxSpeed
@@ -238,18 +230,11 @@ public class PastRoutePreview extends AppCompatActivity implements OnMapReadyCal
 
     }
 
-    @Override
-    public void onPolygonClick(@NonNull Polygon polygon) {
-
-    }
-
+    // For future functionality
     @Override
     public void onPolylineClick(@NonNull Polyline polyline) {
 
     }
-
-
-
 
     // MENU
     @Override

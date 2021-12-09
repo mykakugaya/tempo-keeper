@@ -13,7 +13,8 @@ motivating them to improve and excel in their running, whether it is a leisure o
 
 ## Spotify API
 In order to enable the music features of this app, you must have a Spotify account (free or premium) 
-and your SHA-1 key must be registered in the app on the Spotify Dashboard (https://developer.spotify.com/dashboard/applications).
+and the Spotify app must be downloaded on the device.
+The user's SHA-1 key must also be registered in the app on the Spotify Dashboard (https://developer.spotify.com/dashboard/applications).
 
 For grading purposes, we have already added the grader's SHA-1 key so the app's Spotify features 
 should already be functional.
@@ -101,9 +102,16 @@ the most recently added route image (topmost image) in the route history list wi
 This is the purpose of the Reload History button, where it will refresh the run history to properly display
 any images that were not generated on time.
 
+## Bonuses
+- Proper request of device permissions for 5.1 and above
+- Use of RecyclerView or CardView
+- Good use of Menus
+- Using Gestures and Accelerometer
+
 ## References
 - Spotify API
   - https://developer.spotify.com/documentation/android/quick-start/
+  - https://spotify.github.io/android-sdk/app-remote-lib/docs/com/spotify/android/appremote/api/PlayerApi.html
   - https://towardsdatascience.com/using-the-spotify-api-with-your-android-application-the-essentials-1a3c1bc36b9e
     
 - Pedometer
@@ -111,12 +119,18 @@ any images that were not generated on time.
 
 - Google Directions API
   - https://developers.google.com/maps/documentation/directions/overview
-    
+  - https://github.com/mitchtabian/Google-Maps-2018.git
+  - https://github.com/trulymittal/LocationTutorial.git
+  - https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
+
 - Google Elevation API
   - https://developers.google.com/maps/documentation/elevation/overview
     
-- Color Coding Routes
+- Color Coding Routes + Distance
   - https://www.geeksforgeeks.org/program-distance-two-points-earth/
     
-## Questions
-If you have any questions about this repo, please contact Myka Kugaya at mykakug129@gmail.com.
+## Contact Team Members
+Elliot Cho echochs@bu.edu
+Edward Choe edchoe00@bu.edu
+Mark Nam marknam@bu.edu
+Myka Kugaya mkugaya@bu.edu
