@@ -45,8 +45,8 @@
         android:textColor="@color/text"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/txtRunDuration"
-        app:layout_constraintEnd_toStartOf="@+id/txtRunDate"
-        app:layout_constraintStart_toStartOf="@+id/txtRunDate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtRunDate" />
 
     <TextView
@@ -58,8 +58,8 @@
         android:textColor="@color/text"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/txtAvgSpeed"
-        app:layout_constraintEnd_toStartOf="@+id/txtDist"
-        app:layout_constraintStart_toStartOf="@+id/txtDist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtDist" />
 
     <TextView
@@ -71,8 +71,8 @@
         android:textColor="@color/text"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/btnProfile"
-        app:layout_constraintEnd_toStartOf="@+id/txtRunDuration"
-        app:layout_constraintStart_toStartOf="@+id/txtRunDuration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtRunDuration" />
 
     <Button
@@ -86,8 +86,8 @@
         android:padding="5dp"
         android:text="@string/btnProfile"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/txtAvgSpeed"
-        app:layout_constraintStart_toStartOf="@+id/txtAvgSpeed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtAvgSpeed" />
 
     <TextView

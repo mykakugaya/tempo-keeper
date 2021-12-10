@@ -42,8 +42,8 @@
         android:textColor="@color/text"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/txtPastDur"
-        app:layout_constraintEnd_toStartOf="@+id/txtPastDate"
-        app:layout_constraintStart_toStartOf="@+id/txtPastDate" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/txtPastDur"
@@ -54,8 +54,8 @@
         android:textColor="@color/text"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/txtPastAvgSpd"
-        app:layout_constraintEnd_toStartOf="@+id/txtPastDist"
-        app:layout_constraintStart_toStartOf="@+id/txtPastDist" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/txtPastAvgSpd"
@@ -66,8 +66,8 @@
         android:textColor="@color/text"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/btnRerun"
-        app:layout_constraintEnd_toStartOf="@+id/txtPastDur"
-        app:layout_constraintStart_toStartOf="@+id/txtPastDur" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/txtPastDate"

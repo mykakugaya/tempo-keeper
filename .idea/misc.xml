@@ -3,9 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/mykak/cs501/tempokeeper/app/src/main/res/layout/activity_past_preview.xml" value="0.25885416666666666" />
+        <entry key="..\:/Users/mykak/cs501/tempokeeper/app/src/main/res/layout/activity_past_preview.xml" value="0.375" />
         <entry key="..\:/Users/mykak/cs501/tempokeeper/app/src/main/res/layout/activity_running.xml" value="0.321875" />
-        <entry key="..\:/Users/mykak/cs501/tempokeeper/app/src/main/res/layout/activity_runstats.xml" value="0.25" />
+        <entry key="..\:/Users/mykak/cs501/tempokeeper/app/src/main/res/layout/activity_runstats.xml" value="0.5" />
         <entry key="..\:/Users/mykak/cs501/tempokeeper/app/src/main/res/layout/adapter_run.xml" value="0.32447916666666665" />
       </map>
     </option>
