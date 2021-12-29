@@ -131,6 +131,7 @@ any images that were not generated on time.
     
 ## Contact Team Members
 Elliot Cho echochs@bu.edu
+          conductorelliot@gmail.com
 
 Edward Choe edchoe00@bu.edu
 
